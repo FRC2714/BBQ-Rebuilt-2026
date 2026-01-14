@@ -43,7 +43,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
-  private final Canandgyro m_gyro = new Canandgyro(17);
+  private final Canandgyro m_gyro = new Canandgyro(0);
 
 
   // Odometry class for tracking robot pose

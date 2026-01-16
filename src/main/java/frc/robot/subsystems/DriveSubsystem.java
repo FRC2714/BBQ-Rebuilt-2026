@@ -67,6 +67,8 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+
+    SmartDashboard.putData("Field", m_field2d);
   }
 
   @Override
@@ -82,7 +84,6 @@ public class DriveSubsystem extends SubsystemBase {
         });
 
     m_field2d.setRobotPose(m_odometry.getPoseMeters());
-    SmartDashboard.putData("Field", m_field2d);
     SmartDashboard.putNumber("heading", getHeading());
   }
 

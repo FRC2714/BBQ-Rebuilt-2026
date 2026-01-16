@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
@@ -48,6 +49,8 @@ public class DriveSubsystem extends SubsystemBase {
   // The gyro sensor
   private final Canandgyro m_gyro = new Canandgyro(0);
 
+  private final Field2d m_field2d = new Field2d();
+
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry =
       new SwerveDriveOdometry(
@@ -78,6 +81,8 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
         });
 
+    m_field2d.setRobotPose(m_odometry.getPoseMeters());
+    SmartDashboard.putData("Field", m_field2d);
     SmartDashboard.putNumber("heading", getHeading());
   }
 

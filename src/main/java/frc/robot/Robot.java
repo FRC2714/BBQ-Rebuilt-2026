@@ -35,6 +35,9 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
 
     CanandEventLoop.getInstance();
+
+    LimelightHelpers.SetIMUMode("limelight-front", 1);
+    LimelightHelpers.SetIMUMode("limelight-back", 1);
   }
 
   /**
@@ -53,18 +56,35 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     double omegaRps = Units.degreesToRotations(m_robotContainer.m_robotDrive.getTurnRate());
-    var frontLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
-    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-back");
+    var frontLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
+    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-back");
 
     if (backLLMeasurement != null
         && backLLMeasurement.tagCount > 0
         && Math.abs(omegaRps) < 2.0
         && backLLMeasurement.rawFiducials[0].ambiguity
             <= frontLLMeasurement.rawFiducials[0].ambiguity) {
+      LimelightHelpers.SetRobotOrientation(
+          "limelight-back",
+          m_robotContainer.m_robotDrive.getHeading(),
+          m_robotContainer.m_robotDrive.getTurnRate(),
+          0,
+          0,
+          0,
+          0);
       m_robotContainer.m_robotDrive.resetOdometry(backLLMeasurement.pose);
     } else if (frontLLMeasurement != null
         && frontLLMeasurement.tagCount > 0
         && Math.abs(omegaRps) < 2.0) {
+      LimelightHelpers.SetRobotOrientation(
+          "limelight-front",
+          m_robotContainer.m_robotDrive.getHeading(),
+          m_robotContainer.m_robotDrive.getTurnRate(),
+          0,
+          0,
+          0,
+          0);
       m_robotContainer.m_robotDrive.resetOdometry(frontLLMeasurement.pose);
     }
 
@@ -81,7 +101,9 @@ public class Robot extends TimedRobot {
                   ((frontLLMeasurement.pose.getRotation()).getDegrees()
                           + backLLMeasurement.pose.getRotation().getDegrees())
                       / 2)));
-
+      // LimelightHelpers.SetRobotOrientation("limelight-back",
+      // m_robotContainer.m_robotDrive.getHeading(), m_robotContainer.m_robotDrive.getTurnRate(), 0,
+      // 0, 0, 0);
       // m_robotContainer.m_robotDrive.resetOdometry(avgPose);
     }
   }
@@ -124,6 +146,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    LimelightHelpers.SetIMUMode("limelight-front", 2);
+    LimelightHelpers.SetIMUMode("limelight-back", 2);
   }
 
   /** This function is called periodically during operator control. */

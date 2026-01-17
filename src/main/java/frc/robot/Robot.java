@@ -34,22 +34,10 @@ public class Robot extends TimedRobot {
     CanandEventLoop.getInstance();
 
     LimelightHelpers.SetRobotOrientation(
-        "limelight-back",
-        m_robotContainer.m_robotDrive.getHeading(),
-        0,
-        0,
-        0,
-        0,
-        0);
+        "limelight-back", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
 
     LimelightHelpers.SetRobotOrientation(
-        "limelight-front",
-        m_robotContainer.m_robotDrive.getHeading(),
-        0,
-        0,
-        0,
-        0,
-        0);
+        "limelight-front", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
     LimelightHelpers.SetIMUMode("limelight-front", 1);
     LimelightHelpers.SetIMUMode("limelight-back", 1);
   }

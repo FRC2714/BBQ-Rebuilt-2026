@@ -81,11 +81,9 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     // Update the odometry in the periodic block
 
-    LimelightHelpers.SetRobotOrientation("limelight-back", getHeading(), 0, 0, 0, 0,
-    0);
+    LimelightHelpers.SetRobotOrientation("limelight-back", getHeading(), 0, 0, 0, 0, 0);
 
-    LimelightHelpers.SetRobotOrientation(
-        "limelight-front", getHeading(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-front", getHeading(), 0, 0, 0, 0, 0);
 
     double omegaRps = Units.degreesToRotations(getTurnRate());
     var frontLLMeasurement =

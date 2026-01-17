@@ -36,7 +36,6 @@ public class Robot extends TimedRobot {
     CanandEventLoop.getInstance();
 
     LimelightHelpers.SetIMUMode("limelight-front", 1);
-
   }
 
   /**
@@ -54,13 +53,13 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-        double omegaRps = Units.degreesToRotations(m_robotContainer.m_robotDrive.getTurnRate());
+    double omegaRps = Units.degreesToRotations(m_robotContainer.m_robotDrive.getTurnRate());
     var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
 
     if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
       m_robotContainer.m_robotDrive.resetOdometry(llMeasurement.pose);
     }
-    SmartDashboard.putNumber("tx", LimelightHelpers.getTX("limelight-front"));  
+    SmartDashboard.putNumber("tx", LimelightHelpers.getTX("limelight-front"));
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -101,8 +100,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-        LimelightHelpers.SetIMUMode("limelight-front", 2);
-
+    LimelightHelpers.SetIMUMode("limelight-front", 2);
   }
 
   /** This function is called periodically during operator control. */

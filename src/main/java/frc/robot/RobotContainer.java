@@ -79,10 +79,10 @@ public class RobotContainer {
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
 
-    m_driverController.a().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(270)));
-    m_driverController.x().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(180)));
-    m_driverController.y().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(90)));
-    m_driverController.b().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(0)));
+    m_driverController.y().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(180)));
+    m_driverController.b().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(90)));
+    m_driverController.a().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(0)));
+    m_driverController.x().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(270)));
   }
 
   /**

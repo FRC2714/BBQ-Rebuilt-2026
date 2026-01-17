@@ -81,6 +81,7 @@ public final class Constants {
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final double kDriveDeadband = 0.05;
+    public static final double kTriggerButtonThreshold = 0.2;
   }
 
   public static final class AutoConstants {
@@ -108,5 +109,18 @@ public final class Constants {
         VecBuilder.fill(0.15, 0.15, 0.00001); // TODO
     public static final Matrix<N3, N1> m_visionStdDevs =
         VecBuilder.fill(0.00001, 0.00001, 999999); // TODO
+  }
+
+  public static final class TurretConstants {
+    // CHANGE EVERYTHING
+    public static final int kTurretShooterCanId = 5;
+    public static final double kPivotReduction = 1;
+    public static final double kP = 0.06;
+    public static final double kG = 0.2;
+
+    public static final class PivotSetpoints {
+      // Zero offset in Hardware Client is 10
+      public static final double kStow = 15.2;
+    }
   }
 }

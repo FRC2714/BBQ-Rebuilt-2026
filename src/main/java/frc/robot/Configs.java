@@ -5,6 +5,7 @@ import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.TurretConstants;
 
 public final class Configs {
   public static final class MAXSwerveModule {
@@ -57,6 +58,37 @@ public final class Configs {
           // longer route.
           .positionWrappingEnabled(true)
           .positionWrappingInputRange(0, turningFactor);
+    }
+  }
+
+  public static final class Flywheel {
+    public static final SparkFlexConfig pivotConfig = new SparkFlexConfig();
+
+    static {
+      pivotConfig
+          .smartCurrentLimit(40)
+          .idleMode(IdleMode.kBrake)
+          .inverted(false) // POSSIBLY CHANGED
+          .voltageCompensation(12);
+      pivotConfig
+          .absoluteEncoder
+          .positionConversionFactor(360 / TurretConstants.kPivotReduction)
+          .inverted(false) // POSSIBLE CHANGED
+          .zeroCentered(false); // POSSIBLE CHANGED
+      pivotConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+          // Set PID values for position control. We don't need to pass a
+          // loop slot, as it will default to slow 0.
+          .p(Constants.TurretConstants.kP)
+          .d(0)
+          .outputRange(-1, 0)
+          .positionWrappingEnabled(true)
+          .positionWrappingInputRange(0, 360)
+          .maxMotion
+          .cruiseVelocity(4200 * 360)
+          .maxAcceleration(6000 * 360)
+          .allowedProfileError(0.5);
     }
   }
 }

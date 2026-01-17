@@ -21,13 +21,13 @@ public class Limelight extends SubsystemBase {
 
   //need way to find the best pipeline to swithc to when align
  public void setPipeline(){
-    LimelightHelpers.setPipelineIndex(m_limelightName, 0);
+    LimelightHelpers.setPipelineIndex("limelight-turret", 0);
     double bestID1 = bestTarget();
 
-    LimelightHelpers.setPipelineIndex(m_limelightName, 1);
+    LimelightHelpers.setPipelineIndex("limelight-turret", 1);
     double bestID2 = bestTarget();
 
-    LimelightHelpers.setPipelineIndex(m_limelightName, 2);
+    LimelightHelpers.setPipelineIndex("limelight-turret", 2);
     double bestID3 = bestTarget();
 
     if(bestID1 >= bestID2 && bestID1 >= bestID3){
@@ -53,6 +53,6 @@ public class Limelight extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("bets tag", getTargetID());
+    SmartDashboard.putNumber("pipeline", LimelightHelpers.getCurrentPipelineIndex("limelight-turret"));
   }
 }

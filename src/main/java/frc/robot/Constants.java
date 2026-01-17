@@ -100,7 +100,7 @@ public final class Constants {
   }
 
   public static final class NeoMotorConstants {
-    public static final double kFreeSpeedRpm = 5676;
+    public static final double kFreeSpeedRpm = 6780;
   }
 
   public static final class LimelightConstants {

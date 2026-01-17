@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,10 +21,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.utils.LimelightHelpers;
 import java.util.List;
 
 /*
@@ -73,6 +76,25 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, XboxController.Button.kStart.value)
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
+
+    new Trigger(m_driverController::getLeftBumper)
+        .whileTrue(
+            new RunCommand(
+                () ->
+                    m_robotDrive.drive(
+                        -m_driverController.getLeftY(),
+                        -m_driverController.getLeftX(),
+                        LimelightHelpers.getTX("limelight-front") * -0.02,
+                        false),
+                m_robotDrive));
+
+    new Trigger(m_driverController::getRightBumper)
+        .whileTrue(
+            m_robotDrive.alignDrive(
+                m_driverController,
+                () ->
+                    new Pose2d(
+                        Units.Inches.of(468.56), Units.Inches.of(158.32), new Rotation2d())));
   }
 
   /**

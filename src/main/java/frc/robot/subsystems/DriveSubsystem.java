@@ -8,6 +8,8 @@ import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,12 +18,17 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.utils.LimelightHelpers;
+import java.util.function.Supplier;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -129,6 +136,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putNumber("heading", getHeading());
     SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX());
+    SmartDashboard.putNumber("OdometryY", m_poseEstimator.getEstimatedPosition().getY());
   }
 
   /**
@@ -230,6 +238,44 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getHeading() {
     return m_gyro.getYaw() >= 0 ? m_gyro.getYaw() * 360 : Math.abs((m_gyro.getYaw() * 360) + 360);
+  }
+
+  public Command alignDrive(XboxController controller, Supplier<Pose2d> targetPoseSupplier) {
+    PIDController turnController = new PIDController(.1, 0.0, 0.0);
+    turnController.enableContinuousInput(-Math.PI, Math.PI);
+
+    return Commands.run(
+        () -> {
+          double controllerVelX = -controller.getLeftY();
+          double controllerVelY = -controller.getLeftX();
+          Pose2d drivePose = getPose(); // MaxSwerve: getPose() instead of getState().Pose
+          Pose2d targetPose = targetPoseSupplier.get();
+
+          Rotation2d desiredAngle =
+              drivePose.relativeTo(targetPose).getTranslation().getAngle().plus(Rotation2d.k180deg);
+
+          Rotation2d currentAngle = drivePose.getRotation();
+          Rotation2d deltaAngle = currentAngle.minus(desiredAngle);
+          double wrappedAngleDeg = MathUtil.inputModulus(deltaAngle.getDegrees(), -180.0, 180.0);
+
+          if ((Math.abs(wrappedAngleDeg) < 1) && Math.hypot(controllerVelX, controllerVelY) < .1) {
+            // MaxSwerve: Lock wheels in X formation
+            setX(); // Stop
+            // Or: setX(); if you have that method
+          } else {
+            double rotationalRate =
+                turnController.calculate(currentAngle.getRadians(), desiredAngle.getRadians());
+
+            // MaxSwerve: Call drive() method directly
+            drive(
+                controllerVelX * Constants.DriveConstants.kMaxSpeedMetersPerSecond,
+                controllerVelY * Constants.DriveConstants.kMaxSpeedMetersPerSecond,
+                rotationalRate * Constants.DriveConstants.kMaxAngularSpeed,
+                true // field-relative
+                );
+          }
+        },
+        this); // 'this' = drivetrain subsystem for requirements
   }
 
   /**

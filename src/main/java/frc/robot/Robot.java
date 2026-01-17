@@ -5,9 +5,7 @@
 package frc.robot;
 
 import com.reduxrobotics.canand.CanandEventLoop;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.utils.LimelightHelpers;
@@ -35,7 +33,13 @@ public class Robot extends TimedRobot {
 
     CanandEventLoop.getInstance();
 
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-back", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-front", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
     LimelightHelpers.SetIMUMode("limelight-front", 1);
+    LimelightHelpers.SetIMUMode("limelight-back", 1);
   }
 
   /**
@@ -52,14 +56,6 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-
-    double omegaRps = Units.degreesToRotations(m_robotContainer.m_robotDrive.getTurnRate());
-    var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
-
-    if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
-      m_robotContainer.m_robotDrive.resetOdometry(llMeasurement.pose);
-    }
-    SmartDashboard.putNumber("tx", LimelightHelpers.getTX("limelight-front"));
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -101,6 +97,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     LimelightHelpers.SetIMUMode("limelight-front", 2);
+    LimelightHelpers.SetIMUMode("limelight-back", 2);
   }
 
   /** This function is called periodically during operator control. */

@@ -75,8 +75,14 @@ public class RobotContainer {
     new JoystickButton(m_driverController.getHID(), Button.kR1.value)
         .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
 
-    new JoystickButton(m_driverController.getHID(), XboxController.Button.kStart.value)
+    m_driverController
+        .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
+
+    m_driverController.a().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(270)));
+    m_driverController.x().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(180)));
+    m_driverController.y().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(90)));
+    m_driverController.b().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(0)));
   }
 
   /**

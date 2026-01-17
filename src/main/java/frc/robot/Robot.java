@@ -35,6 +35,7 @@ public class Robot extends TimedRobot {
 
     CanandEventLoop.getInstance();
 
+    LimelightHelpers.SetIMUMode("limelight-front", 1);
 
   }
 
@@ -54,7 +55,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
         double omegaRps = Units.degreesToRotations(m_robotContainer.m_robotDrive.getTurnRate());
-    var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
+    var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
 
     if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
       m_robotContainer.m_robotDrive.resetOdometry(llMeasurement.pose);
@@ -100,6 +101,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+        LimelightHelpers.SetIMUMode("limelight-front", 2);
+
   }
 
   /** This function is called periodically during operator control. */

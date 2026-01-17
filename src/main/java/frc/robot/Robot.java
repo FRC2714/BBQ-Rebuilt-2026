@@ -5,13 +5,9 @@
 package frc.robot;
 
 import com.reduxrobotics.canand.CanandEventLoop;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.utils.LimelightHelpers;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -51,39 +47,6 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-
-    double omegaRps = Units.degreesToRotations(m_robotContainer.m_robotDrive.getTurnRate());
-    var frontLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
-    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-back");
-
-    if (backLLMeasurement != null
-        && backLLMeasurement.tagCount > 0
-        && Math.abs(omegaRps) < 2.0
-        && backLLMeasurement.rawFiducials[0].ambiguity
-            <= frontLLMeasurement.rawFiducials[0].ambiguity) {
-      m_robotContainer.m_robotDrive.resetOdometry(backLLMeasurement.pose);
-    } else if (frontLLMeasurement != null
-        && frontLLMeasurement.tagCount > 0
-        && Math.abs(omegaRps) < 2.0) {
-      m_robotContainer.m_robotDrive.resetOdometry(frontLLMeasurement.pose);
-    }
-
-    if (backLLMeasurement != null
-        && frontLLMeasurement != null
-        && frontLLMeasurement.tagCount > 0
-        && backLLMeasurement.tagCount > 0
-        && Math.abs(omegaRps) < 2.0) {
-      Pose2d avgPose =
-          new Pose2d(
-              (frontLLMeasurement.pose.getX() + backLLMeasurement.pose.getX()) / 2,
-              (frontLLMeasurement.pose.getY() + backLLMeasurement.pose.getY()) / 2,
-              (Rotation2d.fromDegrees(
-                  ((frontLLMeasurement.pose.getRotation()).getDegrees()
-                          + backLLMeasurement.pose.getRotation().getDegrees())
-                      / 2)));
-
-      // m_robotContainer.m_robotDrive.resetOdometry(avgPose);
-    }
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

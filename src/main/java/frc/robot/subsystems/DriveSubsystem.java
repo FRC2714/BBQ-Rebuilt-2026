@@ -8,17 +8,20 @@ import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.LimelightConstants;
+import frc.robot.utils.LimelightHelpers;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -52,8 +55,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final Field2d m_field2d = new Field2d();
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry =
-      new SwerveDriveOdometry(
+  public SwerveDrivePoseEstimator m_poseEstimator =
+      new SwerveDrivePoseEstimator(
           DriveConstants.kDriveKinematics,
           Rotation2d.fromDegrees(getHeading()),
           new SwerveModulePosition[] {
@@ -61,7 +64,10 @@ public class DriveSubsystem extends SubsystemBase {
             m_frontRight.getPosition(),
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
-          });
+          },
+          new Pose2d(),
+          LimelightConstants.m_stateStdDevs,
+          LimelightConstants.m_visionStdDevs);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -74,7 +80,42 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(
+
+    double omegaRps = Units.degreesToRotations(getTurnRate());
+    var frontLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
+    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-back");
+
+    if (backLLMeasurement != null
+        && backLLMeasurement.tagCount > 0
+        && Math.abs(omegaRps) < 2.0
+        && backLLMeasurement.rawFiducials[0].ambiguity
+            <= frontLLMeasurement.rawFiducials[0].ambiguity) {
+      resetOdometry(backLLMeasurement.pose);
+    } else if (frontLLMeasurement != null
+        && frontLLMeasurement.tagCount > 0
+        && Math.abs(omegaRps) < 2.0) {
+      m_poseEstimator.addVisionMeasurement(
+          frontLLMeasurement.pose, frontLLMeasurement.timestampSeconds);
+      // m_robotContainer.m_robotDrive.resetOdometry(frontLLMeasurement.pose);
+    }
+
+    if (backLLMeasurement != null
+        && frontLLMeasurement != null
+        && frontLLMeasurement.tagCount > 0
+        && backLLMeasurement.tagCount > 0
+        && Math.abs(omegaRps) < 2.0) {
+      Pose2d avgPose =
+          new Pose2d(
+              (frontLLMeasurement.pose.getX() + backLLMeasurement.pose.getX()) / 2,
+              (frontLLMeasurement.pose.getY() + backLLMeasurement.pose.getY()) / 2,
+              (Rotation2d.fromDegrees(
+                  ((frontLLMeasurement.pose.getRotation()).getDegrees()
+                          + backLLMeasurement.pose.getRotation().getDegrees())
+                      / 2)));
+      //  m_poseEstimator.addVisionMeasurement(avgPose, frontLLMeasurement.timestampSeconds);
+      // m_robotContainer.m_robotDrive.resetOdometry(avgPose);
+    }
+    m_poseEstimator.update(
         Rotation2d.fromDegrees(getHeading()),
         new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
@@ -83,9 +124,9 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
         });
 
-    m_field2d.setRobotPose(m_odometry.getPoseMeters());
+    m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putNumber("heading", getHeading());
-    SmartDashboard.putNumber("OdometryX", m_odometry.getPoseMeters().getX());
+    SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX());
   }
 
   /**
@@ -94,7 +135,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_poseEstimator.getEstimatedPosition();
   }
 
   /**
@@ -103,7 +144,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(
+    m_poseEstimator.resetPosition(
         Rotation2d.fromDegrees(getHeading()),
         new SwerveModulePosition[] {
           m_frontLeft.getPosition(),

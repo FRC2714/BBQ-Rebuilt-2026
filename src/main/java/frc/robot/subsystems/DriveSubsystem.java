@@ -93,7 +93,8 @@ public class DriveSubsystem extends SubsystemBase {
     var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-back");
 
     if (backLLMeasurement != null && backLLMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
-      resetOdometry(backLLMeasurement.pose);
+      m_poseEstimator.addVisionMeasurement(
+          backLLMeasurement.pose, backLLMeasurement.timestampSeconds);
     } else if (frontLLMeasurement != null
         && frontLLMeasurement.tagCount > 0
         && Math.abs(omegaRps) < 2.0) {

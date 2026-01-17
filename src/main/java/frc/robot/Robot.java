@@ -31,6 +31,8 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
 
     CanandEventLoop.getInstance();
+
+    LimelightHelpers.SetIMUMode("limelight-front", 1);
   }
 
   /**
@@ -87,6 +89,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    LimelightHelpers.SetIMUMode("limelight-front", 2);
   }
 
   /** This function is called periodically during operator control. */

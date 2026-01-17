@@ -8,9 +8,9 @@ import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -137,7 +137,6 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("heading", getHeading());
     SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX());
     SmartDashboard.putNumber("OdometryY", m_poseEstimator.getEstimatedPosition().getY());
-
   }
 
   /**
@@ -253,11 +252,7 @@ public class DriveSubsystem extends SubsystemBase {
           Pose2d targetPose = targetPoseSupplier.get();
 
           Rotation2d desiredAngle =
-              drivePose
-                  .relativeTo(targetPose)
-                  .getTranslation()
-                  .getAngle()
-                  .plus(Rotation2d.k180deg);
+              drivePose.relativeTo(targetPose).getTranslation().getAngle().plus(Rotation2d.k180deg);
 
           Rotation2d currentAngle = drivePose.getRotation();
           Rotation2d deltaAngle = currentAngle.minus(desiredAngle);

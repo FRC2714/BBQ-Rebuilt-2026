@@ -4,23 +4,20 @@
 
 package frc.robot.subsystems;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.LimelightHelpers;
 
 public class Limelight extends SubsystemBase {
-  
+
   private String m_limelightName;
 
   public Limelight(String limelightName) {
     m_limelightName = limelightName;
   }
 
-  //need way to find the best pipeline to swithc to when align
- public void setPipeline(){
+  // need way to find the best pipeline to swithc to when align
+  public void setPipeline() {
     LimelightHelpers.setPipelineIndex("limelight-turret", 0);
     double bestID1 = bestTarget();
 
@@ -30,14 +27,15 @@ public class Limelight extends SubsystemBase {
     LimelightHelpers.setPipelineIndex("limelight-turret", 2);
     double bestID3 = bestTarget();
 
-    if(bestID1 >= bestID2 && bestID1 >= bestID3){
+    if (bestID1 >= bestID2 && bestID1 >= bestID3) {
       LimelightHelpers.setPipelineIndex(m_limelightName, 0);
-    } else if (bestID2 >= bestID1 && bestID2 >= bestID3){
+    } else if (bestID2 >= bestID1 && bestID2 >= bestID3) {
       LimelightHelpers.setPipelineIndex(m_limelightName, 1);
     } else {
       LimelightHelpers.setPipelineIndex(m_limelightName, 2);
     }
- }
+  }
+
   public int getTargetID() {
     return (int) LimelightHelpers.getFiducialID(m_limelightName);
   }
@@ -46,13 +44,14 @@ public class Limelight extends SubsystemBase {
     return LimelightHelpers.getTV(m_limelightName);
   }
 
-  public double bestTarget(){
+  public double bestTarget() {
     return LimelightHelpers.getTA(m_limelightName);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("pipeline", LimelightHelpers.getCurrentPipelineIndex("limelight-turret"));
+    SmartDashboard.putNumber(
+        "pipeline", LimelightHelpers.getCurrentPipelineIndex("limelight-turret"));
   }
 }

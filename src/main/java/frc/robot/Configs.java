@@ -4,8 +4,8 @@ import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import frc.robot.Constants.TurretConstants;
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.TurretConstants;
 
 public final class Configs {
   public static final class MAXSwerveModule {

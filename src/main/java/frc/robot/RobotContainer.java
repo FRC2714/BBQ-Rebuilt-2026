@@ -77,8 +77,6 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController.getHID(), XboxController.Button.kStart.value)
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
-
-    
   }
 
   /**

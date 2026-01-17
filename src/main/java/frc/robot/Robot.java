@@ -8,6 +8,7 @@ import com.reduxrobotics.canand.CanandEventLoop;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.utils.LimelightHelpers;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -32,7 +33,25 @@ public class Robot extends TimedRobot {
 
     CanandEventLoop.getInstance();
 
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-back",
+        m_robotContainer.m_robotDrive.getHeading(),
+        0,
+        0,
+        0,
+        0,
+        0);
+
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-front",
+        m_robotContainer.m_robotDrive.getHeading(),
+        0,
+        0,
+        0,
+        0,
+        0);
     LimelightHelpers.SetIMUMode("limelight-front", 1);
+    LimelightHelpers.SetIMUMode("limelight-back", 1);
   }
 
   /**
@@ -90,6 +109,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     LimelightHelpers.SetIMUMode("limelight-front", 2);
+    LimelightHelpers.SetIMUMode("limelight-back", 2);
   }
 
   /** This function is called periodically during operator control. */

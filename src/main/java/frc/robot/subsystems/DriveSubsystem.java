@@ -81,15 +81,18 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     // Update the odometry in the periodic block
 
-    double omegaRps = Units.degreesToRotations(getTurnRate());
-    var frontLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
-    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-back");
+    LimelightHelpers.SetRobotOrientation("limelight-back", getHeading(), 0, 0, 0, 0,
+    0);
 
-    if (backLLMeasurement != null
-        && backLLMeasurement.tagCount > 0
-        && Math.abs(omegaRps) < 2.0
-        && backLLMeasurement.rawFiducials[0].ambiguity
-            <= frontLLMeasurement.rawFiducials[0].ambiguity) {
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-front", getHeading(), 0, 0, 0, 0, 0);
+
+    double omegaRps = Units.degreesToRotations(getTurnRate());
+    var frontLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
+    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-back");
+
+    if (backLLMeasurement != null && backLLMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
       resetOdometry(backLLMeasurement.pose);
     } else if (frontLLMeasurement != null
         && frontLLMeasurement.tagCount > 0

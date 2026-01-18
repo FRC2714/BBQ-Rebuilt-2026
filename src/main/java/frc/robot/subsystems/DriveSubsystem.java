@@ -91,12 +91,18 @@ public class DriveSubsystem extends SubsystemBase {
     var frontLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
     var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-back");
 
-    if (backLLMeasurement != null && backLLMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
+    if (backLLMeasurement != null
+        && backLLMeasurement.tagCount > 0
+        && Math.abs(omegaRps) < 2.0
+        && backLLMeasurement.rawFiducials[0].ambiguity
+            >= frontLLMeasurement.rawFiducials[0].ambiguity) { // remove ambiguity for Mt2
       m_poseEstimator.addVisionMeasurement(
           backLLMeasurement.pose, backLLMeasurement.timestampSeconds);
     } else if (frontLLMeasurement != null
         && frontLLMeasurement.tagCount > 0
-        && Math.abs(omegaRps) < 2.0) {
+        && Math.abs(omegaRps) < 2.0
+        && frontLLMeasurement.rawFiducials[0].ambiguity
+            >= backLLMeasurement.rawFiducials[0].ambiguity) { // remove ambiguity for Mt2
       m_poseEstimator.addVisionMeasurement(
           frontLLMeasurement.pose, frontLLMeasurement.timestampSeconds);
       // m_robotContainer.m_robotDrive.resetOdometry(frontLLMeasurement.pose);

@@ -113,10 +113,9 @@ public final class Constants {
 
   public static final class TurretConstants {
     // CHANGE EVERYTHING
-    public static final int kTurretShooterCanId = 5;
+    public static final int kTurretShooterCanId = 30;
     public static final double kPivotReduction = 1;
-    public static final double kP = 0.06;
-    public static final double kG = 0.2;
+    public static final double kP = 0.01;
 
     public static final class PivotSetpoints {
       // Zero offset in Hardware Client is 10

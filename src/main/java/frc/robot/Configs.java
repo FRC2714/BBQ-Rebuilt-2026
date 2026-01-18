@@ -74,7 +74,7 @@ public final class Configs {
           .absoluteEncoder
           .positionConversionFactor(360 / TurretConstants.kPivotReduction)
           .inverted(false) // POSSIBLE CHANGED
-          .zeroCentered(false); // POSSIBLE CHANGED
+          .zeroCentered(true); // POSSIBLE CHANGED
       pivotConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
@@ -82,13 +82,7 @@ public final class Configs {
           // loop slot, as it will default to slow 0.
           .p(Constants.TurretConstants.kP)
           .d(0)
-          .outputRange(-1, 0)
-          .positionWrappingEnabled(true)
-          .positionWrappingInputRange(0, 360)
-          .maxMotion
-          .cruiseVelocity(4200 * 360)
-          .maxAcceleration(6000 * 360)
-          .allowedProfileError(0.5);
+          .outputRange(-0.1, 0.1);
     }
   }
 }

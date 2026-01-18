@@ -9,11 +9,9 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
-import frc.robot.Constants.TurretConstants;
 import frc.robot.Constants.TurretConstants.PivotSetpoints;
 
 public class Shooter extends SubsystemBase {
@@ -21,7 +19,6 @@ public class Shooter extends SubsystemBase {
   private SparkFlex turretMotor =
       new SparkFlex(Constants.TurretConstants.kTurretShooterCanId, MotorType.kBrushless);
   private SparkClosedLoopController turretController = turretMotor.getClosedLoopController();
-  private ArmFeedforward turretFF = new ArmFeedforward(0, TurretConstants.kG, getTurretPosition());
   private AbsoluteEncoder turretAbsoluteEncoder = turretMotor.getAbsoluteEncoder();
 
   // limit switch
@@ -48,10 +45,6 @@ public class Shooter extends SubsystemBase {
   // Runs every 20ms
   @Override
   public void periodic() {
-    turretController.setSetpoint(
-        turretCurrentTarget,
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        turretFF.calculate(turretCurrentTarget, 0));
+    turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 }

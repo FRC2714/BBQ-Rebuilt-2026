@@ -82,7 +82,7 @@ public final class Configs {
           // loop slot, as it will default to slow 0.
           .p(Constants.TurretConstants.kP)
           .d(0)
-          .outputRange(-0.25, 0.25);
+          .outputRange(-0.5, 0.5);
     }
   }
 }

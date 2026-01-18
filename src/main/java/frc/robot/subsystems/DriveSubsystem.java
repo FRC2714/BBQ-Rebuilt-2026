@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Rotation;
+
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -23,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.utils.LimelightHelpers;
+import java.lang.Math;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -89,8 +92,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     double omegaRps = Units.degreesToRotations(getTurnRate());
     var frontLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
-    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-back");
+        LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
+    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-back");
 
     if (backLLMeasurement != null && backLLMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
       m_poseEstimator.addVisionMeasurement(
@@ -224,6 +227,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.setYaw(0);
+    m_poseEstimator.resetRotation(Rotation2d.fromDegrees(0));
   }
 
   /**
@@ -251,7 +255,7 @@ public class DriveSubsystem extends SubsystemBase {
     Translation2d hub =
         new Translation2d(
             edu.wpi.first.math.util.Units.inchesToMeters(468.56),
-            edu.wpi.first.math.util.Units.inchesToMeters(324.0) // set to real hub Y
+            edu.wpi.first.math.util.Units.inchesToMeters(158.32) 
             );
 
     // Vector from robot to hub

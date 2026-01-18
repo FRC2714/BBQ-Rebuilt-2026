@@ -9,6 +9,8 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
@@ -39,7 +41,10 @@ public class Shooter extends SubsystemBase {
   }
 
   public void updateTurretTarget(double updateValue) {
-    turretCurrentTarget = updateValue;
+    turretCurrentTarget = MathUtil.clamp(
+      updateValue,
+      -175,
+      175);
   }
 
   // Runs every 20ms

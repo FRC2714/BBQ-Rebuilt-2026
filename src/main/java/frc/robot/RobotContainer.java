@@ -85,7 +85,6 @@ public class RobotContainer {
     m_driverController.x().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(-170)));
   }
 
-  
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

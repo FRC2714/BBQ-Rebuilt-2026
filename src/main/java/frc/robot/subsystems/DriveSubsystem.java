@@ -248,10 +248,11 @@ public class DriveSubsystem extends SubsystemBase {
     Pose2d pose = getPose();
 
     // Hub position in field coordinates (meters)
-    Translation2d hub = new Translation2d(
-        edu.wpi.first.math.util.Units.inchesToMeters(468.56),
-        edu.wpi.first.math.util.Units.inchesToMeters(324.0) // set to real hub Y
-    );
+    Translation2d hub =
+        new Translation2d(
+            edu.wpi.first.math.util.Units.inchesToMeters(468.56),
+            edu.wpi.first.math.util.Units.inchesToMeters(324.0) // set to real hub Y
+            );
 
     // Vector from robot to hub
     Translation2d robotToHub = hub.minus(pose.getTranslation());

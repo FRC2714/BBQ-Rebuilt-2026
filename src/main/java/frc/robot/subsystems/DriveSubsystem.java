@@ -241,7 +241,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public Command alignDrive(XboxController controller, Supplier<Pose2d> targetPoseSupplier) {
-    PIDController turnController = new PIDController(.1, 0.0, 0.0);
+    PIDController turnController = new PIDController(.1, 0.01, 0);
     turnController.enableContinuousInput(-Math.PI, Math.PI);
 
     return Commands.run(

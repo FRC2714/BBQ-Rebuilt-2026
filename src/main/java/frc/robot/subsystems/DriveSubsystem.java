@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
@@ -87,7 +88,14 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-
+    m_poseEstimator.update(
+        Rotation2d.fromDegrees(getHeading()),
+        new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition()
+        });
     LimelightHelpers.SetRobotOrientation("limelight-back", getHeading(), 0, 0, 0, 0, 0);
 
     LimelightHelpers.SetRobotOrientation("limelight-front", getHeading(), 0, 0, 0, 0, 0);
@@ -124,14 +132,7 @@ public class DriveSubsystem extends SubsystemBase {
       //  m_poseEstimator.addVisionMeasurement(avgPose, frontLLMeasurement.timestampSeconds);
       // m_robotContainer.m_robotDrive.resetOdometry(avgPose);
     }
-    m_poseEstimator.update(
-        Rotation2d.fromDegrees(getHeading()),
-        new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-        });
+
 
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putNumber("heading", getHeading());
@@ -240,7 +241,7 @@ public class DriveSubsystem extends SubsystemBase {
     return m_gyro.getYaw() >= 0 ? m_gyro.getYaw() * 360 : Math.abs((m_gyro.getYaw() * 360) + 360);
   }
 
-  public Command alignDrive(XboxController controller, Supplier<Pose2d> targetPoseSupplier) {
+  public Command alignDrive(CommandXboxController controller, Supplier<Pose2d> targetPoseSupplier) {
     PIDController turnController = new PIDController(.1, 0.01, 0);
     turnController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -276,6 +277,13 @@ public class DriveSubsystem extends SubsystemBase {
           }
         },
         this); // 'this' = drivetrain subsystem for requirements
+  }
+
+  public Rotation2d getRelativeAngleToHub(Supplier<Pose2d> targetPoseSupplier) {
+     Pose2d drivePose = getPose(); // MaxSwerve: getPose() instead of getState().Pose
+          Pose2d targetPose = targetPoseSupplier.get();
+
+        return drivePose.relativeTo(targetPose).getTranslation().getAngle().plus(Rotation2d.k180deg);   
   }
 
   /**

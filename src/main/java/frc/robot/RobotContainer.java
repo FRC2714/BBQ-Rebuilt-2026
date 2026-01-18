@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
@@ -27,6 +28,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utils.LimelightHelpers;
+import frc.robot.subsystems.Shooter;
 import java.util.List;
 
 /*
@@ -38,9 +40,11 @@ import java.util.List;
 public class RobotContainer {
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final Shooter m_turret = new Shooter();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_driverController =
+      new CommandXboxController(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -71,13 +75,19 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
+    new JoystickButton(m_driverController.getHID(), Button.kR1.value)
         .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
 
-    new JoystickButton(m_driverController, XboxController.Button.kStart.value)
+    m_driverController
+        .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
 
-    new Trigger(m_driverController::getLeftBumper)
+    m_driverController.y().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(180)));
+    m_driverController.b().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(90)));
+    m_driverController.a().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(0)));
+    m_driverController.x().onTrue(new InstantCommand(() -> m_turret.updateTurretTarget(270)));
+
+    m_driverController.leftBumper()
         .whileTrue(
             new RunCommand(
                 () ->
@@ -88,13 +98,28 @@ public class RobotContainer {
                         false),
                 m_robotDrive));
 
-    new Trigger(m_driverController::getRightBumper)
+    m_driverController.rightBumper()
         .whileTrue(
             m_robotDrive.alignDrive(
                 m_driverController,
                 () ->
                     new Pose2d(
                         Units.Inches.of(468.56), Units.Inches.of(158.32), new Rotation2d())));
+
+    m_driverController.leftTrigger()
+        .whileTrue(
+            new RunCommand(
+                () ->
+                    m_turret.updateTurretTarget(
+                        m_robotDrive
+                            .getRelativeAngleToHub(
+                                () ->
+                                    new Pose2d(
+                                        Units.Inches.of(468.56),
+                                        Units.Inches.of(158.32),
+                                        new Rotation2d()))
+                            .getDegrees()),
+                m_turret));
   }
 
   /**

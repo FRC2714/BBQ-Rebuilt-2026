@@ -13,24 +13,24 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
-import frc.robot.Constants.TurretConstants.PivotSetpoints;
+import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 
 public class Shooter extends SubsystemBase {
   // turret motor and controller
   private SparkFlex turretMotor =
-      new SparkFlex(Constants.TurretConstants.kTurretShooterCanId, MotorType.kBrushless);
+      new SparkFlex(Constants.ShooterConstants.kTurretCanId, MotorType.kBrushless);
   private SparkClosedLoopController turretController = turretMotor.getClosedLoopController();
   private AbsoluteEncoder turretAbsoluteEncoder = turretMotor.getAbsoluteEncoder();
 
   // limit switch
   private SparkLimitSwitch turretLimitSwitch = turretMotor.getForwardLimitSwitch();
 
-  private double turretCurrentTarget = PivotSetpoints.kStow;
+  private double turretCurrentTarget = TurretSetpoints.kStow;
 
   // Creates a flywheel
   public Shooter() {
     turretMotor.configure(
-        Configs.Flywheel.pivotConfig,
+        Configs.Shooter.turretConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
   }

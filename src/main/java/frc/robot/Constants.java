@@ -111,14 +111,10 @@ public final class Constants {
         VecBuilder.fill(0.00001, 0.00001, 999999); // TODO
   }
 
-  public static final class TurretConstants {
-    // CHANGE EVERYTHING
-    public static final int kTurretShooterCanId = 30;
-    public static final double kPivotReduction = 1;
-    public static final double kP = 0.01;
+  public static final class ShooterConstants {
+    public static final int kTurretCanId = 30;
 
-    public static final class PivotSetpoints {
-      // Zero offset in Hardware Client is 10
+    public static final class TurretSetpoints {
       public static final double kStow = 15.2;
     }
   }

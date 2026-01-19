@@ -55,8 +55,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final Field2d m_field2d = new Field2d();
 
-  private Shooter m_shooter;
-
   // Odometry class for tracking robot pose
   public SwerveDrivePoseEstimator m_poseEstimator =
       new SwerveDrivePoseEstimator(

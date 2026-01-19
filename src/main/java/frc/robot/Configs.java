@@ -5,7 +5,6 @@ import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import frc.robot.Constants.ModuleConstants;
-import frc.robot.Constants.TurretConstants;
 
 public final class Configs {
   public static final class MAXSwerveModule {
@@ -61,26 +60,20 @@ public final class Configs {
     }
   }
 
-  public static final class Flywheel {
-    public static final SparkFlexConfig pivotConfig = new SparkFlexConfig();
+  public static final class Shooter {
+    public static final SparkFlexConfig turretConfig = new SparkFlexConfig();
 
     static {
-      pivotConfig
+      turretConfig
           .smartCurrentLimit(40)
           .idleMode(IdleMode.kBrake)
-          .inverted(false) // POSSIBLY CHANGED
+          .inverted(false)
           .voltageCompensation(12);
-      pivotConfig
-          .absoluteEncoder
-          .positionConversionFactor(360 / TurretConstants.kPivotReduction)
-          .inverted(false) // POSSIBLE CHANGED
-          .zeroCentered(true); // POSSIBLE CHANGED
-      pivotConfig
+      turretConfig.absoluteEncoder.positionConversionFactor(360).inverted(false).zeroCentered(true);
+      turretConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          // Set PID values for position control. We don't need to pass a
-          // loop slot, as it will default to slow 0.
-          .p(Constants.TurretConstants.kP)
+          .p(0.01)
           .d(0)
           .outputRange(-0.5, 0.5);
     }

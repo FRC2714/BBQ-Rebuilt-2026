@@ -59,4 +59,23 @@ public final class Configs {
           .positionWrappingInputRange(0, turningFactor);
     }
   }
+
+  public static final class Shooter {
+    public static final SparkFlexConfig turretConfig = new SparkFlexConfig();
+
+    static {
+      turretConfig
+          .smartCurrentLimit(40)
+          .idleMode(IdleMode.kBrake)
+          .inverted(false)
+          .voltageCompensation(12);
+      turretConfig.absoluteEncoder.positionConversionFactor(360).inverted(false).zeroCentered(true);
+      turretConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+          .p(0.01)
+          .d(0)
+          .outputRange(-0.5, 0.5);
+    }
+  }
 }

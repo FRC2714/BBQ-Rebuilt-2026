@@ -11,6 +11,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -73,7 +74,6 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
-
     SmartDashboard.putData("Field", m_field2d);
   }
 
@@ -86,19 +86,25 @@ public class DriveSubsystem extends SubsystemBase {
     LimelightHelpers.SetRobotOrientation("limelight-front", getHeading(), 0, 0, 0, 0, 0);
 
     double omegaRps = Units.degreesToRotations(getTurnRate());
-    var frontLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
-    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-back");
+    var frontLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
+    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-back");
 
-    if (backLLMeasurement != null && backLLMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
+    if (backLLMeasurement != null
+        && backLLMeasurement.tagCount > 0
+        && Math.abs(omegaRps) < 2.0
+        && backLLMeasurement.rawFiducials[0].ambiguity
+            >= frontLLMeasurement.rawFiducials[0].ambiguity) { // remove ambiguity for Mt2
       m_poseEstimator.addVisionMeasurement(
           backLLMeasurement.pose, backLLMeasurement.timestampSeconds);
     } else if (frontLLMeasurement != null
         && frontLLMeasurement.tagCount > 0
-        && Math.abs(omegaRps) < 2.0) {
+        && Math.abs(omegaRps) < 2.0
+        && frontLLMeasurement.rawFiducials[0].ambiguity
+            >= backLLMeasurement.rawFiducials[0].ambiguity) { // remove ambiguity for Mt2
       m_poseEstimator.addVisionMeasurement(
           frontLLMeasurement.pose, frontLLMeasurement.timestampSeconds);
       // m_robotContainer.m_robotDrive.resetOdometry(frontLLMeasurement.pose);
+
     }
 
     if (backLLMeasurement != null
@@ -221,6 +227,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.setYaw(0);
+    m_poseEstimator.resetRotation(Rotation2d.fromDegrees(0));
   }
 
   /**
@@ -239,5 +246,27 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getTurnRate() {
     return m_gyro.getAngularVelocityYaw() * 360 * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
+
+  public double getAngleToHub() {
+    Pose2d pose = getPose();
+
+    // Hub position in field coordinates (meters)
+    Translation2d hub =
+        new Translation2d(
+            edu.wpi.first.math.util.Units.inchesToMeters(468.56),
+            edu.wpi.first.math.util.Units.inchesToMeters(158.32));
+
+    // Vector from robot to hub
+    Translation2d robotToHub = hub.minus(pose.getTranslation());
+
+    // Field-relative angle to hub
+    Rotation2d angleToHub = robotToHub.getAngle();
+
+    // Turret angle relative to robot forward
+    Rotation2d turretAngle = angleToHub.minus(pose.getRotation());
+
+    // Return degrees (wrapped to [-180, 180])
+    return turretAngle.getDegrees();
   }
 }

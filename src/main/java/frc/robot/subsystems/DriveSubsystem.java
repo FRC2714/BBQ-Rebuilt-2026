@@ -20,6 +20,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.utils.LimelightHelpers;
@@ -243,7 +244,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getAngleToHub() {
-    Pose2d pose = getPose();
+    Pose2d pose = getPose().plus(Constants.ShooterConstants.turretOffset);
 
     // Hub position in field coordinates (meters)
     Translation2d hub =

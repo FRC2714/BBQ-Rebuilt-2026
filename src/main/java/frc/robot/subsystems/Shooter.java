@@ -40,7 +40,11 @@ public class Shooter extends SubsystemBase {
   }
 
   public void updateTurretTarget(double updateValue) {
-    turretCurrentTarget = MathUtil.clamp(updateValue, Constants.ShooterConstants.kTurretMinRange, Constants.ShooterConstants.kTurrentMaxRange);
+    turretCurrentTarget =
+        MathUtil.clamp(
+            updateValue,
+            Constants.ShooterConstants.kTurretMinRange,
+            Constants.ShooterConstants.kTurrentMaxRange);
   }
 
   // Runs every 20ms

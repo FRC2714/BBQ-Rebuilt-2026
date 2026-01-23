@@ -95,8 +95,8 @@ public class DriveSubsystem extends SubsystemBase {
     double omegaRps = Units.degreesToRotations(getTurnRate());
 
     var frontLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
-    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-back");
+        LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
+    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-back");
 
     if (Math.abs(omegaRps) < 2.0) {
       if (frontLLMeasurement != null && frontLLMeasurement.tagCount > 0) {

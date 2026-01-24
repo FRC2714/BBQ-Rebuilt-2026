@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -71,6 +72,15 @@ public class DriveSubsystem extends SubsystemBase {
           LimelightConstants.m_stateStdDevs,
           LimelightConstants.m_visionStdDevs);
 
+  private Pose2d m_previousPose = new Pose2d();
+  private double m_previousTimestamp = 0;
+  private double m_robotVelocityX = 0;
+  private double m_robotVelocityY = 0;
+
+  private static final double kShotSpeedMetersPerSecond = 12.0;
+  private static final double kDragCorrectionFactor = 1.15;
+  private static final double kMinLeadDistance = 0.5;
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     // Usage reporting for MAXSwerve template
@@ -110,6 +120,18 @@ public class DriveSubsystem extends SubsystemBase {
             backLLMeasurement.pose, backLLMeasurement.timestampSeconds);
       }
     }
+
+    double currentTime = Timer.getFPGATimestamp();
+    Pose2d currentPose = m_poseEstimator.getEstimatedPosition();
+    double dt = currentTime - m_previousTimestamp;
+
+    if (dt > 0.005 && dt < 0.1) {
+      m_robotVelocityX = (currentPose.getX() - m_previousPose.getX()) / dt;
+      m_robotVelocityY = (currentPose.getY() - m_previousPose.getY()) / dt;
+    }
+
+    m_previousPose = currentPose;
+    m_previousTimestamp = currentTime;
 
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putNumber("heading", getHeading());
@@ -238,6 +260,14 @@ public class DriveSubsystem extends SubsystemBase {
     return m_gyro.getAngularVelocityYaw() * 360 * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
+  public Translation2d getRobotVelocity() {
+    return new Translation2d(m_robotVelocityX, m_robotVelocityY);
+  }
+
+  public double getRobotSpeed() {
+    return Math.hypot(m_robotVelocityX, m_robotVelocityY);
+  }
+
   public double getAngleToHub() {
     Pose2d pose = getPose();
 
@@ -258,5 +288,44 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Return degrees (wrapped to [-180, 180])
     return turretAngle.getDegrees();
+  }
+
+  public double getAngleToHubWithLead() {
+    Pose2d pose = getPose();
+
+    Translation2d hub =
+        new Translation2d(
+            Units.inchesToMeters(468.56),
+            Units.inchesToMeters(158.32));
+
+    Translation2d robotToHub = hub.minus(pose.getTranslation());
+    double distanceToHub = robotToHub.getNorm();
+
+    if (distanceToHub < kMinLeadDistance) {
+      return getAngleToHub();
+    }
+
+    double flightTime = (distanceToHub / kShotSpeedMetersPerSecond) * kDragCorrectionFactor;
+
+    Translation2d leadOffset =
+        new Translation2d(
+            m_robotVelocityX * flightTime,
+            m_robotVelocityY * flightTime);
+
+    Translation2d aimPoint = hub.minus(leadOffset);
+    Translation2d robotToAimPoint = aimPoint.minus(pose.getTranslation());
+    Rotation2d angleToAimPoint = robotToAimPoint.getAngle();
+    Rotation2d turretAngle = angleToAimPoint.minus(pose.getRotation());
+
+    return turretAngle.getDegrees();
+  }
+
+  public double getDistanceToHub() {
+    Pose2d pose = getPose();
+    Translation2d hub =
+        new Translation2d(
+            Units.inchesToMeters(468.56),
+            Units.inchesToMeters(158.32));
+    return hub.minus(pose.getTranslation()).getNorm();
   }
 }

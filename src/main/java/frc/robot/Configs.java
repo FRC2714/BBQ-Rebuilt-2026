@@ -62,7 +62,7 @@ public final class Configs {
 
   public static final class Shooter {
     public static final SparkFlexConfig turretConfig = new SparkFlexConfig();
-
+    public static final SparkFlexConfig hoodConfig = new SparkFlexConfig();
     static {
       turretConfig
           .smartCurrentLimit(40)
@@ -76,6 +76,21 @@ public final class Configs {
           .p(0.01)
           .d(0)
           .outputRange(-0.5, 0.5);
+      
+      
+      // Hood Config: NEEDS TO BE CHANGED
+      // hoodConfig
+      //     .smartCurrentLimit(40)
+      //     .idleMode(IdleMode.kBrake)
+      //     .inverted(false)
+      //     .voltageCompensation(12);
+      // hoodConfig.absoluteEncoder.positionConversionFactor(360).inverted(false).zeroCentered(true);
+      // hoodConfig
+      //     .closedLoop
+      //     .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+      //     .p(0.01)
+      //     .d(0)
+      //     .outputRange(-0.1, 0.1);
     }
   }
 }

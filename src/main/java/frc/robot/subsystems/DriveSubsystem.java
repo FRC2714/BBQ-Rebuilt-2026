@@ -218,9 +218,7 @@ public class DriveSubsystem extends SubsystemBase {
     Pose2d pose = getPose();
 
     Translation2d hub =
-        new Translation2d(
-            Units.inchesToMeters(468.56),
-            Units.inchesToMeters(158.32));
+        new Translation2d(Units.inchesToMeters(468.56), Units.inchesToMeters(158.32));
 
     Translation2d robotToHub = hub.minus(pose.getTranslation());
     Rotation2d angleToHub = robotToHub.getAngle();
@@ -234,9 +232,7 @@ public class DriveSubsystem extends SubsystemBase {
     Translation2d robotVelocity = getFieldRelativeVelocity();
 
     Translation2d hub =
-        new Translation2d(
-            Units.inchesToMeters(468.56),
-            Units.inchesToMeters(158.32));
+        new Translation2d(Units.inchesToMeters(468.56), Units.inchesToMeters(158.32));
 
     Translation2d futurePosition =
         pose.getTranslation().plus(robotVelocity.times(kLatencyCompensation));
@@ -255,9 +251,7 @@ public class DriveSubsystem extends SubsystemBase {
   public double getDistanceToHub() {
     Pose2d pose = getPose();
     Translation2d hub =
-        new Translation2d(
-            Units.inchesToMeters(468.56),
-            Units.inchesToMeters(158.32));
+        new Translation2d(Units.inchesToMeters(468.56), Units.inchesToMeters(158.32));
     return hub.minus(pose.getTranslation()).getNorm();
   }
 }

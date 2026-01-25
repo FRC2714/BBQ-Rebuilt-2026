@@ -63,6 +63,7 @@ public final class Configs {
   public static final class Shooter {
     public static final SparkFlexConfig turretConfig = new SparkFlexConfig();
     public static final SparkFlexConfig hoodConfig = new SparkFlexConfig();
+
     static {
       turretConfig
           .smartCurrentLimit(40)
@@ -76,8 +77,7 @@ public final class Configs {
           .p(0.01)
           .d(0)
           .outputRange(-0.5, 0.5);
-      
-      
+
       // Hood Config: NEEDS TO BE CHANGED
       // hoodConfig
       //     .smartCurrentLimit(40)

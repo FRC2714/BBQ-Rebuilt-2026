@@ -13,7 +13,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
-import frc.robot.Constants.ShooterConstants.HoodSetpoints;
 import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 
 public class Shooter extends SubsystemBase {
@@ -33,6 +32,7 @@ public class Shooter extends SubsystemBase {
   // private SparkLimitSwitch hoodLimitSwitch = hoodMotor.getForwardLimitSwitch();
 
   private double turretCurrentTarget = TurretSetpoints.kStow;
+
   // private double hoodTarget = HoodSetpoints.kStow;
 
   // Creates a hood
@@ -41,7 +41,7 @@ public class Shooter extends SubsystemBase {
         Configs.Shooter.turretConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-    
+
     // hoodMotor.configure(
     //     Configs.Shooter.hoodConfig,
     //     ResetMode.kResetSafeParameters,

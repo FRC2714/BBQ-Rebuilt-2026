@@ -105,13 +105,11 @@ public class DriveSubsystem extends SubsystemBase {
 
     if (Math.abs(omegaRps) < 2.0) {
       if (frontLLMeasurement != null && frontLLMeasurement.tagCount > 0) {
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
         m_poseEstimator.addVisionMeasurement(
             frontLLMeasurement.pose, frontLLMeasurement.timestampSeconds);
       }
 
       if (backLLMeasurement != null && backLLMeasurement.tagCount > 0) {
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
         m_poseEstimator.addVisionMeasurement(
             backLLMeasurement.pose, backLLMeasurement.timestampSeconds);
       }

@@ -18,6 +18,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -55,6 +57,10 @@ public class DriveSubsystem extends SubsystemBase {
   private final Canandgyro m_gyro = new Canandgyro(0);
 
   private final Field2d m_field2d = new Field2d();
+
+  // Publisher for robot pose for use with AdvantageScope
+  StructPublisher<Pose2d> publisher =
+      NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
 
   // Odometry class for tracking robot pose
   public SwerveDrivePoseEstimator m_poseEstimator =
@@ -114,6 +120,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putNumber("heading", getHeading());
     SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX());
+
+    publisher.set(getPose());
   }
 
   /**

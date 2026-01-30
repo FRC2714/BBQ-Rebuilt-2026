@@ -8,6 +8,7 @@ import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -80,52 +81,36 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Update the odometry in the periodic block
-
-    LimelightHelpers.SetRobotOrientation("limelight-back", getHeading(), 0, 0, 0, 0, 0);
-
-    LimelightHelpers.SetRobotOrientation("limelight-front", getHeading(), 0, 0, 0, 0, 0);
-
-    double omegaRps = Units.degreesToRotations(getTurnRate());
-    var frontLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
-    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-back");
-
-    if (backLLMeasurement != null && backLLMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
-      m_poseEstimator.addVisionMeasurement(
-          backLLMeasurement.pose, backLLMeasurement.timestampSeconds);
-    } else if (frontLLMeasurement != null
-        && frontLLMeasurement.tagCount > 0
-        && Math.abs(omegaRps) < 2.0) {
-      m_poseEstimator.addVisionMeasurement(
-          frontLLMeasurement.pose, frontLLMeasurement.timestampSeconds);
-      // m_robotContainer.m_robotDrive.resetOdometry(frontLLMeasurement.pose);
-
-    }
-
-    if (backLLMeasurement != null
-        && frontLLMeasurement != null
-        && frontLLMeasurement.tagCount > 0
-        && backLLMeasurement.tagCount > 0
-        && Math.abs(omegaRps) < 2.0) {
-      Pose2d avgPose =
-          new Pose2d(
-              (frontLLMeasurement.pose.getX() + backLLMeasurement.pose.getX()) / 2,
-              (frontLLMeasurement.pose.getY() + backLLMeasurement.pose.getY()) / 2,
-              (Rotation2d.fromDegrees(
-                  ((frontLLMeasurement.pose.getRotation()).getDegrees()
-                          + backLLMeasurement.pose.getRotation().getDegrees())
-                      / 2)));
-      //  m_poseEstimator.addVisionMeasurement(avgPose, frontLLMeasurement.timestampSeconds);
-      // m_robotContainer.m_robotDrive.resetOdometry(avgPose);
-    }
     m_poseEstimator.update(
-        Rotation2d.fromDegrees(getHeading()),
+        m_gyro.getRotation2d(),
         new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
         });
+
+    LimelightHelpers.SetRobotOrientation("limelight-back", getHeading(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-front", getHeading(), 0, 0, 0, 0, 0);
+
+    double omegaRps = Units.degreesToRotations(getTurnRate());
+
+    var frontLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
+    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-back");
+
+    if (Math.abs(omegaRps) < 2.0) {
+      if (frontLLMeasurement != null && frontLLMeasurement.tagCount > 0) {
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        m_poseEstimator.addVisionMeasurement(
+            frontLLMeasurement.pose, frontLLMeasurement.timestampSeconds);
+      }
+
+      if (backLLMeasurement != null && backLLMeasurement.tagCount > 0) {
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        m_poseEstimator.addVisionMeasurement(
+            backLLMeasurement.pose, backLLMeasurement.timestampSeconds);
+      }
+    }
 
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putNumber("heading", getHeading());
@@ -221,8 +206,19 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.setYaw(0);
-    m_poseEstimator.resetRotation(Rotation2d.fromDegrees(0));
+    Pose2d pose = new Pose2d();
+
+    m_gyro.setYaw(pose.getRotation().getRotations());
+    m_poseEstimator.resetRotation(pose.getRotation());
+    m_poseEstimator.resetPosition(
+        pose.getRotation(),
+        new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition()
+        },
+        pose);
   }
 
   /**

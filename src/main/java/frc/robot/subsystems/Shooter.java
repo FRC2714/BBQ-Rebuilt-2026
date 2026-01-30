@@ -13,6 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants.HoodSetpoints;
 import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 
 public class Shooter extends SubsystemBase {
@@ -22,18 +23,21 @@ public class Shooter extends SubsystemBase {
   private SparkClosedLoopController turretController = turretMotor.getClosedLoopController();
   private AbsoluteEncoder turretAbsoluteEncoder = turretMotor.getAbsoluteEncoder();
 
-  // private SparkFlex hoodMotor =
-  //     new SparkFlex(Constants.ShooterConstants.kHoodCanId, MotorType.kBrushless);
-  // private SparkClosedLoopController hoodController = hoodMotor.getClosedLoopController();
-  // private AbsoluteEncoder hoodAbsoluteEncoder = hoodMotor.getAbsoluteEncoder();
+  private SparkFlex hoodMotor =
+      new SparkFlex(Constants.ShooterConstants.kHoodCanId, MotorType.kBrushless);
+  private SparkClosedLoopController hoodController = hoodMotor.getClosedLoopController();
+  private AbsoluteEncoder hoodAbsoluteEncoder = hoodMotor.getAbsoluteEncoder();
+
+  private SparkFlex flywheelMotor =
+      new SparkFlex(Constants.ShooterConstants.kFlywheelMotorId, MotorType.kBrushless);
 
   // limit switches
   private SparkLimitSwitch turretLimitSwitch = turretMotor.getForwardLimitSwitch();
-  // private SparkLimitSwitch hoodLimitSwitch = hoodMotor.getForwardLimitSwitch();
+  private SparkLimitSwitch hoodLimitSwitch = hoodMotor.getForwardLimitSwitch();
 
   private double turretCurrentTarget = TurretSetpoints.kStow;
 
-  // private double hoodTarget = HoodSetpoints.kStow;
+  private double hoodTarget = HoodSetpoints.kStow;
 
   // Creates a hood
   public Shooter() {
@@ -42,10 +46,13 @@ public class Shooter extends SubsystemBase {
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    // hoodMotor.configure(
-    //     Configs.Shooter.hoodConfig,
-    //     ResetMode.kResetSafeParameters,
-    //     PersistMode.kPersistParameters);
+    hoodMotor.configure(
+        Configs.Shooter.hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    flywheelMotor.configure(
+        Configs.Shooter.flywheelConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
   }
 
   // Get positions
@@ -53,9 +60,9 @@ public class Shooter extends SubsystemBase {
     return turretAbsoluteEncoder.getPosition();
   }
 
-  // public double getHoodPosition() {
-  //   return hoodAbsoluteEncoder.getPosition();
-  // }
+  public double getHoodPosition() {
+    return hoodAbsoluteEncoder.getPosition();
+  }
 
   // Update the target positions
   public void updateTurretTarget(double updateValue) {
@@ -66,18 +73,23 @@ public class Shooter extends SubsystemBase {
             Constants.ShooterConstants.kTurretMaxRange);
   }
 
-  // public void updateHoodTarget(double updateValue) {
-  //   hoodTarget =
-  //       MathUtil.clamp(
-  //           updateValue,
-  //           Constants.ShooterConstants.kHoodMinRange,
-  //           Constants.ShooterConstants.kHoodMaxRange);
-  // }
+  public void updateHoodTarget(double updateValue) {
+    hoodTarget =
+        MathUtil.clamp(
+            updateValue,
+            Constants.ShooterConstants.kHoodMinRange,
+            Constants.ShooterConstants.kHoodMaxRange);
+  }
+
+  public void updateFlyWheelSpeed(double speed) {
+    flywheelMotor.set(speed);
+  }
 
   // Runs every 20ms
   @Override
   public void periodic() {
     turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-    // hoodController.setSetpoint(hoodTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    hoodController.setSetpoint(hoodTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+  
   }
 }

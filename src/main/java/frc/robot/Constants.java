@@ -116,10 +116,11 @@ public final class Constants {
     public static final int kTurretMaxRange = 175;
     public static final int kTurretMinRange = -175;
 
-    // NEEDS TO BE CHANGED
-    // public static final int kHoodCanId = 31;
-    // public static final int kHoodMaxRange = 175;
-    // public static final int kHoodMinRange = -175;
+    public static final int kHoodCanId = 31;
+    public static final int kHoodMaxRange = 175;
+    public static final int kHoodMinRange = -175;
+
+    public static final int kFlywheelMotorId = 32;
 
     public static final class TurretSetpoints {
       public static final double kStow = 15.2;

@@ -133,6 +133,7 @@ public final class Constants {
 
     public static final class FlywheelSetpoints {
       public static final double kStow = 0.0;
+      public static final double kStartSpeed = 1.0;
     }
   }
 }

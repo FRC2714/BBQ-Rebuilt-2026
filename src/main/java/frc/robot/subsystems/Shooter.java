@@ -34,6 +34,7 @@ public class Shooter extends SubsystemBase {
 
   private SparkFlex flywheelMotorLeader =
       new SparkFlex(Constants.ShooterConstants.kFlywheelLeaderMotorId, MotorType.kBrushless);
+  private SparkClosedLoopController flywheelController = flywheelMotorLeader.getClosedLoopController();
 
   private SparkFlex flywheelMotorFollower =
       new SparkFlex(Constants.ShooterConstants.kFlywheelFollowerMotorId, MotorType.kBrushless);
@@ -117,10 +118,14 @@ public class Shooter extends SubsystemBase {
     return flywheelTargetSpeed = speed;
   }
 
+  public double setHoodAngle(double angle) {
+    return hoodTarget = angle;
+  } 
+
   public Command startShooter() {
     return this.run(
         () -> {
-          setFlywheelSpeed(flywheelTargetSpeed);
+          setFlywheelSpeed(Constants.ShooterConstants.FlywheelSetpoints.kStartSpeed);
         });
   }
 
@@ -131,11 +136,20 @@ public class Shooter extends SubsystemBase {
         });
   }
 
+  public Command stowShooter()
+  {
+    return this.run(
+      () -> {
+        setHoodAngle(Constants.ShooterConstants.HoodSetpoints.kStow);
+      }
+    );
+  }
+
   // Runs every 20ms
   @Override
   public void periodic() {
     turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-    hoodTarget = updateHoodTarget();
-    flywheelTargetSpeed = updateFlyWheelSpeedTarget();
+    hoodController.setSetpoint(updateHoodTarget(), ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    flywheelController.setSetpoint(updateFlyWheelSpeedTarget(), ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
 }

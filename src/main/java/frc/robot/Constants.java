@@ -120,7 +120,8 @@ public final class Constants {
     public static final int kHoodMaxRange = 175;
     public static final int kHoodMinRange = -175;
 
-    public static final int kFlywheelMotorId = 32;
+    public static final int kFlywheelLeaderMotorId = 32;
+    public static final int kFlywheelFollowerMotorId = 32;
 
     public static final class TurretSetpoints {
       public static final double kStow = 15.2;
@@ -128,6 +129,10 @@ public final class Constants {
 
     public static final class HoodSetpoints {
       public static final double kStow = 15.2;
+    }
+
+    public static final class FlywheelSetpoints {
+      public static final double kStow = 0.0;
     }
   }
 }

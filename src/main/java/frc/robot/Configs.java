@@ -5,6 +5,7 @@ import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.ShooterConstants;
 
 public final class Configs {
   public static final class MAXSwerveModule {
@@ -63,7 +64,8 @@ public final class Configs {
   public static final class Shooter {
     public static final SparkFlexConfig turretConfig = new SparkFlexConfig();
     public static final SparkFlexConfig hoodConfig = new SparkFlexConfig();
-    public static final SparkFlexConfig flywheelConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig flywheelConfigLeader = new SparkFlexConfig();
+    public static final SparkFlexConfig flywheelConfigFollower = new SparkFlexConfig();
 
     static {
       turretConfig
@@ -92,11 +94,16 @@ public final class Configs {
           .d(0)
           .outputRange(-0.1, 0.1);
 
-      flywheelConfig
+      flywheelConfigLeader
           .smartCurrentLimit(60)
           .idleMode(IdleMode.kCoast)
           .inverted(true)
           .voltageCompensation(12);
+
+      flywheelConfigFollower
+          .idleMode(IdleMode.kBrake)
+          .inverted(true)
+          .follow(ShooterConstants.kFlywheelLeaderMotorId, true);
     }
   }
 }

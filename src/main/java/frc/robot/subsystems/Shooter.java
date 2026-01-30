@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -10,34 +10,47 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
 import frc.robot.Constants.ShooterConstants.HoodSetpoints;
 import frc.robot.Constants.ShooterConstants.TurretSetpoints;
+import frc.robot.utils.InterpolatingTreeMap;
 
 public class Shooter extends SubsystemBase {
   // turret motors and controllers
   private SparkFlex turretMotor =
       new SparkFlex(Constants.ShooterConstants.kTurretCanId, MotorType.kBrushless);
   private SparkClosedLoopController turretController = turretMotor.getClosedLoopController();
-  private AbsoluteEncoder turretAbsoluteEncoder = turretMotor.getAbsoluteEncoder();
+
+  private RelativeEncoder turretRelativeEncoder = turretMotor.getExternalEncoder();
 
   private SparkFlex hoodMotor =
       new SparkFlex(Constants.ShooterConstants.kHoodCanId, MotorType.kBrushless);
   private SparkClosedLoopController hoodController = hoodMotor.getClosedLoopController();
-  private AbsoluteEncoder hoodAbsoluteEncoder = hoodMotor.getAbsoluteEncoder();
+  private RelativeEncoder hoodRelativeEncoder = hoodMotor.getExternalEncoder();
 
-  private SparkFlex flywheelMotor =
-      new SparkFlex(Constants.ShooterConstants.kFlywheelMotorId, MotorType.kBrushless);
+  private SparkFlex flywheelMotorLeader =
+      new SparkFlex(Constants.ShooterConstants.kFlywheelLeaderMotorId, MotorType.kBrushless);
+
+  private SparkFlex flywheelMotorFollower =
+      new SparkFlex(Constants.ShooterConstants.kFlywheelFollowerMotorId, MotorType.kBrushless);
 
   // limit switches
-  private SparkLimitSwitch turretLimitSwitch = turretMotor.getForwardLimitSwitch();
-  private SparkLimitSwitch hoodLimitSwitch = hoodMotor.getForwardLimitSwitch();
+  private SparkLimitSwitch turretForwardLimitSwitch = turretMotor.getForwardLimitSwitch();
+  private SparkLimitSwitch turretReverseLimitSwitch = turretMotor.getReverseLimitSwitch();
 
   private double turretCurrentTarget = TurretSetpoints.kStow;
 
   private double hoodTarget = HoodSetpoints.kStow;
+
+  private double flywheelTargetSpeed = FlywheelSetpoints.kStow;
+
+  private InterpolatingTreeMap hoodAngleMap;
+  private InterpolatingTreeMap flywheelSpeedMap;
+  private DriveSubsystem m_DriveSubsystem;
 
   // Creates a hood
   public Shooter() {
@@ -49,19 +62,38 @@ public class Shooter extends SubsystemBase {
     hoodMotor.configure(
         Configs.Shooter.hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    flywheelMotor.configure(
-        Configs.Shooter.flywheelConfig,
+    flywheelMotorLeader.configure(
+        Configs.Shooter.flywheelConfigLeader,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
+
+    flywheelMotorFollower.configure(
+        Configs.Shooter.flywheelConfigFollower,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
+
+    hoodAngleMap = new InterpolatingTreeMap();
+    flywheelSpeedMap = new InterpolatingTreeMap();
+
+    populateHoodAngleMap();
+    populateFlywheelSpeedMap();
+  }
+
+  public void populateHoodAngleMap() {
+    // Populate hood angle with data
+  }
+
+  public void populateFlywheelSpeedMap() {
+    // Populate flywheel speed with data
   }
 
   // Get positions
   public double getTurretPosition() {
-    return turretAbsoluteEncoder.getPosition();
+    return turretRelativeEncoder.getPosition();
   }
 
   public double getHoodPosition() {
-    return hoodAbsoluteEncoder.getPosition();
+    return hoodRelativeEncoder.getPosition();
   }
 
   // Update the target positions
@@ -73,23 +105,37 @@ public class Shooter extends SubsystemBase {
             Constants.ShooterConstants.kTurretMaxRange);
   }
 
-  public void updateHoodTarget(double updateValue) {
-    hoodTarget =
-        MathUtil.clamp(
-            updateValue,
-            Constants.ShooterConstants.kHoodMinRange,
-            Constants.ShooterConstants.kHoodMaxRange);
+  public double updateHoodTarget() {
+    return hoodAngleMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
   }
 
-  public void updateFlyWheelSpeed(double speed) {
-    flywheelMotor.set(speed);
+  public double updateFlyWheelSpeedTarget() {
+    return flywheelSpeedMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
+  }
+
+  public double setFlywheelSpeed(double speed) {
+    return flywheelTargetSpeed = speed;
+  }
+
+  public Command startShooter() {
+    return this.run(
+        () -> {
+          setFlywheelSpeed(flywheelTargetSpeed);
+        });
+  }
+
+  public Command stopShooter() {
+    return this.run(
+        () -> {
+          setFlywheelSpeed(0);
+        });
   }
 
   // Runs every 20ms
   @Override
   public void periodic() {
     turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-    hoodController.setSetpoint(hoodTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-  
+    hoodTarget = updateHoodTarget();
+    flywheelTargetSpeed = updateFlyWheelSpeedTarget();
   }
 }

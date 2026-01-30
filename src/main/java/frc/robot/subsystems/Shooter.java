@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
@@ -34,7 +35,8 @@ public class Shooter extends SubsystemBase {
 
   private SparkFlex flywheelMotorLeader =
       new SparkFlex(Constants.ShooterConstants.kFlywheelLeaderMotorId, MotorType.kBrushless);
-  private SparkClosedLoopController flywheelController = flywheelMotorLeader.getClosedLoopController();
+  private SparkClosedLoopController flywheelController =
+      flywheelMotorLeader.getClosedLoopController();
 
   private SparkFlex flywheelMotorFollower =
       new SparkFlex(Constants.ShooterConstants.kFlywheelFollowerMotorId, MotorType.kBrushless);
@@ -120,7 +122,11 @@ public class Shooter extends SubsystemBase {
 
   public double setHoodAngle(double angle) {
     return hoodTarget = angle;
-  } 
+  }
+
+  public double getHoodAngle() {
+    return hoodController.getSetpoint();
+  }
 
   public Command startShooter() {
     return this.run(
@@ -136,13 +142,11 @@ public class Shooter extends SubsystemBase {
         });
   }
 
-  public Command stowShooter()
-  {
+  public Command stowShooter() {
     return this.run(
-      () -> {
-        setHoodAngle(Constants.ShooterConstants.HoodSetpoints.kStow);
-      }
-    );
+        () -> {
+          setHoodAngle(Constants.ShooterConstants.HoodSetpoints.kStow);
+        });
   }
 
   // Runs every 20ms
@@ -150,6 +154,9 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     hoodController.setSetpoint(updateHoodTarget(), ControlType.kPosition, ClosedLoopSlot.kSlot0);
-    flywheelController.setSetpoint(updateFlyWheelSpeedTarget(), ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    flywheelController.setSetpoint(
+        updateFlyWheelSpeedTarget(), ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+
+    SmartDashboard.putNumber("Hood Angle", getHoodAngle());
   }
 }

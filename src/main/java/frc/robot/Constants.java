@@ -119,7 +119,7 @@ public final class Constants {
     public static final int kTurretMinRange = -175;
     public static final Transform2d turretOffset =
         new Transform2d(
-            Units.inchesToMeters(2.25), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));
+            Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));
 
     public static final class TurretSetpoints {
       public static final double kStow = 15.2;

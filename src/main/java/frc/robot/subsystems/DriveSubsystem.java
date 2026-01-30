@@ -99,14 +99,13 @@ public class DriveSubsystem extends SubsystemBase {
 
     LimelightHelpers.SetRobotOrientation("limelight-right", getHeading(), 0, 0, 0, 0, 0);
 
-
     double omegaRps = Units.degreesToRotations(getTurnRate());
 
     var frontLLMeasurement =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
     var leftLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
-        var rightLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
-
+    var rightLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
 
     if (Math.abs(omegaRps) < 2.0) {
       if (frontLLMeasurement != null && frontLLMeasurement.tagCount > 0) {
@@ -118,7 +117,7 @@ public class DriveSubsystem extends SubsystemBase {
         m_poseEstimator.addVisionMeasurement(
             leftLLMeasurement.pose, leftLLMeasurement.timestampSeconds);
       }
-            if (rightLLMeasurement != null && rightLLMeasurement.tagCount > 0) {
+      if (rightLLMeasurement != null && rightLLMeasurement.tagCount > 0) {
         m_poseEstimator.addVisionMeasurement(
             rightLLMeasurement.pose, rightLLMeasurement.timestampSeconds);
       }

@@ -120,4 +120,15 @@ public final class Constants {
       public static final double kStow = 15.2;
     }
   }
+
+  public static final class IntakeConstants {
+    public static final int kIntakePivotCanId = 1; // needs tuning
+    public static final int kIntakeRollerCanId = 2; // needs tuning
+    public static final int kPivotkG = 0; // needs tuning
+    public static final int kPivotStow = 0;
+    public static final int kPivotExtend = 0;
+    public static final int kIntakeRollerPower = 0; // needs tuning
+    public static final int kExtakeRollerPower = 0;
+    public static final int kRollerStop = 0;
+  }
 }

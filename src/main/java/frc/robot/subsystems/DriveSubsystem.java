@@ -8,7 +8,6 @@ import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,6 +17,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -55,6 +56,10 @@ public class DriveSubsystem extends SubsystemBase {
   private final Canandgyro m_gyro = new Canandgyro(0);
 
   private final Field2d m_field2d = new Field2d();
+
+  // Publisher for robot pose for use with AdvantageScope
+  StructPublisher<Pose2d> publisher =
+      NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
 
   // Odometry class for tracking robot pose
   public SwerveDrivePoseEstimator m_poseEstimator =
@@ -94,18 +99,17 @@ public class DriveSubsystem extends SubsystemBase {
 
     double omegaRps = Units.degreesToRotations(getTurnRate());
 
-    var frontLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
-    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-back");
+    var frontLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
+    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-back");
 
     if (Math.abs(omegaRps) < 2.0) {
       if (frontLLMeasurement != null && frontLLMeasurement.tagCount > 0) {
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
         m_poseEstimator.addVisionMeasurement(
             frontLLMeasurement.pose, frontLLMeasurement.timestampSeconds);
       }
 
       if (backLLMeasurement != null && backLLMeasurement.tagCount > 0) {
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
         m_poseEstimator.addVisionMeasurement(
             backLLMeasurement.pose, backLLMeasurement.timestampSeconds);
       }
@@ -114,6 +118,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putNumber("heading", getHeading());
     SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX());
+
+    publisher.set(getPose());
   }
 
   /**
@@ -226,7 +232,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return m_gyro.getYaw() >= 0 ? m_gyro.getYaw() * 360 : Math.abs((m_gyro.getYaw() * 360) + 360);
+    return Units.rotationsToDegrees(m_gyro.getYaw());
   }
 
   /**

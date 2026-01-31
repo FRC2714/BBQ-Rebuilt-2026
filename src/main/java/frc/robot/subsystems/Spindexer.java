@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Configs;
 import frc.robot.Constants;
 
 public class Spindexer extends SubsystemBase {
@@ -22,12 +23,10 @@ public class Spindexer extends SubsystemBase {
   public Spindexer() {
     // Configs for rotorMotor
     rotorMotor.configure(
-        Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        Configs.Spindexer.rotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     // Configs for feederMotor
     feederMotor.configure(
-        Configs.Intake.rollerConfig,
-        ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+        Configs.Spindexer.feederConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
   
 

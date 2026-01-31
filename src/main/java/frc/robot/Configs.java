@@ -60,22 +60,42 @@ public final class Configs {
     }
   }
 
-  public static final class Shooter {
-    public static final SparkFlexConfig turretConfig = new SparkFlexConfig();
+  public static final class Spindexer {
+    public static final SparkFlexConfig rotorConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig feederConfig = new SparkFlexConfig();
 
     static {
-      turretConfig
-          .smartCurrentLimit(40)
-          .idleMode(IdleMode.kBrake)
+      rotorConfig
+          .smartCurrentLimit(40) // needs tuning
+          .idleMode(IdleMode.kBrake) // needs tuning
+          .inverted(false) // needs tuning
+          .voltageCompensation(12); // needs tuning
+      rotorConfig
+          .absoluteEncoder
+          .positionConversionFactor(360)
           .inverted(false)
-          .voltageCompensation(12);
-      turretConfig.absoluteEncoder.positionConversionFactor(360).inverted(false).zeroCentered(true);
-      turretConfig
+          .zeroCentered(true); // needs tuning
+      rotorConfig
           .closedLoop
-          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          .p(0.01)
-          .d(0)
-          .outputRange(-0.5, 0.5);
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning
+          .p(0.01) // needs tuning
+          .d(0) // needs tuning
+          .outputRange(-0.5, 0.5); // needs tuning
+    }
+
+    static {
+      feederConfig
+          .smartCurrentLimit(40) // needs tuning
+          .idleMode(IdleMode.kBrake) // needs tuning
+          .inverted(false) // needs tuning
+          .voltageCompensation(12); // needs tuning
+      feederConfig.absoluteEncoder.positionConversionFactor(360).inverted(false).zeroCentered(true);
+      feederConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning
+          .p(0.01) // needs tuning
+          .d(0) // needs tuning
+          .outputRange(-0.5, 0.5); // needs tuning
     }
   }
 }

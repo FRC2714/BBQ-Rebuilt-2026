@@ -37,6 +37,7 @@ public class Shooter extends SubsystemBase {
       new SparkFlex(Constants.ShooterConstants.kFlywheelLeaderMotorId, MotorType.kBrushless);
   private SparkClosedLoopController flywheelController =
       flywheelMotorLeader.getClosedLoopController();
+  private RelativeEncoder flywheelRelativeEncoder = flywheelMotorLeader.getExternalEncoder();
 
   private SparkFlex flywheelMotorFollower =
       new SparkFlex(Constants.ShooterConstants.kFlywheelFollowerMotorId, MotorType.kBrushless);
@@ -108,16 +109,20 @@ public class Shooter extends SubsystemBase {
             Constants.ShooterConstants.kTurretMaxRange);
   }
 
-  // public double updateHoodTarget() {
-  //   return hoodAngleMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
-  // }
+  public double updateHoodTarget() {
+    return hoodAngleMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
+  }
 
-  // public double updateFlyWheelSpeedTarget() {
-  //   return flywheelSpeedMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
-  // }
+  public double updateFlyWheelSpeedTarget() {
+    return flywheelSpeedMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
+  }
 
   public void setFlywheelSpeed(double speed) {
     flywheelTargetSpeed = speed;
+  }
+
+  public double getFlywheelSpeed() {
+    return flywheelController.getSetpoint();
   }
 
   public void setHoodAngle(double angle) {
@@ -153,11 +158,11 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-    // hoodController.setSetpoint(updateHoodTarget(), ControlType.kPosition, ClosedLoopSlot.kSlot0);
-    // flywheelController.setSetpoint(
-    //     updateFlyWheelSpeedTarget(), ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    hoodController.setSetpoint(updateHoodTarget(), ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    flywheelController.setSetpoint(
+        updateFlyWheelSpeedTarget(), ControlType.kVelocity, ClosedLoopSlot.kSlot0);
 
-    SmartDashboard.putNumber("Hood Angle", getHoodAngle());
-    SmartDashboard.putNumber("Flywheel Speed", flywheelTargetSpeed);
+    SmartDashboard.putNumber("Hood Angle", hoodRelativeEncoder.getPosition());
+    SmartDashboard.putNumber("Flywheel Speed", flywheelRelativeEncoder.getVelocity());
   }
 }

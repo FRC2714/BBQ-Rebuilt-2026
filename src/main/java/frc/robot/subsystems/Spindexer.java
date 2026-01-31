@@ -30,9 +30,7 @@ public class Spindexer extends SubsystemBase {
     feederMotor.configure(
         Configs.Spindexer.feederConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
-
-  public void 
-  
+ 
 
   @Override
   public void periodic() {

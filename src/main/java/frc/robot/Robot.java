@@ -57,7 +57,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
 
-        LimelightHelpers.Flush();
+    LimelightHelpers.Flush();
   }
 
   @Override

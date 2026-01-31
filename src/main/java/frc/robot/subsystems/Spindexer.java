@@ -32,7 +32,6 @@ public class Spindexer extends SubsystemBase {
 
   private double feederCurrentTarget = 0;
   private double rotorCurrentTarget = 0;
-  private boolean check = false;
 
 
   public Spindexer() {
@@ -54,6 +53,7 @@ public class Spindexer extends SubsystemBase {
   }
 
   public void setFeederPower(double power) {
+    feederCurrentTarget = power;
     feederMotor.set(power);
   }
 
@@ -110,6 +110,7 @@ public class Spindexer extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("rotor power", rotorCurrentTarget);
+    SmartDashboard.putNumber("Rotor Power", rotorCurrentTarget);
+    SmartDashboard.putNumber("Feeder Power", feederCurrentTarget);
   }
 }

@@ -61,6 +61,17 @@ public class DriveSubsystem extends SubsystemBase {
   // Publisher for robot pose for use with AdvantageScope
   StructPublisher<Pose2d> publisher =
       NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
+  
+  StructPublisher<Pose2d> publisherLLright =
+      NetworkTableInstance.getDefault().getStructTopic("poseLLright", Pose2d.struct).publish();
+
+    StructPublisher<Pose2d> publisherLLleft =
+      NetworkTableInstance.getDefault().getStructTopic("poseLLleft", Pose2d.struct).publish();
+  
+        StructPublisher<Pose2d> publisherLLfront =
+      NetworkTableInstance.getDefault().getStructTopic("poseLLfront", Pose2d.struct).publish();
+
+
 
   // Odometry class for tracking robot pose
   public SwerveDrivePoseEstimator m_poseEstimator =
@@ -123,11 +134,16 @@ public class DriveSubsystem extends SubsystemBase {
       }
     }
 
+
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putNumber("heading", getHeading());
     SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX());
 
     publisher.set(getPose());
+        publisherLLfront.set(frontLLMeasurement.pose);
+                publisherLLleft.set(leftLLMeasurement.pose);
+                        publisherLLright.set(rightLLMeasurement.pose);
+
   }
 
   /**

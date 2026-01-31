@@ -34,12 +34,16 @@ public class Robot extends TimedRobot {
     CanandEventLoop.getInstance();
 
     LimelightHelpers.SetRobotOrientation(
-        "limelight-back", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+        "limelight-left", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation(
+        "limelight-right", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
 
     LimelightHelpers.SetRobotOrientation(
         "limelight-front", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
-    LimelightHelpers.SetIMUMode("limelight-front", 1);
-    LimelightHelpers.SetIMUMode("limelight-back", 1);
+    LimelightHelpers.SetIMUMode("limelight-front", 1); //inactive
+    LimelightHelpers.SetIMUMode("limelight-right", 1);
+        LimelightHelpers.SetIMUMode("limelight-left", 1);
+
   }
 
   /**
@@ -97,8 +101,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    LimelightHelpers.SetIMUMode("limelight-front", 2);
-    LimelightHelpers.SetIMUMode("limelight-back", 2);
+    LimelightHelpers.SetIMUMode("limelight-front", 4); // 4 is internal imu + gyro 
+    LimelightHelpers.SetIMUMode("limelight-right", 4);
+        LimelightHelpers.SetIMUMode("limelight-left", 4);
   }
 
   /** This function is called periodically during operator control. */

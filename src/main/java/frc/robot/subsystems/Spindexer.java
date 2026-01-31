@@ -45,6 +45,24 @@ public class Spindexer extends SubsystemBase {
     feederMotor.set(power);
   }
 
+  public Command loading() {
+    return this.run(
+      () -> {
+        setRotorPower(Constants.SpindexerConstants.kRotorMotorPower);
+        setFeederPower(Constants.SpindexerConstants.kFeederMotorPower);
+      }
+    );
+  }
+
+  public Command stop() {
+    return this.run(
+      () -> {
+        setRotorPower(0);
+        setFeederPower(0);
+      }
+    );
+  }
+  
   public Command feedUntilFull() {
     return this.run(
             () -> {
@@ -55,8 +73,7 @@ public class Spindexer extends SubsystemBase {
         .andThen(
             this.run(
                 () -> {
-                  setRotorPower(0);
-                  setFeederPower(0);
+                  stop();
                 }));
   }
 

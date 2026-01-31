@@ -19,7 +19,16 @@ public class Spindexer extends SubsystemBase {
 
   
 
-  public Spindexer() {}
+  public Spindexer() {
+    // Configs for rotorMotor
+    rotorMotor.configure(
+        Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    // Configs for feederMotor
+    feederMotor.configure(
+        Configs.Intake.rollerConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
+  }
   
 
   @Override

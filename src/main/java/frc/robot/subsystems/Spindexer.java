@@ -6,23 +6,34 @@ package frc.robot.subsystems;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 
 public class Spindexer extends SubsystemBase {
   /** Creates a new Spindexer. */
-  private SparkFlex rotorMotor =
-      new SparkFlex(Constants.SpindexerConstants.kRotorMotorCanId, MotorType.kBrushless);
-
-  private SparkFlex feederMotor =
-      new SparkFlex(Constants.SpindexerConstants.kFeederMotorCanId, MotorType.kBrushless);
+  // Rotor
+  private SparkFlex rotorMotor = new SparkFlex(Constants.SpindexerConstants.kRotorMotorCanId, MotorType.kBrushless);
+  // Feeder
+  private SparkFlex feederMotor = new SparkFlex(Constants.SpindexerConstants.kFeederMotorCanId, MotorType.kBrushless);
+  // Beam breaks
   private SparkLimitSwitch beamBreak1 = feederMotor.getForwardLimitSwitch();
   private SparkLimitSwitch beamBreak2 = feederMotor.getReverseLimitSwitch();
+
+  private double feederCurrentTarget = 0;
+  private double rotorCurrentTarget = 0;
+  private boolean check = false;
+
 
   public Spindexer() {
     // Configs for rotorMotor
@@ -38,7 +49,8 @@ public class Spindexer extends SubsystemBase {
   }
 
   public void setRotorPower(double power) {
-    rotorMotor.set(power);
+    rotorCurrentTarget = power;
+    rotorMotor.set(rotorCurrentTarget);
   }
 
   public void setFeederPower(double power) {
@@ -47,29 +59,27 @@ public class Spindexer extends SubsystemBase {
 
   public Command loading() {
     return this.run(
-      () -> {
-        setRotorPower(Constants.SpindexerConstants.kRotorMotorPower);
-        setFeederPower(Constants.SpindexerConstants.kFeederMotorPower);
-      }
-    );
+        () -> {
+          setRotorPower(Constants.SpindexerConstants.kRotorMotorPower);
+          setFeederPower(Constants.SpindexerConstants.kFeederMotorPower);
+        });
   }
 
   public Command stop() {
     return this.run(
-      () -> {
-        setRotorPower(0);
-        setFeederPower(0);
-      }
-    );
+        () -> {
+          setRotorPower(0);
+          setFeederPower(0);
+        });
   }
-  
+
   public Command feedUntilFull() {
     return this.run(
-            () -> {
-              setRotorPower(Constants.SpindexerConstants.kRotorMotorPower);
-              setFeederPower(Constants.SpindexerConstants.kFeederMotorPower);
-            })
-        .until(() -> beamBreak1.isPressed())
+        () -> {
+          setRotorPower(Constants.SpindexerConstants.kRotorMotorPower + 20);
+          setFeederPower(Constants.SpindexerConstants.kFeederMotorPower + 20);
+        })
+        .until(() -> simPressTrue())
         .andThen(
             this.run(
                 () -> {
@@ -79,9 +89,9 @@ public class Spindexer extends SubsystemBase {
 
   public Command reverseFuel() {
     return this.run(
-            () -> {
-              setFeederPower(-(Constants.SpindexerConstants.kRotorMotorPower));
-            })
+        () -> {
+          setFeederPower(-(Constants.SpindexerConstants.kRotorMotorPower));
+        })
         .until(() -> !(beamBreak2.isPressed()))
         .andThen(
             this.run(
@@ -89,9 +99,17 @@ public class Spindexer extends SubsystemBase {
                   setFeederPower(0);
                 }));
   }
+      
+    public boolean simPressTrue(){
+      return true;
+    }   
+
+  public boolean simPressFalse(){
+    return false;
+    }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    SmartDashboard.putNumber("rotor power", rotorCurrentTarget);
   }
 }

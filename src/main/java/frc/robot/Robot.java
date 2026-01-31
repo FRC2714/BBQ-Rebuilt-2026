@@ -33,13 +33,7 @@ public class Robot extends TimedRobot {
 
     CanandEventLoop.getInstance();
 
-    LimelightHelpers.SetRobotOrientation(
-        "limelight-back", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
-
-    LimelightHelpers.SetRobotOrientation(
-        "limelight-front", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
-    LimelightHelpers.SetIMUMode("limelight-front", 1);
-    LimelightHelpers.SetIMUMode("limelight-back", 1);
+    LimelightHelpers.Flush();
   }
 
   /**
@@ -64,7 +58,19 @@ public class Robot extends TimedRobot {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-left", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-right", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-front", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+
+    LimelightHelpers.SetIMUMode("limelight-left", 1);
+    LimelightHelpers.SetIMUMode("limelight-right", 1);
+    LimelightHelpers.SetIMUMode("limelight-front", 1); // inactive
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
@@ -86,7 +92,15 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-left", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-right", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-front", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+  }
 
   @Override
   public void teleopInit() {
@@ -97,13 +111,26 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    LimelightHelpers.SetIMUMode("limelight-front", 2);
-    LimelightHelpers.SetIMUMode("limelight-back", 2);
+    LimelightHelpers.SetIMUMode("limelight-front", 2); // 4 is internal imu + gyro
+    LimelightHelpers.SetIMUMode("limelight-right", 2);
+    LimelightHelpers.SetIMUMode("limelight-left", 2);
+    // LimelightHelpers.SetIMUAssistAlpha("limelight-front", .005);
+    // LimelightHelpers.SetIMUAssistAlpha("limelight-right", .005);
+    // LimelightHelpers.SetIMUAssistAlpha("limelight-left", .005);
+
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-left", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-right", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+
+    LimelightHelpers.SetRobotOrientation(
+        "limelight-front", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+  }
 
   @Override
   public void testInit() {

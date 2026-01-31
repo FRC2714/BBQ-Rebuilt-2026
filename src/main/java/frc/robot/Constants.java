@@ -127,8 +127,8 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final int kIntakePivotCanId = 1; // needs tuning
-    public static final int kIntakeRollerCanId = 2; // needs tuning
+    public static final int kIntakePivotCanId = 100; // needs tuning
+    public static final int kIntakeRollerCanId = 200; // needs tuning
     public static final int kPivotkG = 0; // needs tuning
     public static final int kPivotStow = 0; // needs tuning
     public static final int kPivotExtend = 0; // needs tuning
@@ -138,8 +138,8 @@ public final class Constants {
   }
 
   public static final class SpindexerConstants {
-    public static final int kRotorMotorCanId = 0; // needs tuning
-    public static final int kFeederMotorCanId = 0; // needs tuning
+    public static final int kRotorMotorCanId = 300; // needs tuning
+    public static final int kFeederMotorCanId = 400; // needs tuning
     public static final double kRotorMotorPower = 0; // needs tuning
     public static final double kFeederMotorPower = 0; // needs tuning
   }

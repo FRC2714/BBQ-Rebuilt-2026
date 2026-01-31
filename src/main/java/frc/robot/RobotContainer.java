@@ -26,6 +26,8 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Spindexer;
+
 import java.util.List;
 
 /*
@@ -38,10 +40,12 @@ public class RobotContainer {
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final Shooter m_turret = new Shooter();
+  public final Spindexer m_spindexer = new Spindexer();
 
   // The driver's controller
   CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);
+    
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -78,6 +82,9 @@ public class RobotContainer {
     m_driverController
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
+
+        m_driverController.a().whileTrue(m_spindexer.loading());
+    
   }
 
   /**

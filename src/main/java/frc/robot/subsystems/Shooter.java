@@ -3,13 +3,22 @@ package frc.robot.subsystems;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,6 +27,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
 import frc.robot.Constants.ShooterConstants.HoodSetpoints;
 import frc.robot.Constants.ShooterConstants.TurretSetpoints;
+import frc.robot.Constants.SimulationRobotConstants;
 import frc.robot.utils.InterpolatingTreeMap;
 
 public class Shooter extends SubsystemBase {
@@ -56,6 +66,33 @@ public class Shooter extends SubsystemBase {
   private InterpolatingTreeMap flywheelSpeedMap;
   private DriveSubsystem m_DriveSubsystem;
 
+    // Simulation setup and variables
+  private DCMotor armMotorModel = DCMotor.getNeoVortex(1);
+  private SparkFlexSim armMotorSim;
+  private final SingleJointedArmSim m_hoodPivotSim =
+      new SingleJointedArmSim(
+          armMotorModel,
+          Constants.SimulationRobotConstants.kHoodReduction,
+          SingleJointedArmSim.estimateMOI(
+          Constants.SimulationRobotConstants.kHoodLength, Constants.SimulationRobotConstants.kHoodMass),
+          Constants.SimulationRobotConstants.kHoodLength,
+          Constants.SimulationRobotConstants.kHoodMinAngleRads,
+          Constants.SimulationRobotConstants.kHoodMaxAngleRads,
+          true,
+          SimulationRobotConstants.kHoodMinAngleRads,
+          0.0,
+          0.0);
+
+  // Mechanism2d setup for subsytem
+  private final Mechanism2d m_mech2d = new Mechanism2d(50, 50);
+  private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("Coral Intake Root", 25.1, 0);
+  private final MechanismLigament2d hoodPivotMechanism =
+      m_mech2dRoot.append(
+          new MechanismLigament2d(
+              "Hood Pivot",
+              SimulationRobotConstants.kHoodLength,
+              Constants.ShooterConstants.HoodSetpoints.kZeroOffsetDegrees));
+
   // Creates a hood
   public Shooter() {
     turretMotor.configure(
@@ -81,6 +118,11 @@ public class Shooter extends SubsystemBase {
 
     populateHoodAngleMap();
     populateFlywheelSpeedMap();
+
+    SmartDashboard.putData("Mech2D's/Hood Pivot", m_mech2d);
+
+    armMotorSim = new SparkFlexSim(hoodMotor, armMotorModel);
+
   }
 
   public void populateHoodAngleMap() {
@@ -109,13 +151,13 @@ public class Shooter extends SubsystemBase {
             Constants.ShooterConstants.kTurretMaxRange);
   }
 
-  public double updateHoodTarget() {
-    return hoodAngleMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
-  }
+  // public double updateHoodTarget() {
+  //   return hoodAngleMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
+  // }
 
-  public double updateFlyWheelSpeedTarget() {
-    return flywheelSpeedMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
-  }
+  // public double updateFlyWheelSpeedTarget() {
+  //   return flywheelSpeedMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
+  // }
 
   public void setFlywheelSpeed(double speed) {
     flywheelTargetSpeed = speed;
@@ -158,11 +200,32 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-    hoodController.setSetpoint(updateHoodTarget(), ControlType.kPosition, ClosedLoopSlot.kSlot0);
-    flywheelController.setSetpoint(
-        updateFlyWheelSpeedTarget(), ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    // hoodController.setSetpoint(updateHoodTarget(), ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    // flywheelController.setSetpoint(
+    //     updateFlyWheelSpeedTarget(), ControlType.kVelocity, ClosedLoopSlot.kSlot0);
 
     SmartDashboard.putNumber("Hood Angle", hoodRelativeEncoder.getPosition());
+    SmartDashboard.putNumber("Flywheel Speed", flywheelRelativeEncoder.getVelocity());
+  }
+
+   @Override
+  public void simulationPeriodic() {
+    // This method will be called once per scheduler run during simulation
+    m_hoodPivotSim.setInput(armMotorSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+
+    // Next, we update it. The standard loop time is 20ms.
+    m_hoodPivotSim.update(0.020);
+
+    // Iterate the arm SPARK simulation
+    armMotorSim.iterate(
+        Units.radiansPerSecondToRotationsPerMinute(
+            m_hoodPivotSim.getVelocityRadPerSec() * SimulationRobotConstants.kArmReduction),
+        RobotController.getBatteryVoltage(),
+        0.02);
+
+    // SimBattery is updated in Robot.java
+
+     SmartDashboard.putNumber("Hood Angle", hoodRelativeEncoder.getPosition());
     SmartDashboard.putNumber("Flywheel Speed", flywheelRelativeEncoder.getVelocity());
   }
 }

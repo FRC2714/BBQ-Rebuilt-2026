@@ -129,11 +129,52 @@ public final class Constants {
 
     public static final class HoodSetpoints {
       public static final double kStow = 15.2;
+      public static final double kZeroOffsetDegrees = 0.0;
     }
 
     public static final class FlywheelSetpoints {
       public static final double kStow = 0.0;
       public static final double kStartSpeed = 1.0;
     }
+  }
+
+    public static final class SimulationRobotConstants {
+    // ! Remove *20 from all values for final Robot Testing
+    public static final double kPixelsPerMeter = 1 * 20;
+
+    public static final double kElevatorGearing = 25; // 25:1
+    public static final double kCarriageMass =
+        4.3 + 3.15 + 0.151; // Kg, arm + elevator stage + chain
+    public static final double kElevatorDrumRadius = 0.0328 / 2.0; // m
+    public static final double kMinElevatorHeightMeters = Units.inchesToMeters(35.2 * 20); // m
+    public static final double kMaxElevatorHeightMeters = Units.inchesToMeters(66.7 * 20); // m
+
+    public static final double kArmReduction = 60; // 60:1
+    public static final double kArmLength = 0.433; // m
+    public static final double kArmMass = 4.3; // Kg
+
+    public static final double kPivotReduction = 60; // 60:1
+    public static final double kPivotLength = Units.inchesToMeters(10); // m
+    public static final double kPivotMass = 4.3; // Kg
+
+    public static final double kMinAngleRads =
+        Units.degreesToRadians(-50.1); // -50.1 deg from horiz
+    public static final double kMaxAngleRads =
+        Units.degreesToRadians(40.9 + 180); // 40.9 deg from horiz
+
+    public static final double kHoodReduction = 135; // 135:1
+    public static final double kHoodLength = Units.inchesToMeters(15); // m
+    public static final double kHoodMass = 5.8738; // Kg
+
+
+    public static final double kHoodMinAngleRads = Units.degreesToRadians(0);
+    public static final double kHoodMaxAngleRads =
+        Units.degreesToRadians(360 * kHoodReduction);
+
+    public static final double kHoodShortBarLength = Units.inchesToMeters(11);
+    public static final double kHoodLongBarLength = Units.inchesToMeters(13);
+    public static final double kCoralIntakeLength = Units.inchesToMeters(11 * 20);
+    public static final double kCoralStandLength = Units.inchesToMeters(35.2 * 20);
+    public static final double kIntakeBarAngleRads = Units.degreesToRadians(90);
   }
 }

@@ -125,17 +125,17 @@ public final class Constants {
     public static final int kIntakePivotCanId = 1; // needs tuning
     public static final int kIntakeRollerCanId = 2; // needs tuning
     public static final int kPivotkG = 0; // needs tuning
-    public static final int kPivotStow = 0; //needs tuning
-    public static final int kPivotExtend = 0; //needs tuning
+    public static final int kPivotStow = 0; // needs tuning
+    public static final int kPivotExtend = 0; // needs tuning
     public static final int kIntakeRollerPower = 0; // needs tuning
-    public static final int kExtakeRollerPower = 0; //needs tuning 
+    public static final int kExtakeRollerPower = 0; // needs tuning
     public static final int kRollerStop = 0; // needs tuning
   }
 
-  public static final class SpindexerConstants{
-    public static final int kRotorMotorCanId = 0; //needs tuning
+  public static final class SpindexerConstants {
+    public static final int kRotorMotorCanId = 0; // needs tuning
     public static final int kFeederMotorCanId = 0; // needs tuning
-    public static final double kRotorMotorPower = 0; //needs tuning
-    public static final double kFeederMotorPower = 0; //needs tuning
+    public static final double kRotorMotorPower = 0; // needs tuning
+    public static final double kFeederMotorPower = 0; // needs tuning
   }
 }

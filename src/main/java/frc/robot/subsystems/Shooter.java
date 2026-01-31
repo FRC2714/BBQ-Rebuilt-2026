@@ -17,7 +17,8 @@ import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 
 public class Shooter extends SubsystemBase {
   // turret motor and controller
-  private SparkFlex turretMotor = new SparkFlex(Constants.ShooterConstants.kTurretCanId, MotorType.kBrushless);
+  private SparkFlex turretMotor =
+      new SparkFlex(Constants.ShooterConstants.kTurretCanId, MotorType.kBrushless);
   private SparkClosedLoopController turretController = turretMotor.getClosedLoopController();
   private AbsoluteEncoder turretAbsoluteEncoder = turretMotor.getAbsoluteEncoder();
 

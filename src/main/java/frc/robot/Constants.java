@@ -135,5 +135,7 @@ public final class Constants {
   public static final class SpindexerConstants{
     public static final int kRotorMotorCanId = 0; //needs tuning
     public static final int kFeederMotorCanId = 0; // needs tuning
+    public static final double kRotorMotorPower = 0; //needs tuning
+    public static final double kFeederMotorPower = 0; //needs tuning
   }
 }

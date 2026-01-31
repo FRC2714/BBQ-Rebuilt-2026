@@ -41,7 +41,13 @@ public class Spindexer extends SubsystemBase {
   }
 
   public Command spindexerFeed(){
-    this.run()
+    return this.run(
+        () -> {
+          setRotorPower(Constants.SpindexerConstants.kRotorMotorPower);
+          setFeederPower(Constants.SpindexerConstants.kFeederMotorPower);
+        });
+        .until(beamBreak1.isPressed())
+        .andThen
   }
 
   @Override

@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
+import com.revrobotics.spark.SparkLimitSwitch;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
@@ -14,12 +16,12 @@ import frc.robot.Constants;
 public class Spindexer extends SubsystemBase {
   /** Creates a new Spindexer. */
 
-
   private SparkFlex rotorMotor = new SparkFlex(Constants.SpindexerConstants.kRotorMotorCanId, MotorType.kBrushless);
   private SparkFlex feederMotor = new SparkFlex(Constants.SpindexerConstants.kFeederMotorCanId, MotorType.kBrushless);
+  private SparkLimitSwitch beamBreak1 = feederMotor.getForwardLimitSwitch();
+  private SparkLimitSwitch beambreak2 = feederMotor.getReverseLimitSwitch();
 
   
-
   public Spindexer() {
     // Configs for rotorMotor
     rotorMotor.configure(
@@ -28,6 +30,8 @@ public class Spindexer extends SubsystemBase {
     feederMotor.configure(
         Configs.Spindexer.feederConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
+
+  public void 
   
 
   @Override

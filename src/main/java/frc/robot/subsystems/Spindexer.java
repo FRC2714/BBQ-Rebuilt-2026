@@ -4,11 +4,23 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Spindexer extends SubsystemBase {
   /** Creates a new Spindexer. */
+
+
+  private SparkFlex rotorMotor = new SparkFlex(Constants.SpindexerConstants.kRotorMotorCanId, MotorType.kBrushless);
+  private SparkFlex feederMotor = new SparkFlex(Constants.SpindexerConstants.kFeederMotorCanId, MotorType.kBrushless);
+
+  
+
   public Spindexer() {}
+  
 
   @Override
   public void periodic() {

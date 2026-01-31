@@ -9,6 +9,7 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkLimitSwitch;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
@@ -30,7 +31,18 @@ public class Spindexer extends SubsystemBase {
     feederMotor.configure(
         Configs.Spindexer.feederConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
- 
+  
+  public void setRotorPower(double power) {
+    rotorMotor.set(power);
+  }
+   
+  public void setFeederPower(double power) {
+    feederMotor.set(power);
+  }
+
+  public Command spindexerFeed(){
+    this.run()
+  }
 
   @Override
   public void periodic() {

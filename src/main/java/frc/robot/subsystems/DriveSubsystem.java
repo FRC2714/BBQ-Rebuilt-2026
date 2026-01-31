@@ -8,6 +8,7 @@ import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -57,6 +58,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final Canandgyro m_gyro = new Canandgyro(0);
 
   private final Field2d m_field2d = new Field2d();
+
+  double xyStdDev;
 
   // Publisher for robot pose for use with AdvantageScope
   StructPublisher<Pose2d> publisher =
@@ -120,15 +123,21 @@ public class DriveSubsystem extends SubsystemBase {
 
     if (Math.abs(omegaRps) < 2.0) {
       if (frontLLMeasurement != null && frontLLMeasurement.tagCount > 0) {
+        xyStdDev = .7 * (1+ frontLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev,xyStdDev,9999999));
         m_poseEstimator.addVisionMeasurement(
             frontLLMeasurement.pose, frontLLMeasurement.timestampSeconds);
       }
 
       if (leftLLMeasurement != null && leftLLMeasurement.tagCount > 0) {
+        xyStdDev = .7 * (1+ leftLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev,xyStdDev,9999999));
         m_poseEstimator.addVisionMeasurement(
             leftLLMeasurement.pose, leftLLMeasurement.timestampSeconds);
       }
       if (rightLLMeasurement != null && rightLLMeasurement.tagCount > 0) {
+                xyStdDev = .7 * (1+ rightLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev,xyStdDev,9999999));
         m_poseEstimator.addVisionMeasurement(
             rightLLMeasurement.pose, rightLLMeasurement.timestampSeconds);
       }
@@ -137,7 +146,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putNumber("heading", getHeading());
-    SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX());
+    SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX()); 
+    SmartDashboard.putNumber("std dev xy",xyStdDev);
 
     publisher.set(getPose());
         publisherLLfront.set(frontLLMeasurement.pose);

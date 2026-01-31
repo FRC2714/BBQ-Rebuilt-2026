@@ -64,17 +64,15 @@ public class DriveSubsystem extends SubsystemBase {
   // Publisher for robot pose for use with AdvantageScope
   StructPublisher<Pose2d> publisher =
       NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
-  
+
   StructPublisher<Pose2d> publisherLLright =
       NetworkTableInstance.getDefault().getStructTopic("poseLLright", Pose2d.struct).publish();
 
-    StructPublisher<Pose2d> publisherLLleft =
+  StructPublisher<Pose2d> publisherLLleft =
       NetworkTableInstance.getDefault().getStructTopic("poseLLleft", Pose2d.struct).publish();
-  
-        StructPublisher<Pose2d> publisherLLfront =
+
+  StructPublisher<Pose2d> publisherLLfront =
       NetworkTableInstance.getDefault().getStructTopic("poseLLfront", Pose2d.struct).publish();
-
-
 
   // Odometry class for tracking robot pose
   public SwerveDrivePoseEstimator m_poseEstimator =
@@ -107,14 +105,11 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-        });    
-        
+        });
+
     LimelightHelpers.SetRobotOrientation("limelight-right", getHeading(), 0, 0, 0, 0, 0);
     LimelightHelpers.SetRobotOrientation("limelight-front", getHeading(), 0, 0, 0, 0, 0);
     LimelightHelpers.SetRobotOrientation("limelight-left", getHeading(), 0, 0, 0, 0, 0);
-
-
-
 
     double omegaRps = Units.degreesToRotations(getTurnRate());
 
@@ -126,38 +121,36 @@ public class DriveSubsystem extends SubsystemBase {
 
     if (Math.abs(omegaRps) < .7) {
       if (frontLLMeasurement != null && frontLLMeasurement.tagCount > 0) {
-        xyStdDev = .7 * (1+ frontLLMeasurement.avgTagDist * .5);
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev,xyStdDev,9999999));
+        xyStdDev = .7 * (1 + frontLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
         m_poseEstimator.addVisionMeasurement(
             frontLLMeasurement.pose, frontLLMeasurement.timestampSeconds);
       }
 
       if (leftLLMeasurement != null && leftLLMeasurement.tagCount > 0) {
-        xyStdDev = .7 * (1+ leftLLMeasurement.avgTagDist * .5);
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev,xyStdDev,9999999));
+        xyStdDev = .7 * (1 + leftLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
         m_poseEstimator.addVisionMeasurement(
             leftLLMeasurement.pose, leftLLMeasurement.timestampSeconds);
       }
       if (rightLLMeasurement != null && rightLLMeasurement.tagCount > 0) {
-                xyStdDev = .7 * (1+ rightLLMeasurement.avgTagDist * .5);
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev,xyStdDev,9999999));
+        xyStdDev = .7 * (1 + rightLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
         m_poseEstimator.addVisionMeasurement(
             rightLLMeasurement.pose, rightLLMeasurement.timestampSeconds);
       }
     }
 
-
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putNumber("heading", getHeading());
-    SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX()); 
-    SmartDashboard.putNumber("std dev xy",xyStdDev);
+    SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX());
+    SmartDashboard.putNumber("std dev xy", xyStdDev);
     SmartDashboard.putNumber("omegaRps", omegaRps);
 
     publisher.set(getPose());
-        publisherLLfront.set(frontLLMeasurement.pose);
-                publisherLLleft.set(leftLLMeasurement.pose);
-                        publisherLLright.set(rightLLMeasurement.pose);
-
+    publisherLLfront.set(frontLLMeasurement.pose);
+    publisherLLleft.set(leftLLMeasurement.pose);
+    publisherLLright.set(rightLLMeasurement.pose);
   }
 
   /**

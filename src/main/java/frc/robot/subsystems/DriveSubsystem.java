@@ -111,6 +111,8 @@ public class DriveSubsystem extends SubsystemBase {
     LimelightHelpers.SetRobotOrientation("limelight-front", getHeading(), 0, 0, 0, 0, 0);
     LimelightHelpers.SetRobotOrientation("limelight-left", getHeading(), 0, 0, 0, 0, 0);
 
+    LimelightHelpers.Flush();
+
     double omegaRps = Units.degreesToRotations(getTurnRate());
 
     var frontLLMeasurement =

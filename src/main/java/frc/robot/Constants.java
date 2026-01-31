@@ -110,7 +110,7 @@ public final class Constants {
     public static final Matrix<N3, N1> m_stateStdDevs =
         VecBuilder.fill(0.15, 0.15, 0.00001); // TODO
     public static final Matrix<N3, N1> m_visionStdDevs =
-        VecBuilder.fill(0.00001, 0.00001, 999999); // TODO
+        VecBuilder.fill(.7, .7, 999999); // TODO
   }
 
   public static final class ShooterConstants {

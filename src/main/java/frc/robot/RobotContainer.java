@@ -78,6 +78,8 @@ public class RobotContainer {
     m_driverController
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
+
+    m_driverController.a().onTrue(m_turret.startShooter());
   }
 
   /**

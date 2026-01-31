@@ -108,20 +108,20 @@ public class Shooter extends SubsystemBase {
             Constants.ShooterConstants.kTurretMaxRange);
   }
 
-  public double updateHoodTarget() {
-    return hoodAngleMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
+  // public double updateHoodTarget() {
+  //   return hoodAngleMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
+  // }
+
+  // public double updateFlyWheelSpeedTarget() {
+  //   return flywheelSpeedMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
+  // }
+
+  public void setFlywheelSpeed(double speed) {
+    flywheelTargetSpeed = speed;
   }
 
-  public double updateFlyWheelSpeedTarget() {
-    return flywheelSpeedMap.getInterpolated(m_DriveSubsystem.getDistanceToHub());
-  }
-
-  public double setFlywheelSpeed(double speed) {
-    return flywheelTargetSpeed = speed;
-  }
-
-  public double setHoodAngle(double angle) {
-    return hoodTarget = angle;
+  public void setHoodAngle(double angle) {
+    hoodTarget = angle;
   }
 
   public double getHoodAngle() {
@@ -153,10 +153,11 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-    hoodController.setSetpoint(updateHoodTarget(), ControlType.kPosition, ClosedLoopSlot.kSlot0);
-    flywheelController.setSetpoint(
-        updateFlyWheelSpeedTarget(), ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    // hoodController.setSetpoint(updateHoodTarget(), ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    // flywheelController.setSetpoint(
+    //     updateFlyWheelSpeedTarget(), ControlType.kVelocity, ClosedLoopSlot.kSlot0);
 
     SmartDashboard.putNumber("Hood Angle", getHoodAngle());
+    SmartDashboard.putNumber("Flywheel Speed", flywheelTargetSpeed);
   }
 }

@@ -6,8 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
@@ -117,12 +115,25 @@ public final class Constants {
     public static final int kTurretCanId = 30;
     public static final int kTurrentMaxRange = 175;
     public static final int kTurretMinRange = -175;
-    public static final Transform2d turretOffset =
-        new Transform2d(
-            Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));
 
     public static final class TurretSetpoints {
       public static final double kStow = 15.2;
     }
+  }
+
+  public static final class IntakeConstants {
+    public static final int kIntakePivotCanId = 1; // needs tuning
+    public static final int kIntakeRollerCanId = 2; // needs tuning
+    public static final int kPivotkG = 0; // needs tuning
+    public static final int kPivotStow = 0; //needs tuning
+    public static final int kPivotExtend = 0; //needs tuning
+    public static final int kIntakeRollerPower = 0; // needs tuning
+    public static final int kExtakeRollerPower = 0; //needs tuning 
+    public static final int kRollerStop = 0; // needs tuning
+  }
+
+  public static final class SpindexerConstants{
+    public static final int kRotorMotorCanId = 0; //needs tuning
+    public static final int kFeederMotorCanId = 0; // needs tuning
   }
 }

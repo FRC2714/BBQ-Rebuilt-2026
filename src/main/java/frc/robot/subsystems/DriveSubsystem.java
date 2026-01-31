@@ -107,11 +107,14 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-        });
+        });    
+        
+    LimelightHelpers.SetRobotOrientation("limelight-right", getHeading(), 0, 0, 0, 0, 0);
     LimelightHelpers.SetRobotOrientation("limelight-front", getHeading(), 0, 0, 0, 0, 0);
     LimelightHelpers.SetRobotOrientation("limelight-left", getHeading(), 0, 0, 0, 0, 0);
 
-    LimelightHelpers.SetRobotOrientation("limelight-right", getHeading(), 0, 0, 0, 0, 0);
+
+
 
     double omegaRps = Units.degreesToRotations(getTurnRate());
 
@@ -121,7 +124,7 @@ public class DriveSubsystem extends SubsystemBase {
     var rightLLMeasurement =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
 
-    if (Math.abs(omegaRps) < 2.0) {
+    if (Math.abs(omegaRps) < .7) {
       if (frontLLMeasurement != null && frontLLMeasurement.tagCount > 0) {
         xyStdDev = .7 * (1+ frontLLMeasurement.avgTagDist * .5);
         m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev,xyStdDev,9999999));
@@ -148,6 +151,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("heading", getHeading());
     SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX()); 
     SmartDashboard.putNumber("std dev xy",xyStdDev);
+    SmartDashboard.putNumber("omegaRps", omegaRps);
 
     publisher.set(getPose());
         publisherLLfront.set(frontLLMeasurement.pose);

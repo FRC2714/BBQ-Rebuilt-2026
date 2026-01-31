@@ -122,7 +122,7 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    
+
     public static final class RollerConstants {
       public static final int kIntakeRollerCanId = 2; // needs tuning
       public static final int kIntakeRollerPower = 0; // needs tuning

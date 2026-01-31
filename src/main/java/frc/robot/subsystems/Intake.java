@@ -36,14 +36,17 @@ public class Intake extends SubsystemBase {
 
   // creates new intake pivot motor
   private SparkFlex pivotMotor =
-      new SparkFlex(Constants.IntakeConstants.kIntakePivotCanId, MotorType.kBrushless);
+      new SparkFlex(
+          Constants.IntakeConstants.PivotConstants.kIntakePivotCanId, MotorType.kBrushless);
   private SparkClosedLoopController intakePivotController = pivotMotor.getClosedLoopController();
   private AbsoluteEncoder intakePivotAbsoluteEncoder = pivotMotor.getAbsoluteEncoder();
-  private ArmFeedforward pivotFF = new ArmFeedforward(0, Constants.IntakeConstants.kPivotkG, 0);
+  private ArmFeedforward pivotFF =
+      new ArmFeedforward(0, Constants.IntakeConstants.PivotConstants.kPivotkG, 0);
 
   // creates new roller motor
   private SparkFlex rollerMotor =
-      new SparkFlex(Constants.IntakeConstants.kIntakeRollerCanId, MotorType.kBrushless);
+      new SparkFlex(
+          Constants.IntakeConstants.RollerConstants.kIntakeRollerCanId, MotorType.kBrushless);
 
   // Configs for Intake - NEEDS TUNING
   public Intake() {
@@ -59,18 +62,18 @@ public class Intake extends SubsystemBase {
 
   private void pivotExtend() {
     intakePivotController.setSetpoint(
-        Constants.IntakeConstants.kPivotExtend,
+        Constants.IntakeConstants.PivotConstants.kPivotExtend,
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
-        pivotFF.calculate(Constants.IntakeConstants.kPivotExtend, 0));
+        pivotFF.calculate(Constants.IntakeConstants.PivotConstants.kPivotExtend, 0));
   }
 
   private void pivotStow() {
     intakePivotController.setSetpoint(
-        Constants.IntakeConstants.kPivotStow,
+        Constants.IntakeConstants.PivotConstants.kPivotStow,
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
-        pivotFF.calculate(Constants.IntakeConstants.kPivotStow, 0));
+        pivotFF.calculate(Constants.IntakeConstants.PivotConstants.kPivotStow, 0));
   }
 
   private void setRollerPower(double power) {
@@ -80,7 +83,7 @@ public class Intake extends SubsystemBase {
   public Command intake() {
     return this.run(
         () -> {
-          setRollerPower(Constants.IntakeConstants.kIntakeRollerPower);
+          setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
           pivotExtend();
         });
   }
@@ -88,7 +91,7 @@ public class Intake extends SubsystemBase {
   public Command extake() {
     return this.run(
         () -> {
-          setRollerPower(Constants.IntakeConstants.kExtakeRollerPower);
+          setRollerPower(Constants.IntakeConstants.RollerConstants.kExtakeRollerPower);
           pivotExtend();
         });
   }
@@ -96,7 +99,7 @@ public class Intake extends SubsystemBase {
   public Command stow() {
     return this.run(
         () -> {
-          setRollerPower(Constants.IntakeConstants.kRollerStop);
+          setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
           pivotStow();
         });
   }

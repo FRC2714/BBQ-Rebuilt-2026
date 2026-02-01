@@ -18,9 +18,12 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.utils.LimelightHelpers;
@@ -56,6 +59,21 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final Field2d m_field2d = new Field2d();
 
+  double xyStdDev;
+
+  // Publisher for robot pose for use with AdvantageScope
+  StructPublisher<Pose2d> publisher =
+      NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
+
+  StructPublisher<Pose2d> publisherLLright =
+      NetworkTableInstance.getDefault().getStructTopic("poseLLright", Pose2d.struct).publish();
+
+  StructPublisher<Pose2d> publisherLLleft =
+      NetworkTableInstance.getDefault().getStructTopic("poseLLleft", Pose2d.struct).publish();
+
+  StructPublisher<Pose2d> publisherLLfront =
+      NetworkTableInstance.getDefault().getStructTopic("poseLLfront", Pose2d.struct).publish();
+
   // Odometry class for tracking robot pose
   public SwerveDrivePoseEstimator m_poseEstimator =
       new SwerveDrivePoseEstimator(
@@ -89,31 +107,52 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
         });
 
-    LimelightHelpers.SetRobotOrientation("limelight-back", getHeading(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-right", getHeading(), 0, 0, 0, 0, 0);
     LimelightHelpers.SetRobotOrientation("limelight-front", getHeading(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-left", getHeading(), 0, 0, 0, 0, 0);
+
+    LimelightHelpers.Flush();
 
     double omegaRps = Units.degreesToRotations(getTurnRate());
 
-    var frontLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
-    var backLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-back");
+    var frontLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
+    var leftLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
+    var rightLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
 
-    if (Math.abs(omegaRps) < 2.0) {
+    if (Math.abs(omegaRps) < .7) {
       if (frontLLMeasurement != null && frontLLMeasurement.tagCount > 0) {
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        xyStdDev = .7 * (1 + frontLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
         m_poseEstimator.addVisionMeasurement(
             frontLLMeasurement.pose, frontLLMeasurement.timestampSeconds);
       }
 
-      if (backLLMeasurement != null && backLLMeasurement.tagCount > 0) {
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+      if (leftLLMeasurement != null && leftLLMeasurement.tagCount > 0) {
+        xyStdDev = .7 * (1 + leftLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
         m_poseEstimator.addVisionMeasurement(
-            backLLMeasurement.pose, backLLMeasurement.timestampSeconds);
+            leftLLMeasurement.pose, leftLLMeasurement.timestampSeconds);
+      }
+      if (rightLLMeasurement != null && rightLLMeasurement.tagCount > 0) {
+        xyStdDev = .7 * (1 + rightLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
+        m_poseEstimator.addVisionMeasurement(
+            rightLLMeasurement.pose, rightLLMeasurement.timestampSeconds);
       }
     }
 
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putNumber("heading", getHeading());
     SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX());
+    SmartDashboard.putNumber("std dev xy", xyStdDev);
+    SmartDashboard.putNumber("omegaRps", omegaRps);
+
+    publisher.set(getPose());
+    publisherLLfront.set(frontLLMeasurement.pose);
+    publisherLLleft.set(leftLLMeasurement.pose);
+    publisherLLright.set(rightLLMeasurement.pose);
   }
 
   /**
@@ -226,7 +265,9 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return m_gyro.getYaw() >= 0 ? m_gyro.getYaw() * 360 : Math.abs((m_gyro.getYaw() * 360) + 360);
+    return m_poseEstimator == null
+        ? Units.rotationsToDegrees(m_gyro.getYaw())
+        : m_poseEstimator.getEstimatedPosition().getRotation().getDegrees();
   }
 
   /**
@@ -239,7 +280,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double getAngleToHub() {
-    Pose2d pose = getPose();
+    Pose2d pose = getPose().plus(Constants.ShooterConstants.turretOffset);
 
     // Hub position in field coordinates (meters)
     Translation2d hub =

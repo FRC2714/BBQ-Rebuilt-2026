@@ -265,8 +265,9 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return m_poseEstimator == null ? Units.rotationsToDegrees(m_gyro.getYaw()):
-    m_poseEstimator.getEstimatedPosition().getRotation().getDegrees();
+    return m_poseEstimator == null
+        ? Units.rotationsToDegrees(m_gyro.getYaw())
+        : m_poseEstimator.getEstimatedPosition().getRotation().getDegrees();
   }
 
   /**

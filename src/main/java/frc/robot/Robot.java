@@ -27,7 +27,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
+    // Instantiate our RobotContainer. This will perform all our button bindings,
+    // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
@@ -45,9 +46,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
+    // Runs the Scheduler. This is responsible for polling buttons, adding
+    // newly-scheduled
+    // commands, running already-scheduled commands, removing finished or
+    // interrupted commands,
+    // and running subsystem periodic() methods. This must be called from the
+    // robot's periodic
     // block in order for anything in the Command-based framework to work.
     m_robotContainer.m_turret.updateTurretTarget(m_robotContainer.m_robotDrive.getAngleToHub());
     CommandScheduler.getInstance().run();
@@ -91,6 +95,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
+    LimelightHelpers.SetIMUMode("limelight-front", 4); // 4 is internal imu + gyro
+    LimelightHelpers.SetIMUMode("limelight-right", 4);
+    LimelightHelpers.SetIMUMode("limelight-left", 4);
   }
 
   /** This function is called periodically during autonomous. */
@@ -114,9 +121,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    LimelightHelpers.SetIMUMode("limelight-front", 2); // 4 is internal imu + gyro
-    LimelightHelpers.SetIMUMode("limelight-right", 2);
-    LimelightHelpers.SetIMUMode("limelight-left", 2);
+    LimelightHelpers.SetIMUMode("limelight-front", 4); // 4 is internal imu + gyro
+    LimelightHelpers.SetIMUMode("limelight-right", 4);
+    LimelightHelpers.SetIMUMode("limelight-left", 4);
     // LimelightHelpers.SetIMUAssistAlpha("limelight-front", .005);
     // LimelightHelpers.SetIMUAssistAlpha("limelight-right", .005);
     // LimelightHelpers.SetIMUAssistAlpha("limelight-left", .005);

@@ -11,9 +11,12 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.utils.LimelightHelpers;
 
 /**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
- * the package after creating this project, you must also update the build.gradle file in the
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to
+ * each mode, as described in the TimedRobot documentation. If you change the
+ * name of this class or
+ * the package after creating this project, you must also update the
+ * build.gradle file in the
  * project.
  */
 public class Robot extends TimedRobot {
@@ -22,12 +25,14 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
 
   /**
-   * This function is run when the robot is first started up and should be used for any
+   * This function is run when the robot is first started up and should be used
+   * for any
    * initialization code.
    */
   @Override
   public void robotInit() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
+    // Instantiate our RobotContainer. This will perform all our button bindings,
+    // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
@@ -37,17 +42,23 @@ public class Robot extends TimedRobot {
   }
 
   /**
-   * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
+   * This function is called every 20 ms, no matter the mode. Use this for items
+   * like diagnostics
    * that you want ran during disabled, autonomous, teleoperated and test.
    *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
+   * <p>
+   * This runs after the mode specific periodic functions, but before LiveWindow
+   * and
    * SmartDashboard integrated updating.
    */
   @Override
   public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
+    // Runs the Scheduler. This is responsible for polling buttons, adding
+    // newly-scheduled
+    // commands, running already-scheduled commands, removing finished or
+    // interrupted commands,
+    // and running subsystem periodic() methods. This must be called from the
+    // robot's periodic
     // block in order for anything in the Command-based framework to work.
     m_robotContainer.m_turret.updateTurretTarget(m_robotContainer.m_robotDrive.getAngleToHub());
     CommandScheduler.getInstance().run();
@@ -75,7 +86,10 @@ public class Robot extends TimedRobot {
     LimelightHelpers.SetIMUMode("limelight-front", 1); // inactive
   }
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
+  /**
+   * This autonomous runs the autonomous command selected by your
+   * {@link RobotContainer} class.
+   */
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -91,6 +105,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
+    LimelightHelpers.SetIMUMode("limelight-front", 4); // 4 is internal imu + gyro
+    LimelightHelpers.SetIMUMode("limelight-right", 4);
+    LimelightHelpers.SetIMUMode("limelight-left", 4);
   }
 
   /** This function is called periodically during autonomous. */
@@ -114,9 +131,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    LimelightHelpers.SetIMUMode("limelight-front", 2); // 4 is internal imu + gyro
-    LimelightHelpers.SetIMUMode("limelight-right", 2);
-    LimelightHelpers.SetIMUMode("limelight-left", 2);
+    LimelightHelpers.SetIMUMode("limelight-front", 4); // 4 is internal imu + gyro
+    LimelightHelpers.SetIMUMode("limelight-right", 4);
+    LimelightHelpers.SetIMUMode("limelight-left", 4);
     // LimelightHelpers.SetIMUAssistAlpha("limelight-front", .005);
     // LimelightHelpers.SetIMUAssistAlpha("limelight-right", .005);
     // LimelightHelpers.SetIMUAssistAlpha("limelight-left", .005);
@@ -133,6 +150,7 @@ public class Robot extends TimedRobot {
 
     LimelightHelpers.SetRobotOrientation(
         "limelight-front", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+
   }
 
   @Override
@@ -143,5 +161,6 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 }

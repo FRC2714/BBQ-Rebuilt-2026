@@ -13,10 +13,14 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
@@ -104,8 +108,16 @@ public class Intake extends SubsystemBase {
         });
   }
 
+
+  //Mech2d
+  Mechanism2d intakeMech = new Mechanism2d(2, 1);
+  MechanismRoot2d intakeRoot = intakeMech.getRoot("Intake", 1, 0.75);
+  MechanismLigament2d intakeLigament1 =
+      new MechanismLigament2d("intakeLigament1", 0.5, -135);
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putData("Mech2d", intakeMech);
   }
 }

@@ -38,6 +38,7 @@ import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -134,6 +135,9 @@ public class DriveSubsystem extends SubsystemBase {
           new SelfControlledSwerveDriveSimulation(
               new SwerveDriveSimulation(
                   driveTrainSimulationConfig, new Pose2d(3, 3, new Rotation2d())));
+
+      SimulatedArena.overrideInstance(new Arena2026Rebuilt(false));
+
       SimulatedArena.getInstance()
           .addDriveTrainSimulation(swerveDriveSimulation.getDriveTrainSimulation());
     }

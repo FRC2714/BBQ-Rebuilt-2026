@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
@@ -242,16 +243,6 @@ public class DriveSubsystem extends SubsystemBase {
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
-    if (this.swerveDriveSimulation != null) {
-      this.swerveDriveSimulation.runChassisSpeeds(
-          new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered),
-          new Translation2d(),
-          fieldRelative,
-          true);
-
-      return;
-    }
-
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
             fieldRelative
@@ -263,6 +254,12 @@ public class DriveSubsystem extends SubsystemBase {
                 : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+
+    if (this.swerveDriveSimulation != null) {
+      this.swerveDriveSimulation.runSwerveStates(swerveModuleStates);
+      return;
+    }
+
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
@@ -283,12 +280,13 @@ public class DriveSubsystem extends SubsystemBase {
    * @param desiredStates The desired SwerveModule states.
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
+
     if (swerveDriveSimulation != null) {
       swerveDriveSimulation.runSwerveStates(desiredStates);
     }
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(desiredStates[0]);
     m_frontRight.setDesiredState(desiredStates[1]);
     m_rearLeft.setDesiredState(desiredStates[2]);
@@ -341,6 +339,14 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
+    if (swerveDriveSimulation != null) {
+      return swerveDriveSimulation
+          .getDriveTrainSimulation()
+          .getGyroSimulation()
+          .getMeasuredAngularVelocity()
+          .in(DegreesPerSecond);
+    }
+
     return m_gyro.getAngularVelocityYaw() * 360 * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 

@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -17,6 +19,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
@@ -26,7 +29,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
+import frc.robot.Robot;
 import frc.robot.utils.LimelightHelpers;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -74,6 +83,20 @@ public class DriveSubsystem extends SubsystemBase {
   StructPublisher<Pose2d> publisherLLfront =
       NetworkTableInstance.getDefault().getStructTopic("poseLLfront", Pose2d.struct).publish();
 
+  final DriveTrainSimulationConfig driveTrainSimulationConfig =
+      DriveTrainSimulationConfig.Default()
+          .withGyro(COTS.ofGenericGyro())
+          .withSwerveModule(
+              COTS.ofMAXSwerve(
+                  DCMotor.getNeoVortex(1), DCMotor.getNeo550(1), COTS.WHEELS.COLSONS.cof, 1))
+          .withTrackLengthTrackWidth(
+              Inches.of(DriveConstants.kWheelBase), Inches.of(DriveConstants.kTrackWidth))
+          .withBumperSize(
+              Inches.of(DriveConstants.kWheelBase + 6.0),
+              Inches.of(DriveConstants.kTrackWidth + 6.0));
+
+  SelfControlledSwerveDriveSimulation swerveDriveSimulation;
+
   // Odometry class for tracking robot pose
   public SwerveDrivePoseEstimator m_poseEstimator =
       new SwerveDrivePoseEstimator(
@@ -85,7 +108,7 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
           },
-          new Pose2d(),
+          new Pose2d(3, 3, new Rotation2d()),
           LimelightConstants.m_stateStdDevs,
           LimelightConstants.m_visionStdDevs);
 
@@ -94,6 +117,15 @@ public class DriveSubsystem extends SubsystemBase {
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
     SmartDashboard.putData("Field", m_field2d);
+
+    if (Robot.isSimulation()) {
+      swerveDriveSimulation =
+          new SelfControlledSwerveDriveSimulation(
+              new SwerveDriveSimulation(
+                  driveTrainSimulationConfig, new Pose2d(3, 3, new Rotation2d())));
+      SimulatedArena.getInstance()
+          .addDriveTrainSimulation(swerveDriveSimulation.getDriveTrainSimulation());
+    }
   }
 
   @Override
@@ -150,9 +182,16 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("omegaRps", omegaRps);
 
     publisher.set(getPose());
-    publisherLLfront.set(frontLLMeasurement.pose);
-    publisherLLleft.set(leftLLMeasurement.pose);
-    publisherLLright.set(rightLLMeasurement.pose);
+    publisherLLfront.set(frontLLMeasurement != null ? frontLLMeasurement.pose : new Pose2d());
+    publisherLLleft.set(leftLLMeasurement != null ? leftLLMeasurement.pose : new Pose2d());
+    publisherLLright.set(rightLLMeasurement != null ? rightLLMeasurement.pose : new Pose2d());
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    if (swerveDriveSimulation != null) {
+      swerveDriveSimulation.periodic();
+    }
   }
 
   /**
@@ -161,6 +200,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
+    if (swerveDriveSimulation != null) {
+      return swerveDriveSimulation.getActualPoseInSimulationWorld();
+    }
+
     return m_poseEstimator.getEstimatedPosition();
   }
 
@@ -170,6 +213,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
+    if (swerveDriveSimulation != null) {
+      swerveDriveSimulation.resetOdometry(pose);
+    }
+
     m_poseEstimator.resetPosition(
         Rotation2d.fromDegrees(getHeading()),
         new SwerveModulePosition[] {
@@ -194,6 +241,16 @@ public class DriveSubsystem extends SubsystemBase {
     double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
+
+    if (this.swerveDriveSimulation != null) {
+      this.swerveDriveSimulation.runChassisSpeeds(
+          new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered),
+          new Translation2d(),
+          fieldRelative,
+          true);
+
+      return;
+    }
 
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
@@ -226,6 +283,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @param desiredStates The desired SwerveModule states.
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
+    if (swerveDriveSimulation != null) {
+      swerveDriveSimulation.runSwerveStates(desiredStates);
+    }
+
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(desiredStates[0]);
@@ -265,6 +326,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
+    if (swerveDriveSimulation != null) {
+      return swerveDriveSimulation.getActualPoseInSimulationWorld().getRotation().getDegrees();
+    }
+
     return m_poseEstimator == null
         ? Units.rotationsToDegrees(m_gyro.getYaw())
         : m_poseEstimator.getEstimatedPosition().getRotation().getDegrees();

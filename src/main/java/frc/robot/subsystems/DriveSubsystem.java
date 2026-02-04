@@ -11,6 +11,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -19,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,7 +28,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
+import frc.robot.FieldConstants.AprilTagLayoutType;
 import frc.robot.utils.LimelightHelpers;
+import frc.robot.utils.LimelightHelpers.RawFiducial;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -73,6 +79,19 @@ public class DriveSubsystem extends SubsystemBase {
 
   StructPublisher<Pose2d> publisherLLfront =
       NetworkTableInstance.getDefault().getStructTopic("poseLLfront", Pose2d.struct).publish();
+
+  StructArrayPublisher<Pose3d> frontTagPoseArrayPublisher =
+      NetworkTableInstance.getDefault().getStructArrayTopic("tagPoses", Pose3d.struct).publish();
+
+  StructArrayPublisher<Pose3d> leftTagPoseArrayPublisher =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("tagPosesLeft", Pose3d.struct)
+          .publish();
+
+  StructArrayPublisher<Pose3d> rightTagPoseArrayPublisher =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("tagPosesRight", Pose3d.struct)
+          .publish();
 
   // Odometry class for tracking robot pose
   public SwerveDrivePoseEstimator m_poseEstimator =
@@ -153,6 +172,10 @@ public class DriveSubsystem extends SubsystemBase {
     publisherLLfront.set(frontLLMeasurement.pose);
     publisherLLleft.set(leftLLMeasurement.pose);
     publisherLLright.set(rightLLMeasurement.pose);
+
+    frontTagPoseArrayPublisher.set(getCameraTargetPoses3d("limelight-front"));
+    leftTagPoseArrayPublisher.set(getCameraTargetPoses3d("limelight-left"));
+    rightTagPoseArrayPublisher.set(getCameraTargetPoses3d("limelight-right"));
   }
 
   /**
@@ -299,5 +322,16 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Return degrees (wrapped to [-180, 180])
     return turretAngle.getDegrees();
+  }
+
+  public Pose3d[] getCameraTargetPoses3d(String limelightName) {
+    RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(limelightName);
+    List<Pose3d> poses = new ArrayList<>();
+
+    for (RawFiducial fiducial : fiducials) {
+      AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(fiducial.id).ifPresent(poses::add);
+    }
+
+    return poses.toArray(new Pose3d[0]);
   }
 }

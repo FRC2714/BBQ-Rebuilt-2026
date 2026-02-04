@@ -80,15 +80,17 @@ public class DriveSubsystem extends SubsystemBase {
   StructPublisher<Pose2d> publisherLLfront =
       NetworkTableInstance.getDefault().getStructTopic("poseLLfront", Pose2d.struct).publish();
 
-  StructArrayPublisher<Pose3d> frontTagPoseArrayPublisher =
-      NetworkTableInstance.getDefault().getStructArrayTopic("tagPoses", Pose3d.struct).publish();
+  StructArrayPublisher<Pose3d> tagPosesFrontArrayPublisher =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("tagPosesFront", Pose3d.struct)
+          .publish();
 
-  StructArrayPublisher<Pose3d> leftTagPoseArrayPublisher =
+  StructArrayPublisher<Pose3d> tagPosesLeftArrayPublisher =
       NetworkTableInstance.getDefault()
           .getStructArrayTopic("tagPosesLeft", Pose3d.struct)
           .publish();
 
-  StructArrayPublisher<Pose3d> rightTagPoseArrayPublisher =
+  StructArrayPublisher<Pose3d> tagPosesRightArrayPublisher =
       NetworkTableInstance.getDefault()
           .getStructArrayTopic("tagPosesRight", Pose3d.struct)
           .publish();
@@ -173,9 +175,9 @@ public class DriveSubsystem extends SubsystemBase {
     publisherLLleft.set(leftLLMeasurement.pose);
     publisherLLright.set(rightLLMeasurement.pose);
 
-    frontTagPoseArrayPublisher.set(getCameraTargetPoses3d("limelight-front"));
-    leftTagPoseArrayPublisher.set(getCameraTargetPoses3d("limelight-left"));
-    rightTagPoseArrayPublisher.set(getCameraTargetPoses3d("limelight-right"));
+    tagPosesFrontArrayPublisher.set(getCameraTargetPoses3d("limelight-front"));
+    tagPosesLeftArrayPublisher.set(getCameraTargetPoses3d("limelight-left"));
+    tagPosesRightArrayPublisher.set(getCameraTargetPoses3d("limelight-right"));
   }
 
   /**

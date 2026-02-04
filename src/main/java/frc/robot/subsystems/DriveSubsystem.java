@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -84,9 +85,18 @@ public class DriveSubsystem extends SubsystemBase {
   StructPublisher<Pose2d> publisherLLfront =
       NetworkTableInstance.getDefault().getStructTopic("poseLLfront", Pose2d.struct).publish();
 
+  StructArrayPublisher<SwerveModuleState> publisherModuleStates =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("Swerve Module States", SwerveModuleState.struct)
+          .publish();
+  StructArrayPublisher<SwerveModuleState> publisherExpectedModuleStates =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("Expected Swerve Module States", SwerveModuleState.struct)
+          .publish();
+
   final DriveTrainSimulationConfig driveTrainSimulationConfig =
       DriveTrainSimulationConfig.Default()
-          .withGyro(COTS.ofGenericGyro())
+          .withGyro(COTS.ofPigeon2())
           .withSwerveModule(
               COTS.ofMAXSwerve(
                   DCMotor.getNeoVortex(1), DCMotor.getNeo550(1), COTS.WHEELS.COLSONS.cof, 1))
@@ -186,6 +196,18 @@ public class DriveSubsystem extends SubsystemBase {
     publisherLLfront.set(frontLLMeasurement != null ? frontLLMeasurement.pose : new Pose2d());
     publisherLLleft.set(leftLLMeasurement != null ? leftLLMeasurement.pose : new Pose2d());
     publisherLLright.set(rightLLMeasurement != null ? rightLLMeasurement.pose : new Pose2d());
+
+    if (Robot.isReal()) {
+      publisherModuleStates.set(
+          new SwerveModuleState[] {
+            m_frontLeft.getState(),
+            m_frontRight.getState(),
+            m_rearLeft.getState(),
+            m_rearRight.getState()
+          });
+    } else {
+      publisherModuleStates.set(swerveDriveSimulation.getMeasuredStates());
+    }
   }
 
   @Override
@@ -255,8 +277,15 @@ public class DriveSubsystem extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
 
+    publisherExpectedModuleStates.set(swerveModuleStates);
+
     if (this.swerveDriveSimulation != null) {
       this.swerveDriveSimulation.runSwerveStates(swerveModuleStates);
+      // this.swerveDriveSimulation.runChassisSpeeds(
+      //     new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered),
+      //     new Translation2d(),
+      //     fieldRelative,
+      //     true);
       return;
     }
 

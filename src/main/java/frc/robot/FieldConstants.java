@@ -1,26 +1,32 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Copyright (c) 2025-2026 Littleton Robotics
+// http://github.com/Mechanical-Advantage
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
 package frc.robot;
 
-import java.io.IOException;
-import java.nio.file.Path;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
+import java.io.IOException;
+import java.nio.file.Path;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-
-
-/** Add your docs here. */
-public final class FieldConstants {
-    public static final FieldType fieldType = FieldType.WELDED;
+/**
+ * Contains information for location of field element and other useful reference points.
+ *
+ * <p>NOTE: All constants are defined relative to the field coordinate system, and from the
+ * perspective of the blue alliance station
+ */
+public class FieldConstants {
+  public static final FieldType fieldType = FieldType.WELDED;
 
   // AprilTag related constants
   public static final int aprilTagCount = AprilTagLayoutType.OFFICIAL.getLayout().getTags().size();

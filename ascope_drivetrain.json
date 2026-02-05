@@ -1,0 +1,152 @@
+{
+  "hubs": [
+    {
+      "x": 960,
+      "y": 0,
+      "width": 960,
+      "height": 1152,
+      "state": {
+        "sidebar": {
+          "width": 304,
+          "expanded": [
+            "/Shuffleboard",
+            "/SmartDashboard/Field",
+            "/Swerve Module States/0"
+          ]
+        },
+        "tabs": {
+          "selected": 2,
+          "tabs": [
+            {
+              "type": 0,
+              "title": "",
+              "controller": null,
+              "controllerUUID": "tkqqne7e2wql6d2l8qsqxdedgjqd9h5f",
+              "renderer": "",
+              "controlsHeight": 0
+            },
+            {
+              "type": 2,
+              "title": "2D Field",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "NT:Robot Pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "bumpers": ""
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:tagPosesFront",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:tagPosesLeft",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:tagPosesRight",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "field": "FRC:2026 Field",
+                "orientation": 3,
+                "size": "large"
+              },
+              "controllerUUID": "gfi5132ykkfeyajjfsccn0rv4tno97ii",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 3,
+              "title": "3D Field",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "NT:Robot Pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "2026 KitBot"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:tagPosesFront",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:tagPosesLeft",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:tagPosesRight",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "game": "FRC:2026 Field"
+              },
+              "controllerUUID": "hf15d8z0ckx5jtda29315kgha0s04t0b",
+              "renderer": {
+                "cameraIndex": -1,
+                "orbitFov": 50,
+                "cameraPosition": [
+                  -2.0831422337416736,
+                  5.936752028243436,
+                  0.4400578822826663
+                ],
+                "cameraTarget": [
+                  2.389616514197855,
+                  2.9419914610855096,
+                  0.5078454128529064
+                ]
+              },
+              "controlsHeight": 369
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "satellites": [],
+  "version": "26.0.0"
+}

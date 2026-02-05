@@ -1,8 +1,8 @@
 {
   "hubs": [
     {
-      "x": 960,
-      "y": 0,
+      "x": 1130,
+      "y": 96,
       "width": 960,
       "height": 1152,
       "state": {
@@ -11,11 +11,13 @@
           "expanded": [
             "/Shuffleboard",
             "/SmartDashboard/Field",
-            "/Swerve Module States/0"
+            "/Swerve Module States/0",
+            "/Swerve Module States",
+            "/SmartDashboard"
           ]
         },
         "tabs": {
-          "selected": 2,
+          "selected": 1,
           "tabs": [
             {
               "type": 0,
@@ -68,6 +70,26 @@
                       "color": "#0000ff",
                       "size": "normal"
                     }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:Expected Swerve Module States",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:Swerve Module States",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
                   }
                 ],
                 "field": "FRC:2026 Field",
@@ -75,6 +97,41 @@
                 "size": "large"
               },
               "controllerUUID": "gfi5132ykkfeyajjfsccn0rv4tno97ii",
+              "renderer": null,
+              "controlsHeight": 193
+            },
+            {
+              "type": 9,
+              "title": "Swerve",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "states",
+                    "logKey": "NT:Expected Swerve Module States",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "states",
+                    "logKey": "NT:Swerve Module States",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  }
+                ],
+                "maxSpeed": 5,
+                "sizeX": 0.65,
+                "sizeY": 0.65,
+                "orientation": 1
+              },
+              "controllerUUID": "w3cbno0zydmkpnrj4yazvsre970f92xu",
               "renderer": null,
               "controlsHeight": 200
             },
@@ -121,6 +178,26 @@
                       "color": "#0000ff",
                       "size": "normal"
                     }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:Expected Swerve Module States",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:Swerve Module States",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
                   }
                 ],
                 "game": "FRC:2026 Field"
@@ -130,14 +207,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -2.0831422337416736,
-                  5.936752028243436,
-                  0.4400578822826663
+                  -4.428178982241513,
+                  8.104829349235912,
+                  0.30642265875283076
                 ],
                 "cameraTarget": [
-                  2.389616514197855,
-                  2.9419914610855096,
-                  0.5078454128529064
+                  -0.36920381354295284,
+                  0.33079812511421713,
+                  0.2970326224353119
                 ]
               },
               "controlsHeight": 369

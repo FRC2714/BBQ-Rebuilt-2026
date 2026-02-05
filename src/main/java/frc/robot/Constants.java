@@ -124,4 +124,7 @@ public final class Constants {
       public static final double kStow = 15.2;
     }
   }
+
+  // For field constants
+  public static boolean disableHAL = false;
 }

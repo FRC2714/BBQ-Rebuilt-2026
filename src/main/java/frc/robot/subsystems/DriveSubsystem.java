@@ -14,6 +14,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -31,8 +32,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
+import frc.robot.FieldConstants.AprilTagLayoutType;
 import frc.robot.Robot;
 import frc.robot.utils.LimelightHelpers;
+import frc.robot.utils.LimelightHelpers.RawFiducial;
+import java.util.ArrayList;
+import java.util.List;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
@@ -85,6 +90,21 @@ public class DriveSubsystem extends SubsystemBase {
 
   StructPublisher<Pose2d> publisherLLfront =
       NetworkTableInstance.getDefault().getStructTopic("poseLLfront", Pose2d.struct).publish();
+
+  StructArrayPublisher<Pose3d> tagPosesFrontArrayPublisher =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("tagPosesFront", Pose3d.struct)
+          .publish();
+
+  StructArrayPublisher<Pose3d> tagPosesLeftArrayPublisher =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("tagPosesLeft", Pose3d.struct)
+          .publish();
+
+  StructArrayPublisher<Pose3d> tagPosesRightArrayPublisher =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("tagPosesRight", Pose3d.struct)
+          .publish();
 
   StructArrayPublisher<SwerveModuleState> publisherModuleStates =
       NetworkTableInstance.getDefault()
@@ -197,6 +217,9 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("omegaRps", omegaRps);
 
     publisher.set(getPose());
+    tagPosesFrontArrayPublisher.set(getCameraTargetPoses3d("limelight-front"));
+    tagPosesLeftArrayPublisher.set(getCameraTargetPoses3d("limelight-left"));
+    tagPosesRightArrayPublisher.set(getCameraTargetPoses3d("limelight-right"));
     publisherLLfront.set(frontLLMeasurement != null ? frontLLMeasurement.pose : new Pose2d());
     publisherLLleft.set(leftLLMeasurement != null ? leftLLMeasurement.pose : new Pose2d());
     publisherLLright.set(rightLLMeasurement != null ? rightLLMeasurement.pose : new Pose2d());
@@ -403,5 +426,16 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Return degrees (wrapped to [-180, 180])
     return turretAngle.getDegrees();
+  }
+
+  public Pose3d[] getCameraTargetPoses3d(String limelightName) {
+    RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(limelightName);
+    List<Pose3d> poses = new ArrayList<>();
+
+    for (RawFiducial fiducial : fiducials) {
+      AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(fiducial.id).ifPresent(poses::add);
+    }
+
+    return poses.toArray(new Pose3d[0]);
   }
 }

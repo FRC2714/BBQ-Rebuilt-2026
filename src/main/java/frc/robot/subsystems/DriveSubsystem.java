@@ -341,6 +341,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     if (swerveDriveSimulation != null) {
       swerveDriveSimulation.runSwerveStates(desiredStates);
+      return;
     }
 
     m_frontLeft.setDesiredState(desiredStates[0]);

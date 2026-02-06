@@ -6,6 +6,8 @@ package frc.robot;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
@@ -107,14 +109,16 @@ public final class Constants {
   public static final class LimelightConstants {
     public static final Matrix<N3, N1> m_stateStdDevs =
         VecBuilder.fill(0.15, 0.15, 0.00001); // TODO
-    public static final Matrix<N3, N1> m_visionStdDevs =
-        VecBuilder.fill(0.00001, 0.00001, 999999); // TODO
+    public static final Matrix<N3, N1> m_visionStdDevs = VecBuilder.fill(.7, .7, 999999); // TODO
   }
 
   public static final class ShooterConstants {
     public static final int kTurretCanId = 30;
     public static final int kTurretMaxRange = 175;
     public static final int kTurretMinRange = -175;
+    public static final Transform2d turretOffset =
+        new Transform2d(
+            Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));
 
     public static final int kHoodCanId = 31;
     public static final int kHoodMaxRange = 175;
@@ -177,4 +181,7 @@ public final class Constants {
     public static final double kCoralStandLength = Units.inchesToMeters(35.2 * 20);
     public static final double kIntakeBarAngleRads = Units.degreesToRadians(90);
   }
+
+  // For field constants
+  public static boolean disableHAL = false;
 }

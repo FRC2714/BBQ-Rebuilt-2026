@@ -378,6 +378,10 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
+    if (swerveDriveSimulation != null) {
+      return swerveDriveSimulation.getActualSpeedsRobotRelative();
+    }
+
     return DriveConstants.kDriveKinematics.toChassisSpeeds(
         m_frontLeft.getState(),
         m_frontRight.getState(),

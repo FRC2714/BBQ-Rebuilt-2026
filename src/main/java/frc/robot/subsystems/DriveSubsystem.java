@@ -241,6 +241,8 @@ public class DriveSubsystem extends SubsystemBase {
     if (swerveDriveSimulation != null) {
       swerveDriveSimulation.periodic();
     }
+
+    SmartDashboard.putNumber("Distance to Goal", getDistanceToHub());
   }
 
   public Pose2d getPose() {

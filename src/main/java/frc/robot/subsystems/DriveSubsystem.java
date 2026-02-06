@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import com.fasterxml.jackson.annotation.ObjectIdGenerators.None;
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -151,17 +150,16 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("omegaRps", omegaRps);
 
     publisher.set(getPose());
-    
-    if (frontLLMeasurement != null){
+
+    if (frontLLMeasurement != null) {
       publisherLLfront.set(frontLLMeasurement.pose);
-    }      
-    if (leftLLMeasurement != null){
+    }
+    if (leftLLMeasurement != null) {
       publisherLLleft.set(leftLLMeasurement.pose);
     }
-    if (rightLLMeasurement != null){
+    if (rightLLMeasurement != null) {
       publisherLLright.set(rightLLMeasurement.pose);
     }
-
   }
 
   /**

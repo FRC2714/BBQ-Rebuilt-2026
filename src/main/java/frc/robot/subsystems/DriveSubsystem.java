@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
+import frc.robot.Field;
 import frc.robot.FieldConstants.AprilTagLayoutType;
 import frc.robot.Robot;
 import frc.robot.utils.LimelightHelpers;
@@ -394,8 +395,8 @@ public class DriveSubsystem extends SubsystemBase {
   public double getAngleToHub() {
     Pose2d pose = getPose().plus(Constants.ShooterConstants.turretOffset);
 
-    Translation2d hub =
-        new Translation2d(Units.inchesToMeters(468.56), Units.inchesToMeters(158.32));
+    // Hub position in field coordinates (meters)
+    Translation2d hub = Field.getAllianceHub().toTranslation2d();
 
     Translation2d robotToHub = hub.minus(pose.getTranslation());
     Rotation2d angleToHub = robotToHub.getAngle();

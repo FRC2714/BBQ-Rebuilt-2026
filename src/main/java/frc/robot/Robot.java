@@ -7,7 +7,7 @@ package frc.robot;
 import com.reduxrobotics.canand.CanandEventLoop;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -30,8 +30,8 @@ public class Robot extends TimedRobot {
   StructPublisher<Pose2d> turretHeading =
       NetworkTableInstance.getDefault().getStructTopic("turretHeading", Pose2d.struct).publish();
 
-  StructPublisher<Pose2d> hubLead =
-      NetworkTableInstance.getDefault().getStructTopic("hubLead", Pose2d.struct).publish();
+  StructPublisher<Pose2d> virtualTarget =
+      NetworkTableInstance.getDefault().getStructTopic("virtualTarget", Pose2d.struct).publish();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -65,27 +65,18 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods. This must be called from the
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
-    var angleToHub = m_robotContainer.m_robotDrive.getAngleToHub();
-
-    m_robotContainer.m_turret.updateTurretTarget(angleToHub);
-    CommandScheduler.getInstance().run();
+    var virtualTargetTranslation = m_robotContainer.m_robotDrive.getVirtualTarget();
 
     var robotPose = m_robotContainer.m_robotDrive.getPose();
-    turretHeading.set(
-        new Pose2d(
-            robotPose.getX(),
-            robotPose.getY(),
-            robotPose.getRotation().plus(new Rotation2d(Units.degreesToRadians(angleToHub)))));
-    hubLead.set(
-        new Pose2d(
-            robotPose.getX(),
-            robotPose.getY(),
-            robotPose
-                .getRotation()
-                .plus(
-                    new Rotation2d(
-                        Units.degreesToRadians(
-                            m_robotContainer.m_robotDrive.getAngleToHubWithLead())))));
+
+    Translation2d robotToVirtualTarget = virtualTargetTranslation.minus(robotPose.getTranslation());
+    Rotation2d angleToVirtualTarget = robotToVirtualTarget.getAngle();
+
+    m_robotContainer.m_turret.updateTurretTarget(angleToVirtualTarget.getDegrees());
+    CommandScheduler.getInstance().run();
+
+    turretHeading.set(new Pose2d(robotPose.getX(), robotPose.getY(), angleToVirtualTarget));
+    virtualTarget.set(new Pose2d(virtualTargetTranslation, new Rotation2d()));
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

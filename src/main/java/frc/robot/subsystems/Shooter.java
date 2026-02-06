@@ -140,7 +140,10 @@ public class Shooter extends SubsystemBase {
     if (m_DriveSubsystem == null) {
       return HoodSetpoints.kStow;
     }
-    Double dist = m_DriveSubsystem.getDistanceToHub();
+    Double dist =
+        m_DriveSubsystem
+            .getVirtualTarget()
+            .getDistance(m_DriveSubsystem.getPose().getTranslation());
     Double interpolated = hoodAngleMap.getInterpolated(dist);
     return interpolated == null ? HoodSetpoints.kStow : interpolated;
   }
@@ -158,7 +161,10 @@ public class Shooter extends SubsystemBase {
     if (m_DriveSubsystem == null) {
       return FlywheelSetpoints.kStow;
     }
-    Double dist = m_DriveSubsystem.getDistanceToHub();
+    Double dist =
+        m_DriveSubsystem
+            .getVirtualTarget()
+            .getDistance(m_DriveSubsystem.getPose().getTranslation());
     Double interpolated = flywheelSpeedMap.getInterpolated(dist);
     return interpolated == null ? FlywheelSetpoints.kStow : interpolated;
   }

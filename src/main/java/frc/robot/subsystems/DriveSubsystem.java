@@ -242,8 +242,6 @@ public class DriveSubsystem extends SubsystemBase {
     if (swerveDriveSimulation != null) {
       swerveDriveSimulation.periodic();
     }
-
-    SmartDashboard.putNumber("Distance to Goal", getDistanceToHub());
   }
 
   public Pose2d getPose() {
@@ -409,10 +407,9 @@ public class DriveSubsystem extends SubsystemBase {
     return turretAngle.getDegrees();
   }
 
-  public double getAngleToHubWithLead() {
+  public Translation2d getVirtualTarget() {
     Pose2d pose = getPose();
     Translation2d robotVelocity = getFieldRelativeVelocity();
-
     Translation2d hub = Field.getAllianceHub().toTranslation2d();
 
     Translation2d futurePosition =
@@ -424,9 +421,11 @@ public class DriveSubsystem extends SubsystemBase {
     Translation2d targetVelocity = targetDirection.times(kBaselineHorizontalVelocity);
     Translation2d shotVelocity = targetVelocity.minus(robotVelocity);
 
-    Rotation2d turretAngle = shotVelocity.getAngle().minus(pose.getRotation());
+    double distanceToHub = toGoal.getNorm();
+    Translation2d virtualTarget =
+        futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToHub));
 
-    return turretAngle.getDegrees();
+    return virtualTarget;
   }
 
   public Pose3d[] getCameraTargetPoses3d(String limelightName) {
@@ -438,11 +437,5 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     return poses.toArray(new Pose3d[0]);
-  }
-
-  public double getDistanceToHub() {
-    Pose2d pose = getPose();
-    Translation2d hub = Field.getAllianceHub().toTranslation2d();
-    return hub.minus(pose.getTranslation()).getNorm();
   }
 }

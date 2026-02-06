@@ -30,6 +30,9 @@ public class Robot extends TimedRobot {
   StructPublisher<Pose2d> turretHeading =
       NetworkTableInstance.getDefault().getStructTopic("turretHeading", Pose2d.struct).publish();
 
+  StructPublisher<Pose2d> hubLead =
+      NetworkTableInstance.getDefault().getStructTopic("hubLead", Pose2d.struct).publish();
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -73,6 +76,16 @@ public class Robot extends TimedRobot {
             robotPose.getX(),
             robotPose.getY(),
             robotPose.getRotation().plus(new Rotation2d(Units.degreesToRadians(angleToHub)))));
+    hubLead.set(
+        new Pose2d(
+            robotPose.getX(),
+            robotPose.getY(),
+            robotPose
+                .getRotation()
+                .plus(
+                    new Rotation2d(
+                        Units.degreesToRadians(
+                            m_robotContainer.m_robotDrive.getAngleToHubWithLead())))));
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

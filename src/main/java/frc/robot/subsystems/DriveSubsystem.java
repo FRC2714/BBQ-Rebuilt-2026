@@ -373,6 +373,19 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
         },
         pose);
+    
+    LimelightHelpers.SetRobotOrientation("limelight-front", 0, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-right", 0, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-left", 0, 0, 0, 0, 0, 0);
+
+    LimelightHelpers.SetIMUMode("limelight-front", 1);
+    LimelightHelpers.SetIMUMode("limelight-right", 1);
+    LimelightHelpers.SetIMUMode("limelight-left", 1);
+
+    // Switch back to fused mode after seeding
+    LimelightHelpers.SetIMUMode("limelight-front", 4);
+    LimelightHelpers.SetIMUMode("limelight-right", 4);
+    LimelightHelpers.SetIMUMode("limelight-left", 4);
   }
 
   /**

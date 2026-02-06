@@ -66,13 +66,6 @@ public class Shooter extends SubsystemBase {
   private InterpolatingTreeMap flywheelSpeedMap;
   private DriveSubsystem m_DriveSubsystem;
 
-   StructPublisher<Pose2d> turretHeading =
-      NetworkTableInstance.getDefault()
-          .getStructTopic("turretHeading", Pose2d.struct)
-          .publish();
-
-
-
   // Creates a hood
   public Shooter() {
     turretMotor.configure(
@@ -243,7 +236,5 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Hood Angle", simHoodPosition);
     SmartDashboard.putNumber("Flywheel Speed", simFlywheelVelocity);
     SmartDashboard.putNumber("Turret Position", turretCurrentTarget);
-
-    turretHeading.set(new Pose2d(0,0,new Rotation2d(Math.toRadians(turretCurrentTarget))));
   }
 }

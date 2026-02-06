@@ -9,13 +9,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -91,14 +85,12 @@ public class Shooter extends SubsystemBase {
 
     populateHoodAngleMap();
     populateFlywheelSpeedMap();
-
-
-
   }
 
-  //CHANGE LATER
+  // CHANGE LATER
   public void populateHoodAngleMap() {
-    // Keys: distance to hub in meters -> value: hood position (encoder units or degrees depending on hood config)
+    // Keys: distance to hub in meters -> value: hood position (encoder units or degrees depending
+    // on hood config)
     // These are example values for simulation; tune for your robot's hardware.
     hoodAngleMap.put(1.0, 5.0);
     hoodAngleMap.put(2.0, 8.0);
@@ -110,10 +102,12 @@ public class Shooter extends SubsystemBase {
     hoodAngleMap.put(8.0, 50.0);
   }
 
-  //CHANGE LATER
+  // CHANGE LATER
   public void populateFlywheelSpeedMap() {
-    // Keys: distance to hub in meters -> value: flywheel speed (in native closed-loop units, e.g. RPM)
-    // These are example values for simulation; tune for your robot's hardware and controller config.
+    // Keys: distance to hub in meters -> value: flywheel speed (in native closed-loop units, e.g.
+    // RPM)
+    // These are example values for simulation; tune for your robot's hardware and controller
+    // config.
     flywheelSpeedMap.put(1.0, 1500.0);
     flywheelSpeedMap.put(2.0, 2200.0);
     flywheelSpeedMap.put(3.0, 2700.0);
@@ -151,12 +145,13 @@ public class Shooter extends SubsystemBase {
     return interpolated == null ? HoodSetpoints.kStow : interpolated;
   }
 
-  public void moveHoodToSetpoint(){
-        hoodController.setSetpoint(updateHoodTarget(), ControlType.kPosition, ClosedLoopSlot.kSlot0);
+  public void moveHoodToSetpoint() {
+    hoodController.setSetpoint(updateHoodTarget(), ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
-  public void moveFlywheelToSetpoint(){
-        flywheelController.setSetpoint(updateFlyWheelSpeedTarget(), ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+  public void moveFlywheelToSetpoint() {
+    flywheelController.setSetpoint(
+        updateFlyWheelSpeedTarget(), ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
 
   public double updateFlyWheelSpeedTarget() {
@@ -168,9 +163,7 @@ public class Shooter extends SubsystemBase {
     return interpolated == null ? FlywheelSetpoints.kStow : interpolated;
   }
 
-  /**
-   * Provide DriveSubsystem reference so shooter can query vision-based distance.
-   */
+  /** Provide DriveSubsystem reference so shooter can query vision-based distance. */
   public void setDriveSubsystem(DriveSubsystem ds) {
     m_DriveSubsystem = ds;
   }
@@ -222,7 +215,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Flywheel Speed", flywheelController.getSetpoint());
   }
 
-   @Override
+  @Override
   public void simulationPeriodic() {
     // The REV SparkFlex library may not provide simulated encoder values in this environment.
     // Provide a very small, deterministic simulation so AdvantageScope/SmartDashboard shows values.

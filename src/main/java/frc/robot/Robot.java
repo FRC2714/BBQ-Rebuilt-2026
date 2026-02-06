@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.reduxrobotics.canand.CanandEventLoop;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -28,10 +27,8 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-   StructPublisher<Pose2d> turretHeading =
-      NetworkTableInstance.getDefault()
-          .getStructTopic("turretHeading", Pose2d.struct)
-          .publish();
+  StructPublisher<Pose2d> turretHeading =
+      NetworkTableInstance.getDefault().getStructTopic("turretHeading", Pose2d.struct).publish();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -71,7 +68,11 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     var robotPose = m_robotContainer.m_robotDrive.getPose();
-        turretHeading.set(new Pose2d(robotPose.getX(), robotPose.getY(), robotPose.getRotation().plus(new Rotation2d(Units.degreesToRadians(angleToHub)))));
+    turretHeading.set(
+        new Pose2d(
+            robotPose.getX(),
+            robotPose.getY(),
+            robotPose.getRotation().plus(new Rotation2d(Units.degreesToRadians(angleToHub)))));
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

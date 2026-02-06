@@ -142,7 +142,7 @@ public final class Constants {
     }
   }
 
-    public static final class SimulationRobotConstants {
+  public static final class SimulationRobotConstants {
     // ! Remove *20 from all values for final Robot Testing
     public static final double kPixelsPerMeter = 1 * 20;
 
@@ -170,10 +170,8 @@ public final class Constants {
     public static final double kHoodLength = Units.inchesToMeters(15); // m
     public static final double kHoodMass = 5.8738; // Kg
 
-
     public static final double kHoodMinAngleRads = Units.degreesToRadians(0);
-    public static final double kHoodMaxAngleRads =
-        Units.degreesToRadians(360 * kHoodReduction);
+    public static final double kHoodMaxAngleRads = Units.degreesToRadians(360 * kHoodReduction);
 
     public static final double kHoodShortBarLength = Units.inchesToMeters(11);
     public static final double kHoodLongBarLength = Units.inchesToMeters(13);

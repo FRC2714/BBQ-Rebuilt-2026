@@ -11,6 +11,11 @@ import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -60,6 +65,11 @@ public class Shooter extends SubsystemBase {
   private InterpolatingTreeMap hoodAngleMap;
   private InterpolatingTreeMap flywheelSpeedMap;
   private DriveSubsystem m_DriveSubsystem;
+
+   StructPublisher<Pose2d> turretHeading =
+      NetworkTableInstance.getDefault()
+          .getStructTopic("turretHeading", Pose2d.struct)
+          .publish();
 
 
 
@@ -233,5 +243,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Hood Angle", simHoodPosition);
     SmartDashboard.putNumber("Flywheel Speed", simFlywheelVelocity);
     SmartDashboard.putNumber("Turret Position", turretCurrentTarget);
+
+    turretHeading.set(new Pose2d(0,0,new Rotation2d(Math.toRadians(turretCurrentTarget))));
   }
 }

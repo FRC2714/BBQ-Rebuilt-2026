@@ -7,14 +7,19 @@ import frc.robot.subsystems.Shooter;
 public class StateMachine extends SubsystemBase {
   DriveSubsystem m_drivetrain;
   Shooter m_shooter;
+  Publisher m_publisher;
 
   public StateMachine(DriveSubsystem drivetrain, Shooter shooter) {
     m_drivetrain = drivetrain;
     m_shooter = shooter;
+
+    m_publisher = new Publisher(m_drivetrain, m_shooter);
   }
 
   @Override
   public void periodic() {
     m_shooter.updateTurretTarget(m_drivetrain.getAngleToHub());
+
+    m_publisher.publish();
   }
 }

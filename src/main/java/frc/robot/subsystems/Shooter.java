@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
 import frc.robot.Constants.ShooterConstants.HoodSetpoints;
 import frc.robot.Constants.ShooterConstants.TurretSetpoints;
@@ -55,6 +56,8 @@ public class Shooter extends SubsystemBase {
   private double hoodTarget = HoodSetpoints.kStow;
 
   private double flywheelTargetSpeed = FlywheelSetpoints.kStow;
+
+  public boolean wasZeroed = false;
 
   private InterpolatingTreeMap hoodAngleMap;
   private InterpolatingTreeMap flywheelSpeedMap;
@@ -211,6 +214,24 @@ public class Shooter extends SubsystemBase {
         });
   }
 
+  //hit limit switch and set turret angle to limit swithc position
+  public void zeroTurret(){
+    if(!wasZeroed &&  turretMotor.getForwardLimitSwitch().isPressed())
+    {
+      wasZeroed = true;
+      turretRelativeEncoder.setPosition(ShooterConstants.kTurretMaxRange);
+    }
+    else if(!wasZeroed && turretMotor.getReverseLimitSwitch().isPressed())
+    {
+      wasZeroed = true;
+      turretRelativeEncoder.setPosition(ShooterConstants.kTurretMinRange);
+    }
+    else if(!turretMotor.getReverseLimitSwitch().isPressed() && !turretMotor.getForwardLimitSwitch().isPressed())
+    {
+      wasZeroed = false;
+    }
+  }
+
   // Runs every 20ms
   @Override
   public void periodic() {
@@ -235,5 +256,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Hood Angle", simHoodPosition);
     SmartDashboard.putNumber("Flywheel Speed", simFlywheelVelocity);
     SmartDashboard.putNumber("Turret Position", turretCurrentTarget);
+
+    zeroTurret();
   }
 }

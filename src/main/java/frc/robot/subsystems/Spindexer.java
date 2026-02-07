@@ -9,6 +9,9 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,10 +30,14 @@ public class Spindexer extends SubsystemBase {
   // Beam breaks
   private SparkLimitSwitch beamBreak1 = feederMotor.getForwardLimitSwitch();
   private SparkLimitSwitch beamBreak2 = feederMotor.getReverseLimitSwitch();
+  Mechanism2d mech = new Mechanism2d(4, 4);
+  MechanismRoot2d root = mech.getRoot("spindexer", 2, 2);
+
 
   private double feederCurrentTarget = 0;
   private double rotorCurrentTarget = 0;
   private boolean check = false;
+  
 
   public Spindexer() {
     // Configs for rotorMotor
@@ -124,4 +131,5 @@ public class Spindexer extends SubsystemBase {
     SmartDashboard.putBoolean("True", check);
     SmartDashboard.putString("Current Commnad", this.getCurrentCommand() != null ? this.getCurrentCommand().getName(): "None");
   }
+
 }

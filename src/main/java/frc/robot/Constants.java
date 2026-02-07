@@ -125,6 +125,10 @@ public final class Constants {
     }
   }
 
+  public static final class DyeRotorConstants {
+    
+  }
+
   // For field constants
   public static boolean disableHAL = false;
 }

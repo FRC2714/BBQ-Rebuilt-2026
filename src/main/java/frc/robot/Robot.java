@@ -10,6 +10,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.utils.LimelightHelpers;
 import org.ironmaple.simulation.SimulatedArena;
+import com.revrobotics.util.StatusLogger;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -36,6 +43,16 @@ public class Robot extends TimedRobot {
     CanandEventLoop.getInstance();
 
     LimelightHelpers.Flush();
+
+    DataLogManager.start();
+    var log = DataLogManager.getLog();
+    log.addSchema(Pose2d.proto);
+    log.addSchema(ChassisSpeeds.proto);
+    log.addSchema(Pose2d.struct);
+    log.addSchema(Pose3d.struct);
+
+    StatusLogger.start();
+    DriverStation.startDataLog(DataLogManager.getLog());
   }
 
   /**

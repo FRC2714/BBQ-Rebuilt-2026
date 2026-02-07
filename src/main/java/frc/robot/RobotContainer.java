@@ -40,6 +40,8 @@ public class RobotContainer {
   public final Shooter m_turret = new Shooter();
   public final Spindexer m_spindexer = new Spindexer();
 
+  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_turret);
+
   // The driver's controller
   CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);

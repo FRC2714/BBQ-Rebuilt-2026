@@ -62,9 +62,11 @@ public final class Constants {
 
     public static final boolean kGyroReversed = false;
 
-    public static final SimpleMotorFeedforward kDriveFeedforward = new SimpleMotorFeedforward(0,0,0);
-    //test 2 (0.2049,1.9347, 0.37092)
-    public static final SimpleMotorFeedforward kTurningFeedforward = new SimpleMotorFeedforward(0, 0, 0);
+    public static final SimpleMotorFeedforward kDriveFeedforward =
+        new SimpleMotorFeedforward(0, 0, 0);
+    // test 2 (0.2049,1.9347, 0.37092)
+    public static final SimpleMotorFeedforward kTurningFeedforward =
+        new SimpleMotorFeedforward(0, 0, 0);
   }
 
   public static final class ModuleConstants {

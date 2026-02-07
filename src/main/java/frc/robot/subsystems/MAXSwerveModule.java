@@ -116,4 +116,10 @@ public class MAXSwerveModule {
   public void resetEncoders() {
     m_drivingEncoder.setPosition(0);
   }
+
+  public void setVoltageAngle(double voltage, Rotation2d angle) {
+    m_drivingSpark.setVoltage(voltage);
+    m_desiredState.angle = angle.minus(Rotation2d.fromRadians(m_chassisAngularOffset));
+    setDesiredState(m_desiredState);
+  }
 }

@@ -5,9 +5,9 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Shooter;
 
 public class StateMachine extends SubsystemBase {
-  DriveSubsystem m_drivetrain;
-  Shooter m_shooter;
-  Publisher m_publisher;
+  private final DriveSubsystem m_drivetrain;
+  private final Shooter m_shooter;
+  private final Publisher m_publisher;
 
   public StateMachine(DriveSubsystem drivetrain, Shooter shooter) {
     m_drivetrain = drivetrain;

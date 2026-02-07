@@ -8,8 +8,8 @@ import frc.robot.subsystems.Shooter;
  * pose, robot pose, etc.
  */
 public class Publisher {
-  DriveSubsystem m_drivetrain;
-  Shooter m_shooter;
+  private final DriveSubsystem m_drivetrain;
+  private final Shooter m_shooter;
 
   public Publisher(DriveSubsystem drivetrain, Shooter shooter) {
     m_drivetrain = drivetrain;

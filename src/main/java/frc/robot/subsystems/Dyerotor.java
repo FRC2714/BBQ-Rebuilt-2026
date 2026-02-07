@@ -27,8 +27,20 @@ public class DyeRotor extends SubsystemBase {
   //Roller
   private SparkFlex rollerMotor = new SparkFlex(Constants.DyeRotorConstants.kRollerCanId, MotorType.kBrushless);
   
+  private double hookCurrentTarget = 0;
+  private double rollerCurrentTarget = 0;
+  
+  
   /** Creates a new Dyerotor. */
   public DyeRotor() {
+    hookMotor.configure(
+        Configs.DyeRotor.hookConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
+    rollerMotor.configure(
+        Configs.DyeRotor.rollerConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
   }
 
   @Override

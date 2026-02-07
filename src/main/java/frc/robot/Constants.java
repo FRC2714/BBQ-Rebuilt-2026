@@ -125,6 +125,9 @@ public final class Constants {
     }
   }
 
+  // For field constants
+  public static boolean disableHAL = false;
+
   public static final class IntakeConstants {
 
     public static final class RollerConstants {

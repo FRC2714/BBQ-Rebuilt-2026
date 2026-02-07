@@ -33,7 +33,9 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
@@ -81,6 +83,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final Canandgyro m_gyro = new Canandgyro(0);
 
   private final Field2d m_field2d = new Field2d();
+
+  private double m_driverHeadingOffsetDeg = 0.0; // Used for relative heading for the driver
 
   double xyStdDev;
 
@@ -337,6 +341,8 @@ public class DriveSubsystem extends SubsystemBase {
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
+    double driverRelativeHeading = getHeading() - m_driverHeadingOffsetDeg;
+
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
             fieldRelative
@@ -344,7 +350,7 @@ public class DriveSubsystem extends SubsystemBase {
                     xSpeedDelivered,
                     ySpeedDelivered,
                     rotDelivered,
-                    Rotation2d.fromDegrees(getHeading()))
+                    Rotation2d.fromDegrees(driverRelativeHeading))
                 : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -354,10 +360,10 @@ public class DriveSubsystem extends SubsystemBase {
     if (this.swerveDriveSimulation != null) {
       this.swerveDriveSimulation.runSwerveStates(swerveModuleStates);
       // this.swerveDriveSimulation.runChassisSpeeds(
-      //     new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered),
-      //     new Translation2d(),
-      //     fieldRelative,
-      //     true);
+      // new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered),
+      // new Translation2d(),
+      // fieldRelative,
+      // true);
       return;
     }
 
@@ -450,7 +456,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
+  public void zeroPose() {
     Pose2d pose = new Pose2d();
 
     m_gyro.setYaw(pose.getRotation().getRotations());
@@ -464,6 +470,28 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
         },
         pose);
+
+    LimelightHelpers.SetRobotOrientation("limelight-front", 0, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-right", 0, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-left", 0, 0, 0, 0, 0, 0);
+
+    LimelightHelpers.SetIMUMode("limelight-front", 1);
+    LimelightHelpers.SetIMUMode("limelight-right", 1);
+    LimelightHelpers.SetIMUMode("limelight-left", 1);
+
+    // Switch back to fused mode after seeding
+    new WaitCommand(0.1)
+        .andThen(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-front", 4)))
+        .alongWith(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-right", 4)))
+        .alongWith(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-left", 4)));
+  }
+
+  public void zeroDriverHeading() {
+    m_driverHeadingOffsetDeg = getHeading();
+  }
+
+  public void setDriverHeadingOffset(double offsetDeg) {
+    m_driverHeadingOffsetDeg = getHeading() - offsetDeg;
   }
 
   /**

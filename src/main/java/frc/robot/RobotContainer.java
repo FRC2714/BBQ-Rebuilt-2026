@@ -30,6 +30,8 @@ public class RobotContainer {
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final Shooter m_turret = new Shooter();
 
+  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_turret);
+
   private SendableChooser<Command> autoChooser;
 
   // The driver's controller
@@ -73,7 +75,10 @@ public class RobotContainer {
 
     m_driverController
         .start()
-        .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
+        .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(), m_robotDrive));
+    m_driverController
+        .back()
+        .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
   }
 
   /**

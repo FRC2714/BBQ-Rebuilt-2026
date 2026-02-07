@@ -78,6 +78,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final Field2d m_field2d = new Field2d();
 
+  private double m_driverHeadingOffsetDeg = 0.0; // Used for relative heading for the driver
+
   double xyStdDev;
 
   // Publisher for robot pose for use with AdvantageScope
@@ -294,6 +296,8 @@ public class DriveSubsystem extends SubsystemBase {
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
+    double driverRelativeHeading = getHeading() - m_driverHeadingOffsetDeg;
+
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
             fieldRelative
@@ -301,7 +305,7 @@ public class DriveSubsystem extends SubsystemBase {
                     xSpeedDelivered,
                     ySpeedDelivered,
                     rotDelivered,
-                    Rotation2d.fromDegrees(getHeading()))
+                    Rotation2d.fromDegrees(driverRelativeHeading))
                 : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -361,7 +365,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
+  public void zeroPose() {
     Pose2d pose = new Pose2d();
 
     m_gyro.setYaw(pose.getRotation().getRotations());
@@ -389,6 +393,15 @@ public class DriveSubsystem extends SubsystemBase {
         .andThen(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-front", 4)))
         .alongWith(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-right", 4)))
         .alongWith(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-left", 4)));
+  }
+
+
+  public void zeroDriverHeading() {
+    m_driverHeadingOffsetDeg = getHeading();
+  }
+
+  public void setDriverHeadingOffset(double offsetDeg) {
+    m_driverHeadingOffsetDeg = getHeading() - offsetDeg;
   }
 
   /**

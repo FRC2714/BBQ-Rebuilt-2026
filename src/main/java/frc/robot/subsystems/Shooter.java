@@ -214,20 +214,16 @@ public class Shooter extends SubsystemBase {
         });
   }
 
-  //hit limit switch and set turret angle to limit swithc position
-  public void zeroTurret(){
-    if(!wasZeroed &&  turretMotor.getForwardLimitSwitch().isPressed())
-    {
+  // hit limit switch and set turret angle to limit swithc position
+  public void zeroTurret() {
+    if (!wasZeroed && turretMotor.getForwardLimitSwitch().isPressed()) {
       wasZeroed = true;
       turretRelativeEncoder.setPosition(ShooterConstants.kTurretMaxRange);
-    }
-    else if(!wasZeroed && turretMotor.getReverseLimitSwitch().isPressed())
-    {
+    } else if (!wasZeroed && turretMotor.getReverseLimitSwitch().isPressed()) {
       wasZeroed = true;
       turretRelativeEncoder.setPosition(ShooterConstants.kTurretMinRange);
-    }
-    else if(!turretMotor.getReverseLimitSwitch().isPressed() && !turretMotor.getForwardLimitSwitch().isPressed())
-    {
+    } else if (!turretMotor.getReverseLimitSwitch().isPressed()
+        && !turretMotor.getForwardLimitSwitch().isPressed()) {
       wasZeroed = false;
     }
   }

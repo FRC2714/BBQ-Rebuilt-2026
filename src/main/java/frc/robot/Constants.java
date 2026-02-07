@@ -129,7 +129,6 @@ public final class Constants {
 
     public static final class TurretSetpoints {
       public static final double kStow = 15.2;
-      
     }
 
     public static final class HoodSetpoints {

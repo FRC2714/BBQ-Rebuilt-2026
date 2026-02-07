@@ -39,6 +39,8 @@ public class RobotContainer {
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final Shooter m_turret = new Shooter();
 
+  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_turret);
+
   // The driver's controller
   CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);

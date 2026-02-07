@@ -79,7 +79,10 @@ public class RobotContainer {
 
     m_driverController
         .start()
-        .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
+        .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(), m_robotDrive));
+    m_driverController
+        .back()
+        .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
   }
 
   /**

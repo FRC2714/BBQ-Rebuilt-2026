@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
+import frc.robot.Field;
 import frc.robot.FieldConstants.AprilTagLayoutType;
 import frc.robot.Robot;
 import frc.robot.utils.LimelightHelpers;
@@ -501,10 +502,7 @@ public class DriveSubsystem extends SubsystemBase {
     Pose2d pose = getPose().plus(Constants.ShooterConstants.turretOffset);
 
     // Hub position in field coordinates (meters)
-    Translation2d hub =
-        new Translation2d(
-            edu.wpi.first.math.util.Units.inchesToMeters(468.56),
-            edu.wpi.first.math.util.Units.inchesToMeters(158.32));
+    Translation2d hub = Field.getAllianceHub().toTranslation2d();
 
     // Vector from robot to hub
     Translation2d robotToHub = hub.minus(pose.getTranslation());

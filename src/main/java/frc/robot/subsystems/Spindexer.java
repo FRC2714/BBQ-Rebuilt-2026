@@ -58,6 +58,7 @@ public class Spindexer extends SubsystemBase {
   public Command loading() {
     return this.run(
         () -> {
+          check = false;
           setRotorPower(Constants.SpindexerConstants.kRotorMotorPower);
           setFeederPower(Constants.SpindexerConstants.kFeederMotorPower);
         }).withName("loading");
@@ -77,7 +78,8 @@ public class Spindexer extends SubsystemBase {
         setRotorPower(0);
         setFeederPower(0);
       }).withName("feedUntilFull")
-    );  
+    );
+   
   }
 
   public Command feedFullReady()
@@ -87,7 +89,7 @@ public class Spindexer extends SubsystemBase {
               setRotorPower(Constants.SpindexerConstants.kRotorMotorPower + 20);
               setFeederPower(Constants.SpindexerConstants.kFeederMotorPower + 20);
             })
-        .until(() -> check == true).withName("feedUntiLFullReady");
+        .until(() -> check == true).withName("feedUntilFull");
   }
 
   public Command reverseFuel() {
@@ -107,6 +109,7 @@ public class Spindexer extends SubsystemBase {
     //System.out.println("Running SIM PRESS TRUE");
     //System.out.println("CHECK IS " + check);
     check = true;
+    stop();
     return true;
   }
 

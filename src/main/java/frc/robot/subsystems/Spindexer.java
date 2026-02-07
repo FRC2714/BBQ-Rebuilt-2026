@@ -60,7 +60,7 @@ public class Spindexer extends SubsystemBase {
         () -> {
           setRotorPower(Constants.SpindexerConstants.kRotorMotorPower);
           setFeederPower(Constants.SpindexerConstants.kFeederMotorPower);
-        });
+        }).withName("loading");
   }
 
   public Command stop() {
@@ -72,17 +72,22 @@ public class Spindexer extends SubsystemBase {
   }
 
   public Command feedUntilFull() {
-    return this.run(
+    return feedFullReady().andThen(
+      this.run(() -> {
+        setRotorPower(0);
+        setFeederPower(0);
+      }).withName("feedUntilFull")
+    );  
+  }
+
+  public Command feedFullReady()
+  {
+        return this.run(
             () -> {
               setRotorPower(Constants.SpindexerConstants.kRotorMotorPower + 20);
               setFeederPower(Constants.SpindexerConstants.kFeederMotorPower + 20);
             })
-        .until(() -> check == true)
-        .andThen(
-            this.run(
-                () -> {
-                  stop();
-                }));
+        .until(() -> check == true).withName("feedUntiLFullReady");
   }
 
   public Command reverseFuel() {
@@ -98,10 +103,11 @@ public class Spindexer extends SubsystemBase {
                 }));
   }
 
-  public void simPressTrue() {
-    System.out.println("Running SIM PRESS TRUE");
+  public boolean simPressTrue() {
+    //System.out.println("Running SIM PRESS TRUE");
+    //System.out.println("CHECK IS " + check);
     check = true;
-    System.out.println("CHECK IS " + check);
+    return true;
   }
 
   public boolean simPressFalse() {
@@ -112,5 +118,7 @@ public class Spindexer extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Rotor Power", rotorCurrentTarget);
     SmartDashboard.putNumber("Feeder Power", feederCurrentTarget);
+    SmartDashboard.putBoolean("True", check);
+    SmartDashboard.putString("Current Commnad", this.getCurrentCommand() != null ? this.getCurrentCommand().getName(): "None");
   }
 }

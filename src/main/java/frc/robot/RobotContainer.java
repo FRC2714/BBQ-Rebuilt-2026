@@ -83,7 +83,10 @@ public class RobotContainer {
 
     m_driverController.a().whileTrue(m_spindexer.loading());
     m_driverController.b().whileTrue(m_spindexer.feedUntilFull());
-    m_driverController.x().onTrue(new InstantCommand(() -> m_spindexer.simPressTrue()));
+    m_driverController
+        .x()
+        .onTrue(new InstantCommand(() -> m_spindexer.simPressTrue()))
+        .onFalse(new InstantCommand(() -> m_spindexer.simPressFalse()));
     m_driverController.y().whileTrue(m_spindexer.stop());
   }
 

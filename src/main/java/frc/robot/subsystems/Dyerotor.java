@@ -20,10 +20,15 @@ import frc.robot.Constants;
 import frc.robot.Constants.DyeRotorConstants;
 
 
-public class Dyerotor extends SubsystemBase {
+public class DyeRotor extends SubsystemBase {
+  
+  //Hook
+  private SparkFlex hookMotor = new SparkFlex(Constants.DyeRotorConstants.kHookCanId, MotorType.kBrushless);
+  //Roller
+  private SparkFlex rollerMotor = new SparkFlex(Constants.DyeRotorConstants.kRollerCanId, MotorType.kBrushless);
+  
   /** Creates a new Dyerotor. */
-  public Dyerotor() {
-      
+  public DyeRotor() {
   }
 
   @Override

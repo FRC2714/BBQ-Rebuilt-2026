@@ -126,6 +126,8 @@ public final class Constants {
   }
 
   public static final class DyeRotorConstants {
+    public static final int kHookCanId = 70;
+    public static final int kRollerCanId = 80;
     
   }
 

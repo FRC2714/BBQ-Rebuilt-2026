@@ -30,6 +30,7 @@ public class Spindexer extends SubsystemBase {
 
   private double feederCurrentTarget = 0;
   private double rotorCurrentTarget = 0;
+  private boolean check = false;
 
   public Spindexer() {
     // Configs for rotorMotor
@@ -76,7 +77,7 @@ public class Spindexer extends SubsystemBase {
               setRotorPower(Constants.SpindexerConstants.kRotorMotorPower + 20);
               setFeederPower(Constants.SpindexerConstants.kFeederMotorPower + 20);
             })
-        .until(() -> simPressTrue())
+        .until(() -> check == true)
         .andThen(
             this.run(
                 () -> {
@@ -97,8 +98,10 @@ public class Spindexer extends SubsystemBase {
                 }));
   }
 
-  public boolean simPressTrue() {
-    return true;
+  public void simPressTrue() {
+    System.out.println("Running SIM PRESS TRUE");
+    check = true;
+    System.out.println("CHECK IS " + check);
   }
 
   public boolean simPressFalse() {

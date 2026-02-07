@@ -28,7 +28,9 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
@@ -309,10 +311,10 @@ public class DriveSubsystem extends SubsystemBase {
     if (this.swerveDriveSimulation != null) {
       this.swerveDriveSimulation.runSwerveStates(swerveModuleStates);
       // this.swerveDriveSimulation.runChassisSpeeds(
-      //     new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered),
-      //     new Translation2d(),
-      //     fieldRelative,
-      //     true);
+      // new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered),
+      // new Translation2d(),
+      // fieldRelative,
+      // true);
       return;
     }
 
@@ -373,7 +375,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
         },
         pose);
-    
+
     LimelightHelpers.SetRobotOrientation("limelight-front", 0, 0, 0, 0, 0, 0);
     LimelightHelpers.SetRobotOrientation("limelight-right", 0, 0, 0, 0, 0, 0);
     LimelightHelpers.SetRobotOrientation("limelight-left", 0, 0, 0, 0, 0, 0);
@@ -383,9 +385,10 @@ public class DriveSubsystem extends SubsystemBase {
     LimelightHelpers.SetIMUMode("limelight-left", 1);
 
     // Switch back to fused mode after seeding
-    LimelightHelpers.SetIMUMode("limelight-front", 4);
-    LimelightHelpers.SetIMUMode("limelight-right", 4);
-    LimelightHelpers.SetIMUMode("limelight-left", 4);
+    new WaitCommand(0.1)
+        .andThen(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-front", 4)))
+        .alongWith(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-right", 4)))
+        .alongWith(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-left", 4)));
   }
 
   /**

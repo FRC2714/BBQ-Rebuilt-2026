@@ -57,11 +57,12 @@ public class Spindexer extends SubsystemBase {
 
   public Command loading() {
     return this.run(
-        () -> {
-          check = false;
-          setRotorPower(Constants.SpindexerConstants.kRotorMotorPower);
-          setFeederPower(Constants.SpindexerConstants.kFeederMotorPower);
-        }).withName("loading");
+            () -> {
+              check = false;
+              setRotorPower(Constants.SpindexerConstants.kRotorMotorPower);
+              setFeederPower(Constants.SpindexerConstants.kFeederMotorPower);
+            })
+        .withName("loading");
   }
 
   public Command stop() {
@@ -73,23 +74,24 @@ public class Spindexer extends SubsystemBase {
   }
 
   public Command feedUntilFull() {
-    return feedFullReady().andThen(
-      this.run(() -> {
-        setRotorPower(0);
-        setFeederPower(0);
-      }).withName("feedUntilFull")
-    );
-   
+    return feedFullReady()
+        .andThen(
+            this.run(
+                    () -> {
+                      setRotorPower(0);
+                      setFeederPower(0);
+                    })
+                .withName("feedUntilFull"));
   }
 
-  public Command feedFullReady()
-  {
-        return this.run(
+  public Command feedFullReady() {
+    return this.run(
             () -> {
               setRotorPower(Constants.SpindexerConstants.kRotorMotorPower + 20);
               setFeederPower(Constants.SpindexerConstants.kFeederMotorPower + 20);
             })
-        .until(() -> check == true).withName("feedUntilFull");
+        .until(() -> check == true)
+        .withName("feedUntilFull");
   }
 
   public Command reverseFuel() {
@@ -106,8 +108,8 @@ public class Spindexer extends SubsystemBase {
   }
 
   public boolean simPressTrue() {
-    //System.out.println("Running SIM PRESS TRUE");
-    //System.out.println("CHECK IS " + check);
+    // System.out.println("Running SIM PRESS TRUE");
+    // System.out.println("CHECK IS " + check);
     check = true;
     stop();
     return true;
@@ -122,6 +124,8 @@ public class Spindexer extends SubsystemBase {
     SmartDashboard.putNumber("Rotor Power", rotorCurrentTarget);
     SmartDashboard.putNumber("Feeder Power", feederCurrentTarget);
     SmartDashboard.putBoolean("True", check);
-    SmartDashboard.putString("Current Commnad", this.getCurrentCommand() != null ? this.getCurrentCommand().getName(): "None");
+    SmartDashboard.putString(
+        "Current Commnad",
+        this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "None");
   }
 }

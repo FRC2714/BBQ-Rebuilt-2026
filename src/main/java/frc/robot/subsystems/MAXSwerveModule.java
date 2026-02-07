@@ -109,7 +109,7 @@ public class MAXSwerveModule {
     m_drivingClosedLoopController.setSetpoint(
         correctedDesiredState.speedMetersPerSecond,
         ControlType.kVelocity,
-        ClosedLoopSlot.kSlot1,
+        ClosedLoopSlot.kSlot0,
         DriveConstants.kDriveFeedforward.calculate(correctedDesiredState.speedMetersPerSecond));
     m_turningClosedLoopController.setSetpoint(
         correctedDesiredState.angle.getRadians(), ControlType.kPosition);

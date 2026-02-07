@@ -78,4 +78,43 @@ public final class Configs {
           .outputRange(-0.5, 0.5);
     }
   }
+
+  public static final class DyeRotor {
+    public static final SparkFlexConfig hookConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig rollerConfig = new SparkFlexConfig();
+
+    static {
+      hookConfig
+          .smartCurrentLimit(40) // needs tuning
+          .idleMode(IdleMode.kBrake) // needs tuning
+          .inverted(false) // needs tuning
+          .voltageCompensation(12); // needs tuning
+      hookConfig
+          .absoluteEncoder
+          .positionConversionFactor(360)
+          .inverted(false)
+          .zeroCentered(true); // needs tuning
+      hookConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning
+          .p(0.01) // needs tuning
+          .d(0) // needs tuning
+          .outputRange(-0.5, 0.5); // needs tuning
+    }
+
+    static {
+      rollerConfig
+          .smartCurrentLimit(40) // needs tuning
+          .idleMode(IdleMode.kBrake) // needs tuning
+          .inverted(false) // needs tuning
+          .voltageCompensation(12); // needs tuning
+      rollerConfig.absoluteEncoder.positionConversionFactor(360).inverted(false).zeroCentered(true);
+      rollerConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning
+          .p(0.01) // needs tuning
+          .d(0) // needs tuning
+          .outputRange(-0.5, 0.5); // needs tuning
+    }
+  }
 }

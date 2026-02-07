@@ -395,7 +395,6 @@ public class DriveSubsystem extends SubsystemBase {
         .alongWith(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-left", 4)));
   }
 
-
   public void zeroDriverHeading() {
     m_driverHeadingOffsetDeg = getHeading();
   }

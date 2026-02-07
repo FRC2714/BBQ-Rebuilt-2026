@@ -31,6 +31,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -40,6 +42,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Field;
+import frc.robot.FieldConstants;
 import frc.robot.FieldConstants.AprilTagLayoutType;
 import frc.robot.Robot;
 import frc.robot.utils.LimelightHelpers;
@@ -85,6 +88,39 @@ public class DriveSubsystem extends SubsystemBase {
   private final Field2d m_field2d = new Field2d();
 
   private double m_driverHeadingOffsetDeg = 0.0; // Used for relative heading for the driver
+
+  private static final double[] BLUE_ZONE = {
+    0.0, 0.0, FieldConstants.LinesVertical.allianceZone, FieldConstants.fieldWidth
+  };
+  private static final double[] RED_ZONE = {
+    FieldConstants.LinesVertical.oppAllianceZone,
+    0.0,
+    FieldConstants.fieldLength,
+    FieldConstants.fieldWidth
+  };
+
+  private static final double ROBOT_BUFFER =
+      Units.inchesToMeters((DriveConstants.kTrackWidth + 6.0) / 2.0);
+
+  private boolean isInZone(double[] zone) {
+    Translation2d pos = getPose().getTranslation();
+    return pos.getX() + ROBOT_BUFFER >= zone[0]
+        && pos.getY() + ROBOT_BUFFER >= zone[1]
+        && pos.getX() - ROBOT_BUFFER <= zone[2]
+        && pos.getY() - ROBOT_BUFFER <= zone[3];
+  }
+
+  public boolean isInAllianceZone() {
+    boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+    return isInZone(isRed ? RED_ZONE : BLUE_ZONE);
+  }
+
+  public double getTurretTargetAngle() {
+    if (isInAllianceZone()) {
+      return getAngleToHub();
+    }
+    return 0.0; // placeholder
+  }
 
   double xyStdDev;
 

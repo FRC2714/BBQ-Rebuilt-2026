@@ -15,7 +15,6 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
-import com.revrobotics.util.StatusLogger;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -61,6 +60,7 @@ import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -279,7 +279,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   public SysIdRoutine sysIdDrive() {
     return new SysIdRoutine(
-        new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
+        new SysIdRoutine.Config(
+            Volts.of(1).per(Second),
+            Volts.of(7),
+            Seconds.of(10),
+            (state) -> Logger.recordOutput("SysIdTestStateDrive", state.toString())),
         new SysIdRoutine.Mechanism(
             (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)), null, this));
   }
@@ -290,7 +294,7 @@ public class DriveSubsystem extends SubsystemBase {
             Volts.of(1).per(Second),
             Volts.of(7),
             Seconds.of(10),
-            (state) -> StatusLogger.recordOutput("SysIdTestState", state.toString())),
+            (state) -> Logger.recordOutput("SysIdTestStateRot", state.toString())),
         new SysIdRoutine.Mechanism(
             (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)), null, this));
   }

@@ -6,10 +6,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -41,7 +37,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -268,7 +263,7 @@ public class DriveSubsystem extends SubsystemBase {
             new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(2.5)),
             new SysIdRoutine.Mechanism(
                 (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)),
-                this::logDriveSysId,
+                null, // URCL handles logging
                 this,
                 "drive"));
 
@@ -277,7 +272,7 @@ public class DriveSubsystem extends SubsystemBase {
             new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
             new SysIdRoutine.Mechanism(
                 (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)),
-                this::logRotationSysId,
+                null, // URCL handles logging
                 this,
                 "rotation"));
   }
@@ -287,7 +282,7 @@ public class DriveSubsystem extends SubsystemBase {
         new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
         new SysIdRoutine.Mechanism(
             (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)),
-            this::logDriveSysId,
+            null, // URCL handles logging
             this,
             "drive"));
   }
@@ -297,7 +292,7 @@ public class DriveSubsystem extends SubsystemBase {
         new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
         new SysIdRoutine.Mechanism(
             (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)),
-            this::logRotationSysId,
+            null, // URCL handles logging
             this,
             "rotation"));
   }
@@ -340,20 +335,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setVoltageAngle(voltage, Rotation2d.fromDegrees(-45.0));
     m_rearLeft.setVoltageAngle(voltage, Rotation2d.fromDegrees(-45.0));
     m_rearRight.setVoltageAngle(voltage, Rotation2d.fromDegrees(45.0));
-  }
-
-  private void logDriveSysId(SysIdRoutineLog log) {
-    log.motor("drive")
-        .voltage(Volts.of(m_driveSysIdVoltage))
-        .linearPosition(Meters.of(m_frontRight.getPosition().distanceMeters))
-        .linearVelocity(MetersPerSecond.of(m_frontRight.getState().speedMetersPerSecond));
-  }
-
-  private void logRotationSysId(SysIdRoutineLog log) {
-    log.motor("rotation")
-        .voltage(Volts.of(m_rotationSysIdVoltage))
-        .angularPosition(Rotations.of(m_gyro.getRotation2d().getRotations()))
-        .angularVelocity(RotationsPerSecond.of(Units.degreesToRotations(getTurnRate())));
   }
 
   @Override

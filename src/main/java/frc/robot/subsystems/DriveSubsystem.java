@@ -266,13 +266,21 @@ public class DriveSubsystem extends SubsystemBase {
 
     driveRoutine =
         new SysIdRoutine(
-            new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(2.5)),
+            new SysIdRoutine.Config(
+                Volts.of(1).per(Second),
+                Volts.of(7),
+                Seconds.of(2.5),
+                (state) -> Logger.recordOutput("sysid-test-state", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)), null, this));
 
     rotationRoutine =
         new SysIdRoutine(
-            new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
+            new SysIdRoutine.Config(
+                Volts.of(1).per(Second),
+                Volts.of(7),
+                Seconds.of(10),
+                (state) -> Logger.recordOutput("sysid-test-state", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)), null, this));
   }
@@ -283,7 +291,7 @@ public class DriveSubsystem extends SubsystemBase {
             Volts.of(1).per(Second),
             Volts.of(7),
             Seconds.of(10),
-            (state) -> Logger.recordOutput("SysIdTestStateDrive", state.toString())),
+            (state) -> Logger.recordOutput("sysid-test-state", state.toString())),
         new SysIdRoutine.Mechanism(
             (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)), null, this));
   }
@@ -294,7 +302,7 @@ public class DriveSubsystem extends SubsystemBase {
             Volts.of(1).per(Second),
             Volts.of(7),
             Seconds.of(10),
-            (state) -> Logger.recordOutput("SysIdTestStateRot", state.toString())),
+            (state) -> Logger.recordOutput("sysid-test-state", state.toString())),
         new SysIdRoutine.Mechanism(
             (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)), null, this));
   }

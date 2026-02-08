@@ -82,10 +82,16 @@ public class RobotContainer {
 
     m_driverController
         .rightBumper()
-        .onTrue(new InstantCommand(() -> m_robotDrive.sysIdDrive(), m_robotDrive));
+        .onTrue(m_robotDrive.translationalQuasistatic());
     m_driverController
         .leftBumper()
-        .onTrue(new InstantCommand(() -> m_robotDrive.sysIdRotation(), m_robotDrive));
+        .onTrue(m_robotDrive.rotationalQuasistatic());
+    m_driverController
+        .x()
+        .onTrue(m_robotDrive.translationalDynamic());
+    m_driverController
+        .y()
+        .onTrue(m_robotDrive.rotationalDynamic());
   }
 
   /**

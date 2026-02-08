@@ -124,7 +124,9 @@ public class MAXSwerveModule {
 
   public void setVoltageAngle(double voltage, Rotation2d angle) {
     m_drivingSpark.setVoltage(voltage);
-    m_desiredState.angle = angle.minus(Rotation2d.fromRadians(m_chassisAngularOffset));
-    setDesiredState(m_desiredState);
+    m_turningClosedLoopController.setSetpoint(
+        angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset)).getRadians(),
+        ControlType.kPosition);
+    m_desiredState = new SwerveModuleState(0.0, angle);
   }
 }

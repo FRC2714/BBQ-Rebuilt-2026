@@ -6,6 +6,10 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -43,6 +47,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
@@ -60,7 +65,6 @@ import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
-import org.littletonrobotics.junction.Logger;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -196,13 +200,8 @@ public class DriveSubsystem extends SubsystemBase {
           LimelightConstants.m_stateStdDevs,
           LimelightConstants.m_visionStdDevs);
 
-  SysIdRoutine sysIdRoutine =
-      new SysIdRoutine(
-          new SysIdRoutine.Config(),
-          new SysIdRoutine.Mechanism(
-              (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)),
-              null, // No log consumer, since data is recorded by URCL
-              this));
+  private double m_driveSysIdVoltage = 0.0;
+  private double m_rotationSysIdVoltage = 0.0;
 
   private final SysIdRoutine rotationRoutine;
   private final SysIdRoutine driveRoutine;
@@ -266,45 +265,41 @@ public class DriveSubsystem extends SubsystemBase {
 
     driveRoutine =
         new SysIdRoutine(
-            new SysIdRoutine.Config(
-                Volts.of(1).per(Second),
-                Volts.of(7),
-                Seconds.of(2.5),
-                (state) -> Logger.recordOutput("sysid-test-state", state.toString())),
+            new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(2.5)),
             new SysIdRoutine.Mechanism(
-                (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)), null, this));
+                (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)),
+                this::logDriveSysId,
+                this,
+                "drive"));
 
     rotationRoutine =
         new SysIdRoutine(
-            new SysIdRoutine.Config(
-                Volts.of(1).per(Second),
-                Volts.of(7),
-                Seconds.of(10),
-                (state) -> Logger.recordOutput("sysid-test-state", state.toString())),
+            new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
             new SysIdRoutine.Mechanism(
-                (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)), null, this));
+                (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)),
+                this::logRotationSysId,
+                this,
+                "rotation"));
   }
 
   public SysIdRoutine sysIdDrive() {
     return new SysIdRoutine(
-        new SysIdRoutine.Config(
-            Volts.of(1).per(Second),
-            Volts.of(7),
-            Seconds.of(10),
-            (state) -> Logger.recordOutput("sysid-test-state", state.toString())),
+        new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
         new SysIdRoutine.Mechanism(
-            (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)), null, this));
+            (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)),
+            this::logDriveSysId,
+            this,
+            "drive"));
   }
 
   public SysIdRoutine sysIdRotation() {
     return new SysIdRoutine(
-        new SysIdRoutine.Config(
-            Volts.of(1).per(Second),
-            Volts.of(7),
-            Seconds.of(10),
-            (state) -> Logger.recordOutput("sysid-test-state", state.toString())),
+        new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
         new SysIdRoutine.Mechanism(
-            (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)), null, this));
+            (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)),
+            this::logRotationSysId,
+            this,
+            "rotation"));
   }
 
   public Command translationalQuasistatic() {
@@ -332,18 +327,33 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private void driveVoltageForwardTest(double voltage) {
-    var direction = new Rotation2d();
-    m_frontLeft.setVoltageAngle(-voltage, direction.plus(Rotation2d.fromDegrees(90)));
-    m_frontRight.setVoltageAngle(voltage, direction);
-    m_rearLeft.setVoltageAngle(-voltage, direction);
-    m_rearRight.setVoltageAngle(voltage, direction.plus(Rotation2d.fromDegrees(90)));
+    m_driveSysIdVoltage = voltage;
+    m_frontLeft.setVoltageAngle(voltage, new Rotation2d());
+    m_frontRight.setVoltageAngle(voltage, new Rotation2d());
+    m_rearLeft.setVoltageAngle(voltage, new Rotation2d());
+    m_rearRight.setVoltageAngle(voltage, new Rotation2d());
   }
 
   private void driveVoltageRotateTest(double voltage) {
-    m_frontLeft.setVoltageAngle(voltage, Rotation2d.fromDegrees(62.0));
-    m_frontRight.setVoltageAngle(voltage, Rotation2d.fromDegrees(27.9));
-    m_rearLeft.setVoltageAngle(voltage, Rotation2d.fromDegrees(27.9));
-    m_rearRight.setVoltageAngle(voltage, Rotation2d.fromDegrees(62.0));
+    m_rotationSysIdVoltage = voltage;
+    m_frontLeft.setVoltageAngle(voltage, Rotation2d.fromDegrees(45.0));
+    m_frontRight.setVoltageAngle(voltage, Rotation2d.fromDegrees(-45.0));
+    m_rearLeft.setVoltageAngle(voltage, Rotation2d.fromDegrees(-45.0));
+    m_rearRight.setVoltageAngle(voltage, Rotation2d.fromDegrees(45.0));
+  }
+
+  private void logDriveSysId(SysIdRoutineLog log) {
+    log.motor("drive")
+        .voltage(Volts.of(m_driveSysIdVoltage))
+        .linearPosition(Meters.of(m_frontRight.getPosition().distanceMeters))
+        .linearVelocity(MetersPerSecond.of(m_frontRight.getState().speedMetersPerSecond));
+  }
+
+  private void logRotationSysId(SysIdRoutineLog log) {
+    log.motor("rotation")
+        .voltage(Volts.of(m_rotationSysIdVoltage))
+        .angularPosition(Rotations.of(m_gyro.getRotation2d().getRotations()))
+        .angularVelocity(RotationsPerSecond.of(Units.degreesToRotations(getTurnRate())));
   }
 
   @Override

@@ -51,7 +51,7 @@ public class Robot extends TimedRobot {
     log.addSchema(Pose2d.struct);
     log.addSchema(Pose3d.struct);
 
-    URCL.start(log);
+    URCL.start();
 
     StatusLogger.start();
     DriverStation.startDataLog(DataLogManager.getLog());

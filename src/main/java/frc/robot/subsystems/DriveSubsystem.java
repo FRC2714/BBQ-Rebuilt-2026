@@ -331,10 +331,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   private void driveVoltageRotateTest(double voltage) {
     m_rotationSysIdVoltage = voltage;
-    m_frontLeft.setVoltageAngle(voltage, Rotation2d.fromDegrees(45.0));
-    m_frontRight.setVoltageAngle(voltage, Rotation2d.fromDegrees(-45.0));
-    m_rearLeft.setVoltageAngle(voltage, Rotation2d.fromDegrees(-45.0));
-    m_rearRight.setVoltageAngle(voltage, Rotation2d.fromDegrees(45.0));
+    m_frontLeft.setVoltageAngle(-voltage, Rotation2d.fromDegrees(-27.9));
+    m_frontRight.setVoltageAngle(voltage, Rotation2d.fromDegrees(27.9));
+    m_rearLeft.setVoltageAngle(-voltage, Rotation2d.fromDegrees(27.9));
+    m_rearRight.setVoltageAngle(voltage, Rotation2d.fromDegrees(-27.9));
   }
 
   @Override

@@ -46,7 +46,10 @@ public class DyeRotor extends SubsystemBase {
 
   public Command start()
   {
-      this.run()
+      return this.run(
+        () -> {
+          hookMotor.set()
+        });
   }
   
   @Override

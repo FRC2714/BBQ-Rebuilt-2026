@@ -48,8 +48,18 @@ public class DyeRotor extends SubsystemBase {
   {
       return this.run(
         () -> {
-          hookMotor.set()
+          hookMotor.set(Constants.DyeRotorConstants.kHookMotorPower);
+          rollerMotor.set(Constants.DyeRotorConstants.kRollerMotorPower);
         });
+  }
+
+  public Command stop()
+  {
+    return this.run(
+      () -> {
+        hookMotor.set(0);
+        rollerMotor.set(0);
+      });
   }
   
   @Override

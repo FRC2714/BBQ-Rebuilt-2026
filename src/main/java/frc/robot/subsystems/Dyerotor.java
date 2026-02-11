@@ -16,6 +16,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Configs;
 import frc.robot.Constants;
@@ -56,6 +57,10 @@ public class DyeRotor extends SubsystemBase {
         dyeRotorMotor.set(0);
       });
   }
+
+  //Mech2d for DyeRotor   
+  Mechanism2d mech = new Mechanism2d(4, 4);
+
   
   @Override
   public void periodic() {

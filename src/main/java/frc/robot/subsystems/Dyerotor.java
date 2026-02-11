@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
@@ -43,6 +44,11 @@ public class DyeRotor extends SubsystemBase {
         PersistMode.kPersistParameters);
   }
 
+  public Command start()
+  {
+      this.run()
+  }
+  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

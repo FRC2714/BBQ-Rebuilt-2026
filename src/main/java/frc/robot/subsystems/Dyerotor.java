@@ -24,21 +24,15 @@ import frc.robot.Constants.DyeRotorConstants;
 public class DyeRotor extends SubsystemBase {
   
   //Hook
-  private SparkFlex hookMotor = new SparkFlex(Constants.DyeRotorConstants.kHookCanId, MotorType.kBrushless);
   //Roller
-  private SparkFlex rollerMotor = new SparkFlex(Constants.DyeRotorConstants.kRollerCanId, MotorType.kBrushless);
+  private SparkFlex dyeRotorMotor = new SparkFlex(Constants.DyeRotorConstants.kDyeRotorMotorCanID, MotorType.kBrushless);
   
-  private double hookCurrentTarget = 0;
-  private double rollerCurrentTarget = 0;
+  private double dyeRotorCurrentTarget = 0;
   
   
   /** Creates a new Dyerotor. */
   public DyeRotor() {
-    hookMotor.configure(
-        Configs.DyeRotor.hookConfig,
-        ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
-    rollerMotor.configure(
+    dyeRotorMotor.configure(
         Configs.DyeRotor.rollerConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
@@ -48,8 +42,7 @@ public class DyeRotor extends SubsystemBase {
   {
       return this.run(
         () -> {
-          hookMotor.set(Constants.DyeRotorConstants.kHookMotorPower);
-          rollerMotor.set(Constants.DyeRotorConstants.kRollerMotorPower);
+          dyeRotorMotor.set(Constants.DyeRotorConstants.kDyeRotorPower);
         });
   }
 
@@ -57,8 +50,7 @@ public class DyeRotor extends SubsystemBase {
   {
     return this.run(
       () -> {
-        hookMotor.set(0);
-        rollerMotor.set(0);
+        dyeRotorMotor.set(0);
       });
   }
   

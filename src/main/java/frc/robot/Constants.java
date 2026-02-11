@@ -126,10 +126,8 @@ public final class Constants {
   }
 
   public static final class DyeRotorConstants {
-    public static final int kHookCanId = 70;
-    public static final int kRollerCanId = 80;
-    public static final double kHookMotorPower = 20;
-    public static final double kRollerMotorPower = 20;
+    public static final int kDyeRotorMotorCanID = 70;
+    public static final double kDyeRotorPower = 20;
   }
 
   // For field constants

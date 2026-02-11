@@ -34,7 +34,7 @@ public class DyeRotor extends SubsystemBase {
   /** Creates a new Dyerotor. */
   public DyeRotor() {
     dyeRotorMotor.configure(
-        Configs.DyeRotor.rollerConfig,
+        Configs.DyeRotor.dyeRotorConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
   }
@@ -63,4 +63,3 @@ public class DyeRotor extends SubsystemBase {
     SmartDashboard.putNumber("DyeRotor Motor", dyeRotorCurrentTarget);
   }
 }
-

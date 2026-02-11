@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -77,6 +78,13 @@ public class RobotContainer {
   private void configureButtonBindings() {
     new JoystickButton(m_driverController.getHID(), Button.kR1.value)
         .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+       
+    m_driverController.a().onTrue(m_spindexer.loading());
+    m_driverController.b().onTrue(m_spindexer.feedUntilFull());
+    m_driverController.x().onTrue(new InstantCommand(() -> m_spindexer.simPressTrue()))
+        .onFalse(new InstantCommand(() -> m_spindexer.simPressFalse()));
+     m_driverController.y().onTrue(m_spindexer.stop());
+
   }
 
   /**

@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Configs.DyeRotor;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
@@ -38,6 +39,7 @@ public class RobotContainer {
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final Shooter m_turret = new Shooter();
+  public final DyeRotor m_dyeRotor = new DyeRotor();
 
   final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_turret);
 
@@ -81,7 +83,7 @@ public class RobotContainer {
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
 
-     m_driverController.a().onTrue(m_dyerotor.stop());
+     m_driverController.a().onTrue(m_dyeRotor.start());
 
   }
 

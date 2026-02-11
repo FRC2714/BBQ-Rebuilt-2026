@@ -16,6 +16,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.Constants.DyeRotorConstants;
@@ -42,6 +43,7 @@ public class DyeRotor extends SubsystemBase {
   {
       return this.run(
         () -> {
+          dyeRotorCurrentTarget = Constants.DyeRotorConstants.kDyeRotorPower;
           dyeRotorMotor.set(Constants.DyeRotorConstants.kDyeRotorPower);
         });
   }
@@ -50,6 +52,7 @@ public class DyeRotor extends SubsystemBase {
   {
     return this.run(
       () -> {
+        dyeRotorCurrentTarget = 0;
         dyeRotorMotor.set(0);
       });
   }
@@ -57,6 +60,7 @@ public class DyeRotor extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("DyeRotor Motor", dyeRotorCurrentTarget);
   }
 }
 

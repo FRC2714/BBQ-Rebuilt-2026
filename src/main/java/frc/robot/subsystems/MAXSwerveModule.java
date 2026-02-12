@@ -8,6 +8,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Configs;
+import frc.robot.Constants.DriveConstants;
 
 public class MAXSwerveModule {
   private final SparkFlex m_drivingSpark;
@@ -105,7 +107,10 @@ public class MAXSwerveModule {
 
     // Command driving and turning SPARKS towards their respective setpoints.
     m_drivingClosedLoopController.setSetpoint(
-        correctedDesiredState.speedMetersPerSecond, ControlType.kVelocity);
+        correctedDesiredState.speedMetersPerSecond,
+        ControlType.kVelocity,
+        ClosedLoopSlot.kSlot0,
+        DriveConstants.kDriveFeedforward.calculate(correctedDesiredState.speedMetersPerSecond));
     m_turningClosedLoopController.setSetpoint(
         correctedDesiredState.angle.getRadians(), ControlType.kPosition);
 
@@ -115,5 +120,13 @@ public class MAXSwerveModule {
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
     m_drivingEncoder.setPosition(0);
+  }
+
+  public void setVoltageAngle(double voltage, Rotation2d angle) {
+    m_drivingSpark.setVoltage(voltage);
+    m_turningClosedLoopController.setSetpoint(
+        angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset)).getRadians(),
+        ControlType.kPosition);
+    m_desiredState = new SwerveModuleState(0.0, angle);
   }
 }

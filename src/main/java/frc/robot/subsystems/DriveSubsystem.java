@@ -6,7 +6,14 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -26,15 +33,21 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Field;
+import frc.robot.FieldConstants;
 import frc.robot.FieldConstants.AprilTagLayoutType;
 import frc.robot.Robot;
 import frc.robot.utils.LimelightHelpers;
@@ -78,6 +91,39 @@ public class DriveSubsystem extends SubsystemBase {
   private final Field2d m_field2d = new Field2d();
 
   private double m_driverHeadingOffsetDeg = 0.0; // Used for relative heading for the driver
+
+  private static final double[] BLUE_ZONE = {
+    0.0, 0.0, FieldConstants.LinesVertical.allianceZone, FieldConstants.fieldWidth
+  };
+  private static final double[] RED_ZONE = {
+    FieldConstants.LinesVertical.oppAllianceZone,
+    0.0,
+    FieldConstants.fieldLength,
+    FieldConstants.fieldWidth
+  };
+
+  private static final double ROBOT_BUFFER =
+      Units.inchesToMeters((DriveConstants.kTrackWidth + 6.0) / 2.0);
+
+  private boolean isInZone(double[] zone) {
+    Translation2d pos = getPose().getTranslation();
+    return pos.getX() + ROBOT_BUFFER >= zone[0]
+        && pos.getY() + ROBOT_BUFFER >= zone[1]
+        && pos.getX() - ROBOT_BUFFER <= zone[2]
+        && pos.getY() - ROBOT_BUFFER <= zone[3];
+  }
+
+  public boolean isInAllianceZone() {
+    boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+    return isInZone(isRed ? RED_ZONE : BLUE_ZONE);
+  }
+
+  public double getTurretTargetAngle() {
+    if (isInAllianceZone()) {
+      return getAngleToHub();
+    }
+    return 0.0; // placeholder
+  }
 
   double xyStdDev;
 
@@ -150,6 +196,13 @@ public class DriveSubsystem extends SubsystemBase {
   private static final double kLatencyCompensation = 0.1;
   private static final double kBaselineHorizontalVelocity = 6.0;
 
+  private double m_driveSysIdVoltage = 0.0;
+  private double m_rotationSysIdVoltage = 0.0;
+
+  private final SysIdRoutine rotationRoutine;
+  private final SysIdRoutine driveRoutine;
+
+  /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
     SmartDashboard.putData("Field", m_field2d);
@@ -165,6 +218,123 @@ public class DriveSubsystem extends SubsystemBase {
       SimulatedArena.getInstance()
           .addDriveTrainSimulation(swerveDriveSimulation.getDriveTrainSimulation());
     }
+
+    RobotConfig config;
+    try {
+      config = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      // Handle exception as needed
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+
+    // Configure AutoBuilder last
+    AutoBuilder.configure(
+        this::getPose, // Robot pose supplier
+        this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting
+        // pose)
+        this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        (speeds, feedforwards) ->
+            driveRobotRelative(
+                speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds.
+        // Also optionally outputs individual module feedforwards
+        new PPHolonomicDriveController( // PPHolonomicController is the built in path following
+            // controller for holonomic drive trains
+            new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+            new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            ),
+        config, // The robot configuration
+        () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        this // Reference to this subsystem to set requirements
+        );
+
+    driveRoutine =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(2.5)),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)),
+                null, // URCL handles logging
+                this,
+                "drive"));
+
+    rotationRoutine =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)),
+                null, // URCL handles logging
+                this,
+                "rotation"));
+  }
+
+  public SysIdRoutine sysIdDrive() {
+    return new SysIdRoutine(
+        new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
+        new SysIdRoutine.Mechanism(
+            (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)),
+            null, // URCL handles logging
+            this,
+            "drive"));
+  }
+
+  public SysIdRoutine sysIdRotation() {
+    return new SysIdRoutine(
+        new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
+        new SysIdRoutine.Mechanism(
+            (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)),
+            null, // URCL handles logging
+            this,
+            "rotation"));
+  }
+
+  public Command translationalQuasistatic() {
+    return new SequentialCommandGroup(
+        driveRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+        driveRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
+  }
+
+  public Command rotationalQuasistatic() {
+    return new SequentialCommandGroup(
+        rotationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+        rotationRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
+  }
+
+  public Command translationalDynamic() {
+    return new SequentialCommandGroup(
+        driveRoutine.dynamic(SysIdRoutine.Direction.kForward),
+        driveRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+  }
+
+  public Command rotationalDynamic() {
+    return new SequentialCommandGroup(
+        rotationRoutine.dynamic(SysIdRoutine.Direction.kForward),
+        rotationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+  }
+
+  private void driveVoltageForwardTest(double voltage) {
+    m_driveSysIdVoltage = voltage;
+    m_frontLeft.setVoltageAngle(voltage, new Rotation2d());
+    m_frontRight.setVoltageAngle(voltage, new Rotation2d());
+    m_rearLeft.setVoltageAngle(voltage, new Rotation2d());
+    m_rearRight.setVoltageAngle(voltage, new Rotation2d());
+  }
+
+  private void driveVoltageRotateTest(double voltage) {
+    m_rotationSysIdVoltage = voltage;
+    m_frontLeft.setVoltageAngle(-voltage, Rotation2d.fromDegrees(-27.9));
+    m_frontRight.setVoltageAngle(voltage, Rotation2d.fromDegrees(27.9));
+    m_rearLeft.setVoltageAngle(-voltage, Rotation2d.fromDegrees(27.9));
+    m_rearRight.setVoltageAngle(voltage, Rotation2d.fromDegrees(-27.9));
   }
 
   @Override
@@ -309,6 +479,43 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
+  public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
+    // Convert the commanded speeds into the correct units for the drivetrain
+    double xSpeedDelivered = speeds.vxMetersPerSecond;
+    double ySpeedDelivered = speeds.vyMetersPerSecond;
+    double rotDelivered = speeds.omegaRadiansPerSecond;
+
+    var swerveModuleStates =
+        DriveConstants.kDriveKinematics.toSwerveModuleStates(
+            fieldRelative
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                    xSpeedDelivered,
+                    ySpeedDelivered,
+                    rotDelivered,
+                    Rotation2d.fromDegrees(getHeading()))
+                : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+
+    publisherExpectedModuleStates.set(swerveModuleStates);
+
+    if (this.swerveDriveSimulation != null) {
+      this.swerveDriveSimulation.runSwerveStates(swerveModuleStates);
+      // this.swerveDriveSimulation.runChassisSpeeds(
+      //     new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered),
+      //     new Translation2d(),
+      //     fieldRelative,
+      //     true);
+      return;
+    }
+
+    m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    m_frontRight.setDesiredState(swerveModuleStates[1]);
+    m_rearLeft.setDesiredState(swerveModuleStates[2]);
+    m_rearRight.setDesiredState(swerveModuleStates[3]);
+  }
+
+  /** Sets the wheels into an X formation to prevent movement. */
   public void setX() {
     m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
@@ -316,6 +523,15 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
   }
 
+  public void driveRobotRelative(ChassisSpeeds speeds) {
+    drive(speeds, false);
+  }
+
+  /**
+   * Sets the swerve ModuleStates.
+   *
+   * @param desiredStates The desired SwerveModule states.
+   */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -331,6 +547,13 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(desiredStates[3]);
   }
 
+  public SwerveModuleState[] getModuleStates() {
+    return new SwerveModuleState[] {
+      m_frontLeft.getState(), m_frontRight.getState(), m_rearLeft.getState(), m_rearRight.getState()
+    };
+  }
+
+  /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
     m_frontLeft.resetEncoders();
     m_rearLeft.resetEncoders();
@@ -471,5 +694,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     return poses.toArray(new Pose3d[0]);
+  }
+
+  public ChassisSpeeds getRobotRelativeSpeeds() {
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
   }
 }

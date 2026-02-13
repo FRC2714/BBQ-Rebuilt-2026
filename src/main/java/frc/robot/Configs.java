@@ -108,7 +108,6 @@ public final class Configs {
           .idleMode(IdleMode.kBrake) // needs tuning
           .inverted(false) // needs tuning
           .voltageCompensation(12); // needs tuning
-      rollerConfig.absoluteEncoder.positionConversionFactor(360).inverted(false).zeroCentered(true);
       rollerConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning

@@ -105,4 +105,22 @@ public final class Configs {
           .follow(ShooterConstants.kFlywheelLeaderMotorId, true);
     }
   }
+
+  public static final class DyeRotor {
+    public static final SparkFlexConfig dyeRotorConfig = new SparkFlexConfig();
+
+    static {
+      dyeRotorConfig
+          .smartCurrentLimit(40) // needs tuning
+          .idleMode(IdleMode.kBrake) // needs tuning
+          .inverted(false) // needs tuning
+          .voltageCompensation(12); // needs tuning
+      dyeRotorConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder) // needs tuning
+          .p(0.01) // needs tuning
+          .d(0) // needs tuning
+          .outputRange(-0.5, 0.5); // needs tuning
+    }
+  }
 }

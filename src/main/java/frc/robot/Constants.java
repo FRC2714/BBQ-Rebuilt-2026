@@ -187,6 +187,11 @@ public final class Constants {
     public static final double kIntakeBarAngleRads = Units.degreesToRadians(90);
   }
 
+  public static final class DyeRotorConstants {
+    public static final int kDyeRotorMotorCanID = 60;
+    public static final double kDyeRotorPower = 260;
+  }
+
   // For field constants
   public static boolean disableHAL = false;
 }

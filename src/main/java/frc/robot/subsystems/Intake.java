@@ -68,16 +68,14 @@ public class Intake extends SubsystemBase {
     intakePivotController.setSetpoint(
         Constants.IntakeConstants.PivotConstants.kPivotExtend,
         ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        pivotFF.calculate(Constants.IntakeConstants.PivotConstants.kPivotExtend, 0));
+        ClosedLoopSlot.kSlot0);
   }
 
   private void pivotStow() {
     intakePivotController.setSetpoint(
         Constants.IntakeConstants.PivotConstants.kPivotStow,
         ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        pivotFF.calculate(Constants.IntakeConstants.PivotConstants.kPivotStow, 0));
+        ClosedLoopSlot.kSlot0);
   }
 
   private void setRollerPower(double power) {
@@ -117,6 +115,6 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Intake/Alive", true);
-    SmartDashboard.putData("Mech2d", intakeMech);
+    SmartDashboard.putData("Intake/Mech2d", intakeMech);
   }
 }

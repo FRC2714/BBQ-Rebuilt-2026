@@ -87,8 +87,8 @@ public class RobotContainer {
     // m_driverController.x().onTrue(m_robotDrive.translationalDynamic());
     // m_driverController.y().onTrue(m_robotDrive.rotationalDynamic());
 
-    m_driverController.leftBumper().whileTrue(m_intake.intake()).onFalse(m_intake.stow());
-    m_driverController.rightBumper().whileTrue(m_intake.extake()).onFalse(m_intake.stow());
+    m_driverController.leftBumper().whileTrue(m_intake.intake());
+    m_driverController.rightBumper().whileTrue(m_intake.extake());
   }
 
   /**

@@ -695,8 +695,4 @@ public class DriveSubsystem extends SubsystemBase {
 
     return poses.toArray(new Pose3d[0]);
   }
-
-  public ChassisSpeeds getRobotRelativeSpeeds() {
-    return DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
-  }
 }

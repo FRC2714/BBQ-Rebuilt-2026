@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Shooter;
 
 /*
@@ -29,6 +30,7 @@ public class RobotContainer {
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final Shooter m_turret = new Shooter();
+  public final DyeRotor m_dyeRotor = new DyeRotor();
 
   final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_turret);
 
@@ -84,6 +86,7 @@ public class RobotContainer {
     // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());
     // m_driverController.x().onTrue(m_robotDrive.translationalDynamic());
     // m_driverController.y().onTrue(m_robotDrive.rotationalDynamic());
+
   }
 
   /**

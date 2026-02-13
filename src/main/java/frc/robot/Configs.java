@@ -101,8 +101,7 @@ public final class Configs {
           .voltageCompensation(12);
 
       flywheelConfigFollower
-          .idleMode(IdleMode.kBrake)
-          .inverted(true)
+          .idleMode(IdleMode.kCoast)
           .follow(ShooterConstants.kFlywheelLeaderMotorId, true);
     }
   }

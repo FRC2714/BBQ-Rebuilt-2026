@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "depot start to nz"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "depot mid nz to side depot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "intake depot to mid nz"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

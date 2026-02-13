@@ -12,7 +12,6 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -23,31 +22,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
+import frc.robot.Constants.IntakeConstants;
+import frc.robot.Robot;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
-  private enum PivotSetpoints {
-    STOW,
-    INTAKE,
-    EXTAKE,
-    SCORE,
-  }
-
-  private enum RollerSetpoints {
-    STOW,
-    INTAKE,
-    EXTAKE,
-    STOP,
-  }
 
   // creates new intake pivot motor
   private SparkFlex pivotMotor =
       new SparkFlex(
           Constants.IntakeConstants.PivotConstants.kIntakePivotCanId, MotorType.kBrushless);
+
   private SparkClosedLoopController intakePivotController = pivotMotor.getClosedLoopController();
-  private AbsoluteEncoder intakePivotAbsoluteEncoder = pivotMotor.getAbsoluteEncoder();
-  private ArmFeedforward pivotFF =
-      new ArmFeedforward(0, Constants.IntakeConstants.PivotConstants.kPivotkG, 0);
+  private AbsoluteEncoder pivotEncoder = pivotMotor.getAbsoluteEncoder();
 
   // creates new roller motor
   private SparkFlex rollerMotor =
@@ -75,16 +62,14 @@ public class Intake extends SubsystemBase {
     intakePivotController.setSetpoint(
         Constants.IntakeConstants.PivotConstants.kPivotExtend,
         ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        pivotFF.calculate(Constants.IntakeConstants.PivotConstants.kPivotExtend, 0));
+        ClosedLoopSlot.kSlot0);
   }
 
   private void pivotStow() {
     intakePivotController.setSetpoint(
         Constants.IntakeConstants.PivotConstants.kPivotStow,
         ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        pivotFF.calculate(Constants.IntakeConstants.PivotConstants.kPivotStow, 0));
+        ClosedLoopSlot.kSlot0);
   }
 
   private double currentRollerPower = 0;
@@ -92,6 +77,14 @@ public class Intake extends SubsystemBase {
   private void setRollerPower(double power) {
     rollerMotor.set(power);
     currentRollerPower = power;
+  }
+
+  public boolean atSetpoint() {
+    if (Robot.isSimulation()) {
+      return true;
+    }
+    return Math.abs(intakePivotController.getSetpoint() - pivotEncoder.getPosition())
+        <= IntakeConstants.PivotConstants.kPivotThreshold;
   }
 
   public Command intake() {
@@ -137,7 +130,9 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     // intakeLigament.setAngle(intakePivotAbsoluteEncoder.getPosition());P
-    // SmartDashboard.putData("IntakeMechanism", intakeMech);
+    // SmartDashboard.putData("Intake/IntakeMechanism", intakeMech);
+    SmartDashboard.putNumber("Intake/Pivot/Current Position", pivotEncoder.getPosition());
+    SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
 
     rollerSimAngle += currentRollerPower * 10;
 

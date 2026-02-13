@@ -32,7 +32,6 @@ public class Intake extends SubsystemBase {
   }
 
   private enum RollerSetpoints {
-    STOW,
     INTAKE,
     EXTAKE,
     STOP,

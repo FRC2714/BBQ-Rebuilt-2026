@@ -55,7 +55,7 @@ public class DyeRotor extends SubsystemBase {
   // Mech2d for DyeRotor
   private final Mechanism2d mech2d = new Mechanism2d(60, 60); // width, height in "virtual units"
 
-  private final MechanismRoot2d rotorRoot = mech2d.getRoot("DyeRotorRoot", 29.5, 0);
+  private final MechanismRoot2d rotorRoot = mech2d.getRoot("DyeRotorRoot", 29.83, 0);
 
   private final MechanismLigament2d rotorArm =
       rotorRoot.append(

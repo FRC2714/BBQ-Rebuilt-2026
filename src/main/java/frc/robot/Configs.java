@@ -89,13 +89,8 @@ public final class Configs {
           .inverted(false) // needs tuning
           .voltageCompensation(12); // needs tuning
       dyeRotorConfig
-          .absoluteEncoder
-          .positionConversionFactor(360)
-          .inverted(false)
-          .zeroCentered(true); // needs tuning
-      dyeRotorConfig
           .closedLoop
-          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder) // needs tuning
           .p(0.01) // needs tuning
           .d(0) // needs tuning
           .outputRange(-0.5, 0.5); // needs tuning

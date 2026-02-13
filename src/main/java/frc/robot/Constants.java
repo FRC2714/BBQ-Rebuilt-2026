@@ -132,16 +132,16 @@ public final class Constants {
 
     public static final class RollerConstants {
       public static final int kIntakeRollerCanId = 10; // needs tuning
-      public static final int kIntakeRollerPower = 0; // needs tuning
-      public static final int kExtakeRollerPower = 0; // needs tuning
-      public static final int kRollerStop = 0; // needs tuning
+      public static final double kIntakeRollerPower = 0.5; // needs tuning
+      public static final double kExtakeRollerPower = -0.5; // needs tuning
+      public static final double kRollerStop = 0.0; // needs tuning
     }
 
     public static final class PivotConstants {
       public static final int kIntakePivotCanId = 9; // needs tuning
-      public static final int kPivotkG = 0; // needs tuning
-      public static final int kPivotStow = 0; // needs tuning
-      public static final int kPivotExtend = 0; // needs tuning
+      public static final double kPivotkG = 0; // needs tuning
+      public static final double kPivotStow = 0; // needs tuning
+      public static final double kPivotExtend = 0; // needs tuning
     }
   }
 }

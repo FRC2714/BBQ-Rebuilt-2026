@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
@@ -55,6 +57,7 @@ public class Intake extends SubsystemBase {
   // Configs for Intake - NEEDS TUNING
   public Intake() {
     // Configs for pivotMotor
+
     pivotMotor.configure(
         Configs.Intake.pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     // Configs for rollerMotor
@@ -62,6 +65,10 @@ public class Intake extends SubsystemBase {
         Configs.Intake.rollerConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
+    SmartDashboard.putData("Mech2d", intakeMech);
+    SmartDashboard.putData("Intake Stow", this.stow());
+    SmartDashboard.putData("Intake In", this.intake());
+    SmartDashboard.putData("Intake Out", this.extake());
   }
 
   private void pivotExtend() {
@@ -80,8 +87,11 @@ public class Intake extends SubsystemBase {
         pivotFF.calculate(Constants.IntakeConstants.PivotConstants.kPivotStow, 0));
   }
 
+  private double currentRollerPower = 0;
+
   private void setRollerPower(double power) {
     rollerMotor.set(power);
+    currentRollerPower = power;
   }
 
   public Command intake() {
@@ -108,15 +118,30 @@ public class Intake extends SubsystemBase {
         });
   }
 
-  // Mech2d
-  Mechanism2d intakeMech = new Mechanism2d(2, 1);
-  MechanismRoot2d intakeRoot = intakeMech.getRoot("Intake", 1, 0.75);
-  MechanismLigament2d intakeLigament1 = new MechanismLigament2d("intakeLigament1", 0.5, -135);
+  Mechanism2d intakeMech = new Mechanism2d(3, 3);
+  MechanismRoot2d intakeRoot = intakeMech.getRoot("Intake", 1, 1.5);
+
+  MechanismLigament2d intakeRoller =
+      intakeRoot.append(
+          new MechanismLigament2d("Intake Roller", 1, 0, 6, new Color8Bit(Color.kAzure)));
+  // Two spokes to make it look like a spinning wheel
+  MechanismLigament2d rollerSpoke1 =
+      intakeRoller.append(
+          new MechanismLigament2d("rollerSpoke1", 0.1, -180, 6, new Color8Bit(Color.kYellow)));
+  MechanismLigament2d rollerSpoke2 =
+      rollerSpoke1.append(
+          new MechanismLigament2d("rollerSpoke2", 0.1, 180, 6, new Color8Bit(Color.kBlue)));
+  private double rollerSimAngle = 0;
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putBoolean("Intake/Alive", true);
-    SmartDashboard.putData("Mech2d", intakeMech);
+    // intakeLigament.setAngle(intakePivotAbsoluteEncoder.getPosition());P
+    // SmartDashboard.putData("IntakeMechanism", intakeMech);
+
+    rollerSimAngle += currentRollerPower * 10;
+
+    rollerSpoke1.setAngle(rollerSimAngle);
+    rollerSpoke2.setAngle(rollerSimAngle + 180); // always opposite
   }
 }

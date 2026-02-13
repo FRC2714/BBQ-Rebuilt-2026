@@ -17,10 +17,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.Shooter;
-import java.util.List;
 import frc.robot.subsystems.DyeRotor;
-
+import frc.robot.subsystems.Shooter;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -89,8 +87,8 @@ public class RobotContainer {
     // m_driverController.x().onTrue(m_robotDrive.translationalDynamic());
     // m_driverController.y().onTrue(m_robotDrive.rotationalDynamic());
 
-     m_driverController.a().onTrue(m_dyeRotor.start());
-     m_driverController.b().onTrue(m_dyeRotor.stop());
+    m_driverController.a().onTrue(m_dyeRotor.start());
+    m_driverController.b().onTrue(m_dyeRotor.stop());
   }
 
   /**

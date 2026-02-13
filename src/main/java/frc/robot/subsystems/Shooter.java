@@ -159,12 +159,6 @@ public class Shooter extends SubsystemBase {
         });
   }
 
-  public Command stowShooter() {
-    return this.run(
-        () -> {
-          setHoodAngle(Constants.ShooterConstants.HoodSetpoints.kStow);
-        });
-  }
 
   public void zeroTurret() {
     if (!wasZeroed && turretMotor.getForwardLimitSwitch().isPressed()) {

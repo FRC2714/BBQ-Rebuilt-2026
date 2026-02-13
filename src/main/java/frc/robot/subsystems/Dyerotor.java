@@ -17,19 +17,26 @@ import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.Constants.DyeRotorConstants;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
+
 
 
 public class DyeRotor extends SubsystemBase {
   
-  //Hook
-  //Roller
-  private SparkFlex dyeRotorMotor = new SparkFlex(Constants.DyeRotorConstants.kDyeRotorMotorCanID, MotorType.kBrushless);
   
+  private SparkFlex dyeRotorMotor = new SparkFlex(Constants.DyeRotorConstants.kDyeRotorMotorCanID, MotorType.kBrushless);
   private double dyeRotorCurrentTarget = 0;
+  private double rotorAngleDeg = 0;
+
   
   
   /** Creates a new Dyerotor. */
@@ -38,6 +45,9 @@ public class DyeRotor extends SubsystemBase {
         Configs.DyeRotor.dyeRotorConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
+        rotorArm.setAngle(45);
+        SmartDashboard.putData("Dye Rotor Mech", mech2d);
+
   }
 
   public Command start()
@@ -59,12 +69,29 @@ public class DyeRotor extends SubsystemBase {
   }
 
   //Mech2d for DyeRotor   
-  Mechanism2d mech = new Mechanism2d(4, 4);
+  private final Mechanism2d mech2d =
+    new Mechanism2d(60, 60); // width, height in "virtual units"
+
+  private final MechanismRoot2d rotorRoot =
+    mech2d.getRoot("DyeRotorRoot", 29.5, 0);
+
+  private final MechanismLigament2d rotorArm =
+      rotorRoot.append(
+          new MechanismLigament2d(
+              "Rotor",
+              1,      // length
+              0,       // starting angle
+              20,       // line thickness
+              new Color8Bit(Color.kPurple)));
 
   
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("DyeRotor Motor", dyeRotorCurrentTarget);
+    rotorAngleDeg += dyeRotorCurrentTarget * 5; // tune speed
+    rotorAngleDeg %= 360; // tune speed
+    rotorArm.setAngle(rotorAngleDeg);
+
   }
 }

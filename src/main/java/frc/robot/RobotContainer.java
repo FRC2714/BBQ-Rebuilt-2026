@@ -32,7 +32,7 @@ public class RobotContainer {
   public final Shooter m_shooter = new Shooter();
   public final Intake m_intake = new Intake();
 
-  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_turret);
+  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_shooter);
 
   private SendableChooser<Command> autoChooser;
 

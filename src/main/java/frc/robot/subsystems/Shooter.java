@@ -234,8 +234,8 @@ public class Shooter extends SubsystemBase {
     moveHoodToSetpoint();
     moveFlywheelToSetpoint();
 
-    SmartDashboard.putNumber("Hood Angle", hoodController.getSetpoint());
-    SmartDashboard.putNumber("Flywheel Speed", flywheelController.getSetpoint());
+    SmartDashboard.putNumber("Shooter/Hood Angle", getHoodAngle());
+    SmartDashboard.putNumber("Shooter/Flywheel Speed", getFlywheelSpeed());
   }
 
   @Override

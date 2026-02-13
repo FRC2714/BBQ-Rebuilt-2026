@@ -127,7 +127,7 @@ public final class Constants {
         new Transform2d(
             Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));
 
-    public static final int kHoodCanId = 31;
+    public static final int kHoodCanId = 31; // TBD
     public static final int kHoodMaxRange = 175;
     public static final int kHoodMinRange = -175;
 

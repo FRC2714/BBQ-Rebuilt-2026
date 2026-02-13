@@ -58,8 +58,6 @@ public class RobotContainer {
                         m_driverController.getRightX(), OIConstants.kDriveDeadband),
                     true),
             m_robotDrive));
-    // Provide the drive subsystem reference to the shooter so it can query distance/vision
-    m_turret.setDriveSubsystem(m_robotDrive);
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);

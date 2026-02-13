@@ -22,48 +22,38 @@ import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 import frc.robot.utils.InterpolatingTreeMap;
 
 public class Shooter extends SubsystemBase {
-  // turret motors and controllers
-  private SparkFlex turretMotor =
-      new SparkFlex(Constants.ShooterConstants.kTurretCanId, MotorType.kBrushless);
+  private SparkFlex turretMotor = new SparkFlex(Constants.ShooterConstants.kTurretCanId, MotorType.kBrushless);
   private SparkClosedLoopController turretController = turretMotor.getClosedLoopController();
 
   private RelativeEncoder turretRelativeEncoder = turretMotor.getExternalEncoder();
 
-  private SparkFlex hoodMotor =
-      new SparkFlex(Constants.ShooterConstants.kHoodCanId, MotorType.kBrushless);
+  private SparkFlex hoodMotor = new SparkFlex(Constants.ShooterConstants.kHoodCanId, MotorType.kBrushless);
   private SparkClosedLoopController hoodController = hoodMotor.getClosedLoopController();
   private RelativeEncoder hoodRelativeEncoder = hoodMotor.getExternalEncoder();
 
-  private SparkFlex flywheelMotorLeader =
-      new SparkFlex(Constants.ShooterConstants.kFlywheelLeaderMotorId, MotorType.kBrushless);
-  private SparkClosedLoopController flywheelController =
-      flywheelMotorLeader.getClosedLoopController();
+  private SparkFlex flywheelMotorLeader = new SparkFlex(Constants.ShooterConstants.kFlywheelLeaderMotorId,
+      MotorType.kBrushless);
+  private SparkClosedLoopController flywheelController = flywheelMotorLeader.getClosedLoopController();
   private RelativeEncoder flywheelRelativeEncoder = flywheelMotorLeader.getExternalEncoder();
 
-  private SparkFlex flywheelMotorFollower =
-      new SparkFlex(Constants.ShooterConstants.kFlywheelFollowerMotorId, MotorType.kBrushless);
+  private SparkFlex flywheelMotorFollower = new SparkFlex(Constants.ShooterConstants.kFlywheelFollowerMotorId,
+      MotorType.kBrushless);
 
-  // Simple simulation state (used only when running in WPILib simulation)
-  private double simFlywheelVelocity = 0.0; // RPM-ish
-  private double simHoodPosition = 0.0; // degrees-ish
+  private double simFlywheelVelocity = 0.0;
+  private double simHoodPosition = 0.0;
 
-  // limit switches
   private SparkLimitSwitch turretForwardLimitSwitch = turretMotor.getForwardLimitSwitch();
   private SparkLimitSwitch turretReverseLimitSwitch = turretMotor.getReverseLimitSwitch();
 
   private double turretCurrentTarget = TurretSetpoints.kStow;
-
-  private double hoodTarget = HoodSetpoints.kStow;
-
-  private double flywheelTargetSpeed = FlywheelSetpoints.kStow;
+  private double hoodCurrentTarget = HoodSetpoints.kStow;
+  private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
 
   public boolean wasZeroed = false;
 
   private InterpolatingTreeMap hoodAngleMap;
   private InterpolatingTreeMap flywheelSpeedMap;
-  private DriveSubsystem m_DriveSubsystem;
 
-  // Creates a hood
   public Shooter() {
     turretMotor.configure(
         Configs.Shooter.turretConfig,
@@ -92,9 +82,6 @@ public class Shooter extends SubsystemBase {
 
   // CHANGE LATER
   public void populateHoodAngleMap() {
-    // Keys: distance to hub in meters -> value: hood position (encoder units or degrees depending
-    // on hood config)
-    // These are example values for simulation; tune for your robot's hardware.
     hoodAngleMap.put(1.0, 5.0);
     hoodAngleMap.put(2.0, 8.0);
     hoodAngleMap.put(3.0, 12.0);
@@ -107,10 +94,6 @@ public class Shooter extends SubsystemBase {
 
   // CHANGE LATER
   public void populateFlywheelSpeedMap() {
-    // Keys: distance to hub in meters -> value: flywheel speed (in native closed-loop units, e.g.
-    // RPM)
-    // These are example values for simulation; tune for your robot's hardware and controller
-    // config.
     flywheelSpeedMap.put(1.0, 1500.0);
     flywheelSpeedMap.put(2.0, 2200.0);
     flywheelSpeedMap.put(3.0, 2700.0);
@@ -121,7 +104,6 @@ public class Shooter extends SubsystemBase {
     flywheelSpeedMap.put(8.0, 4800.0);
   }
 
-  // Get positions
   public double getTurretPosition() {
     return turretRelativeEncoder.getPosition();
   }
@@ -130,67 +112,37 @@ public class Shooter extends SubsystemBase {
     return hoodRelativeEncoder.getPosition();
   }
 
-  // Update the target positions
   public void updateTurretTarget(double updateValue) {
-    turretCurrentTarget =
-        MathUtil.clamp(
-            updateValue,
-            Constants.ShooterConstants.kTurretMinRange,
-            Constants.ShooterConstants.kTurretMaxRange);
+    turretCurrentTarget = MathUtil.clamp(
+        updateValue,
+        Constants.ShooterConstants.kTurretMinRange,
+        Constants.ShooterConstants.kTurretMaxRange);
   }
 
-  public double updateHoodTarget() {
-    if (m_DriveSubsystem == null) {
-      return HoodSetpoints.kStow;
-    }
-    Double dist =
-        m_DriveSubsystem
-            .getVirtualTarget()
-            .getDistance(m_DriveSubsystem.getPose().getTranslation());
-    Double interpolated = hoodAngleMap.getInterpolated(dist);
-    return interpolated == null ? HoodSetpoints.kStow : interpolated;
+  public void updateHoodTarget(double distanceToHub) {
+    Double interpolated = hoodAngleMap.getInterpolated(distanceToHub);
+    hoodCurrentTarget = interpolated != null ? interpolated : HoodSetpoints.kStow;
   }
 
-  public void moveHoodToSetpoint() {
-    hoodController.setSetpoint(updateHoodTarget(), ControlType.kPosition, ClosedLoopSlot.kSlot0);
-  }
-
-  public void moveFlywheelToSetpoint() {
-    flywheelController.setSetpoint(
-        updateFlyWheelSpeedTarget(), ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-  }
-
-  public double updateFlyWheelSpeedTarget() {
-    if (m_DriveSubsystem == null) {
-      return FlywheelSetpoints.kStow;
-    }
-    Double dist =
-        m_DriveSubsystem
-            .getVirtualTarget()
-            .getDistance(m_DriveSubsystem.getPose().getTranslation());
-    Double interpolated = flywheelSpeedMap.getInterpolated(dist);
-    return interpolated == null ? FlywheelSetpoints.kStow : interpolated;
-  }
-
-  /** Provide DriveSubsystem reference so shooter can query vision-based distance. */
-  public void setDriveSubsystem(DriveSubsystem ds) {
-    m_DriveSubsystem = ds;
+  public void updateFlywheelTarget(double distanceToHub) {
+    Double interpolated = flywheelSpeedMap.getInterpolated(distanceToHub);
+    flywheelCurrentTarget = interpolated != null ? interpolated : FlywheelSetpoints.kStow;
   }
 
   public void setFlywheelSpeed(double speed) {
-    flywheelTargetSpeed = speed;
+    flywheelCurrentTarget = speed;
   }
 
   public double getFlywheelSpeed() {
-    return flywheelController.getSetpoint();
+    return flywheelCurrentTarget;
   }
 
   public void setHoodAngle(double angle) {
-    hoodTarget = angle;
+    hoodCurrentTarget = angle;
   }
 
   public double getHoodAngle() {
-    return hoodController.getSetpoint();
+    return hoodCurrentTarget;
   }
 
   public Command startShooter() {
@@ -214,7 +166,6 @@ public class Shooter extends SubsystemBase {
         });
   }
 
-  // hit limit switch and set turret angle to limit swithc position
   public void zeroTurret() {
     if (!wasZeroed && turretMotor.getForwardLimitSwitch().isPressed()) {
       wasZeroed = true;
@@ -228,26 +179,21 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  // Runs every 20ms
   @Override
   public void periodic() {
-    moveHoodToSetpoint();
-    moveFlywheelToSetpoint();
+    turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    flywheelController.setSetpoint(flywheelCurrentTarget, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
 
-    SmartDashboard.putNumber("Shooter/Hood Angle", getHoodAngle());
-    SmartDashboard.putNumber("Shooter/Flywheel Speed", getFlywheelSpeed());
+    SmartDashboard.putNumber("Shooter/Hood Angle", hoodCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Flywheel Speed", flywheelCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Turret Target", turretCurrentTarget);
   }
 
   @Override
   public void simulationPeriodic() {
-    // The REV SparkFlex library may not provide simulated encoder values in this environment.
-    // Provide a very small, deterministic simulation so AdvantageScope/SmartDashboard shows values.
-    double targetFlywheel = flywheelController.getSetpoint();
-    double targetHood = hoodController.getSetpoint();
-
-    // Simple first-order response toward setpoint
-    simFlywheelVelocity += (targetFlywheel - simFlywheelVelocity) * 0.2; // responsiveness tuning
-    simHoodPosition += (targetHood - simHoodPosition) * 0.05;
+    simFlywheelVelocity += (flywheelCurrentTarget - simFlywheelVelocity) * 0.2;
+    simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
 
     SmartDashboard.putNumber("Hood Angle", simHoodPosition);
     SmartDashboard.putNumber("Flywheel Speed", simFlywheelVelocity);

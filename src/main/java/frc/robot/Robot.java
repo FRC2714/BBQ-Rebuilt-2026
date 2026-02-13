@@ -90,8 +90,7 @@ public class Robot extends TimedRobot {
 
     Translation2d robotToVirtualTarget = virtualTargetTranslation.minus(robotPose.getTranslation());
     Rotation2d angleToVirtualTarget = robotToVirtualTarget.getAngle();
-
-    m_robotContainer.m_turret.updateTurretTarget(angleToVirtualTarget.getDegrees());
+    
     CommandScheduler.getInstance().run();
 
     turretHeading.set(new Pose2d(robotPose.getX(), robotPose.getY(), angleToVirtualTarget));

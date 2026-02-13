@@ -62,7 +62,6 @@ public final class Constants {
 
     public static final boolean kGyroReversed = false;
 
-
     public static final SimpleMotorFeedforward kDriveFeedforward =
         new SimpleMotorFeedforward(.11204, 2.0817, .15569);
     // test 2 (0.2049,1.9347, 0.37092)

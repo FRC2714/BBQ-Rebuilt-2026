@@ -121,14 +121,31 @@ public final class Constants {
 
   public static final class ShooterConstants {
     public static final int kTurretCanId = 30;
-    public static final int kTurrentMaxRange = 175;
+    public static final int kTurretMaxRange = 175;
     public static final int kTurretMinRange = -175;
     public static final Transform2d turretOffset =
         new Transform2d(
             Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));
 
+    public static final int kHoodCanId = 31; // TBD
+    public static final int kHoodMaxRange = 175;
+    public static final int kHoodMinRange = -175;
+
+    public static final int kFlywheelLeaderMotorId = 32;
+    public static final int kFlywheelFollowerMotorId = 33;
+
     public static final class TurretSetpoints {
       public static final double kStow = 15.2;
+    }
+
+    public static final class HoodSetpoints {
+      public static final double kStow = 15.2;
+      public static final double kZeroOffsetDegrees = 0.0;
+    }
+
+    public static final class FlywheelSetpoints {
+      public static final double kStow = 0.0;
+      public static final double kStartSpeed = 1.0;
     }
   }
 

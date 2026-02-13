@@ -1,10 +1,10 @@
 {
   "hubs": [
     {
-      "x": 1130,
-      "y": 96,
+      "x": 768,
+      "y": 38,
       "width": 960,
-      "height": 1152,
+      "height": 1006,
       "state": {
         "sidebar": {
           "width": 304,
@@ -90,6 +90,24 @@
                       "color": "#ff0000",
                       "arrangement": "0,1,2,3"
                     }
+                  },
+                  {
+                    "type": "robot",
+                    "logKey": "NT:virtualTarget",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "bumpers": "#00ff00"
+                    }
+                  },
+                  {
+                    "type": "arrow",
+                    "logKey": "NT:turretHeading",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "position": "back"
+                    }
                   }
                 ],
                 "field": "FRC:2026 Field",
@@ -98,7 +116,7 @@
               },
               "controllerUUID": "gfi5132ykkfeyajjfsccn0rv4tno97ii",
               "renderer": null,
-              "controlsHeight": 193
+              "controlsHeight": 306
             },
             {
               "type": 9,
@@ -140,6 +158,16 @@
               "title": "3D Field",
               "controller": {
                 "sources": [
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:virtualTarget",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "2026 KitBot",
+                      "color": "#00ff00"
+                    }
+                  },
                   {
                     "type": "robot",
                     "logKey": "NT:Robot Pose",
@@ -207,9 +235,9 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -4.428178982241513,
-                  8.104829349235912,
-                  0.30642265875283076
+                  -8.586270693021,
+                  16.068695460475464,
+                  0.3160419913560189
                 ],
                 "cameraTarget": [
                   -0.36920381354295284,

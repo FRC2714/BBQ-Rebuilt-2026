@@ -82,6 +82,8 @@ public class RobotContainer {
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
+    m_driverController.a().onTrue(m_turret.startShooter());
+
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
     // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());
     // m_driverController.x().onTrue(m_robotDrive.translationalDynamic());

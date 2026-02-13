@@ -146,7 +146,6 @@ public final class Constants {
 
     public static final class PivotConstants {
       public static final int kIntakePivotCanId = 9; // needs tuning
-      public static final int kPivotkG = 0; // needs tuning
       public static final int kPivotStow = 0; // needs tuning
       public static final int kPivotExtend = 0; // needs tuning
     }

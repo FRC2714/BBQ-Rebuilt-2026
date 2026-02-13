@@ -87,8 +87,6 @@ public class RobotContainer {
     // m_driverController.x().onTrue(m_robotDrive.translationalDynamic());
     // m_driverController.y().onTrue(m_robotDrive.rotationalDynamic());
 
-    m_driverController.a().onTrue(m_dyeRotor.start());
-    m_driverController.b().onTrue(m_dyeRotor.stop());
   }
 
   /**

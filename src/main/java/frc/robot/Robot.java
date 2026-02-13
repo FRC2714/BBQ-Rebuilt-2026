@@ -5,15 +5,14 @@
 package frc.robot;
 
 import com.reduxrobotics.canand.CanandEventLoop;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructPublisher;
 import com.revrobotics.util.StatusLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -90,7 +89,7 @@ public class Robot extends TimedRobot {
 
     Translation2d robotToVirtualTarget = virtualTargetTranslation.minus(robotPose.getTranslation());
     Rotation2d angleToVirtualTarget = robotToVirtualTarget.getAngle();
-    
+
     CommandScheduler.getInstance().run();
 
     turretHeading.set(new Pose2d(robotPose.getX(), robotPose.getY(), angleToVirtualTarget));

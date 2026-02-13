@@ -19,21 +19,21 @@ public class StateMachine extends SubsystemBase {
   }
 
   @Override
-public void periodic() {
-  Translation2d virtualTarget = m_drivetrain.getVirtualTarget();
-  Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
-  
-  double distanceToTarget = virtualTarget.getDistance(robotPosition);
-  
-  // Calculate robot-relative angle to virtual target
-  Translation2d robotToTarget = virtualTarget.minus(robotPosition);
-  Rotation2d fieldAngle = robotToTarget.getAngle();
-  Rotation2d turretAngle = fieldAngle.minus(m_drivetrain.getPose().getRotation());
-  
-  m_shooter.updateTurretTarget(turretAngle.getDegrees());
-  m_shooter.updateHoodTarget(distanceToTarget);
-  m_shooter.updateFlywheelTarget(distanceToTarget);
+  public void periodic() {
+    Translation2d virtualTarget = m_drivetrain.getVirtualTarget();
+    Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
 
-  m_publisher.publish();
-}
+    double distanceToTarget = virtualTarget.getDistance(robotPosition);
+
+    // Calculate robot-relative angle to virtual target
+    Translation2d robotToTarget = virtualTarget.minus(robotPosition);
+    Rotation2d fieldAngle = robotToTarget.getAngle();
+    Rotation2d turretAngle = fieldAngle.minus(m_drivetrain.getPose().getRotation());
+
+    m_shooter.updateTurretTarget(turretAngle.getDegrees());
+    m_shooter.updateHoodTarget(distanceToTarget);
+    m_shooter.updateFlywheelTarget(distanceToTarget);
+
+    m_publisher.publish();
+  }
 }

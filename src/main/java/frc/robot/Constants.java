@@ -148,6 +148,8 @@ public final class Constants {
       public static final int kIntakePivotCanId = 9; // needs tuning
       public static final int kPivotStow = 0; // needs tuning
       public static final int kPivotExtend = 0; // needs tuning
+
+      public static final int kPivotThreshold = 1; // needs tuning
     }
   }
 }

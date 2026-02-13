@@ -20,27 +20,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
+import frc.robot.Constants.IntakeConstants;
+import frc.robot.Robot;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
-  private enum PivotSetpoints {
-    STOW,
-    INTAKE,
-    EXTAKE,
-  }
-
-  private enum RollerSetpoints {
-    INTAKE,
-    EXTAKE,
-    STOP,
-  }
 
   // creates new intake pivot motor
   private SparkFlex pivotMotor =
       new SparkFlex(
           Constants.IntakeConstants.PivotConstants.kIntakePivotCanId, MotorType.kBrushless);
+
   private SparkClosedLoopController intakePivotController = pivotMotor.getClosedLoopController();
-  private AbsoluteEncoder intakePivotAbsoluteEncoder = pivotMotor.getAbsoluteEncoder();
+  private AbsoluteEncoder pivotEncoder = pivotMotor.getAbsoluteEncoder();
 
   // creates new roller motor
   private SparkFlex rollerMotor =
@@ -77,6 +69,14 @@ public class Intake extends SubsystemBase {
     rollerMotor.set(power);
   }
 
+  public boolean atSetpoint() {
+    if (Robot.isSimulation()) {
+      return true;
+    }
+    return Math.abs(intakePivotController.getSetpoint() - pivotEncoder.getPosition())
+        <= IntakeConstants.PivotConstants.kPivotThreshold;
+  }
+
   public Command intake() {
     return this.run(
         () -> {
@@ -111,5 +111,7 @@ public class Intake extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Intake/Alive", true);
     SmartDashboard.putData("Intake/Mech2d", intakeMech);
+    SmartDashboard.putNumber("Intake/Pivot/Current Position", pivotEncoder.getPosition());
+    SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
   }
 }

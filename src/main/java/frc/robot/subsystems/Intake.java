@@ -44,8 +44,6 @@ public class Intake extends SubsystemBase {
           Constants.IntakeConstants.PivotConstants.kIntakePivotCanId, MotorType.kBrushless);
   private SparkClosedLoopController intakePivotController = pivotMotor.getClosedLoopController();
   private AbsoluteEncoder intakePivotAbsoluteEncoder = pivotMotor.getAbsoluteEncoder();
-  private ArmFeedforward pivotFF =
-      new ArmFeedforward(0, Constants.IntakeConstants.PivotConstants.kPivotkG, 0);
 
   // creates new roller motor
   private SparkFlex rollerMotor =

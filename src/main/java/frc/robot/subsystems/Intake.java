@@ -28,7 +28,6 @@ public class Intake extends SubsystemBase {
     STOW,
     INTAKE,
     EXTAKE,
-    SCORE,
   }
 
   private enum RollerSetpoints {

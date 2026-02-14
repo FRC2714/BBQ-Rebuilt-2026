@@ -89,6 +89,12 @@ public class StateMachine extends SubsystemBase {
 
   @Override
   public void periodic() {
+    fuelTrigger = fuelBeamBreak.isPressed();
+    if (fuelTrigger) {
+      fuelTrue();
+    } else {
+      fuelFalse();
+    }
     Translation2d virtualTarget = m_drivetrain.getVirtualTarget();
     Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
 

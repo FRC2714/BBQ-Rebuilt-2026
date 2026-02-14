@@ -66,7 +66,7 @@ public class StateMachine extends SubsystemBase {
     Rotation2d fieldAngle = robotToTarget.getAngle();
     Rotation2d turretAngle = fieldAngle.minus(robotHeading);
 
-    m_shooter.updateTurretTarget(turretAngle.getDegrees());
+    m_shooter.updateTurretTarget(turretAngle.getDegrees(), m_drivetrain.getTurnRate());
     m_shooter.updateHoodTarget(distanceToTarget);
     m_shooter.updateFlywheelTarget(distanceToTarget);
   }
@@ -99,10 +99,10 @@ public class StateMachine extends SubsystemBase {
     double airstrikeY = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/y", 0));
 
     if (airstrikeX == 0 && airstrikeY == 0) {
-      m_shooter.updateTurretTarget(0.0);
-      m_publisher.publish();
-      return;
-    }
+  m_shooter.updateTurretTarget(0.0, m_drivetrain.getTurnRate());
+  m_publisher.publish();
+  return;
+}
 
     Translation2d airstrikeTarget = new Translation2d(airstrikeX, airstrikeY);
     aimAt(airstrikeTarget, robotPosition, robotHeading);

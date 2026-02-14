@@ -59,8 +59,9 @@ public class StateMachine extends SubsystemBase {
     Translation2d shotVelocity = targetVelocity.minus(robotVelocity);
 
     double distanceToTarget = toGoal.getNorm();
-    
-    Translation2d virtualTarget = futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToTarget));
+
+    Translation2d virtualTarget =
+        futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToTarget));
 
     Translation2d robotToTarget = virtualTarget.minus(robotPosition);
     Rotation2d fieldAngle = robotToTarget.getAngle();

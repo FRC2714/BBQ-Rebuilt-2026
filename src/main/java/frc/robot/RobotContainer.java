@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
 /*
@@ -29,10 +30,11 @@ import frc.robot.subsystems.Shooter;
 public class RobotContainer {
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  public final Shooter m_turret = new Shooter();
+  public final Shooter m_shooter = new Shooter();
   public final DyeRotor m_dyeRotor = new DyeRotor();
+  public final Intake m_intake = new Intake();
 
-  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_turret);
+  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_shooter);
 
   private SendableChooser<Command> autoChooser;
 
@@ -60,7 +62,6 @@ public class RobotContainer {
                         m_driverController.getRightX(), OIConstants.kDriveDeadband),
                     true),
             m_robotDrive));
-
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -82,7 +83,7 @@ public class RobotContainer {
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
-    m_driverController.a().onTrue(m_turret.startShooter());
+    m_driverController.a().onTrue(m_shooter.startShooter());
 
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
     // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());

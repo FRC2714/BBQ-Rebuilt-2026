@@ -156,4 +156,23 @@ public final class Constants {
 
   // For field constants
   public static boolean disableHAL = false;
+
+  public static final class IntakeConstants {
+
+    public static final class RollerConstants {
+      public static final int kIntakeRollerCanId = 10; // needs tuning
+      public static final double kIntakeRollerPower = 0.5; // needs tuning
+      public static final double kExtakeRollerPower = -0.5; // needs tuning
+      public static final double kRollerStop = 0.0; // needs tuning
+    }
+
+    public static final class PivotConstants {
+      public static final int kIntakePivotCanId = 9; // needs tuning
+      public static final double kPivotkG = 0; // needs tuning
+      public static final double kPivotStow = 0; // needs tuning
+      public static final double kPivotExtend = 0; // needs tuning
+
+      public static final int kPivotThreshold = 1; // needs tuning
+    }
+  }
 }

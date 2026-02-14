@@ -123,4 +123,42 @@ public final class Configs {
           .outputRange(-0.5, 0.5); // needs tuning
     }
   }
+
+  public static final class Intake {
+    public static final SparkFlexConfig pivotConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig rollerConfig = new SparkFlexConfig();
+
+    static {
+      pivotConfig
+          .smartCurrentLimit(40) // needs tuning
+          .idleMode(IdleMode.kBrake) // needs tuning
+          .inverted(false) // needs tuning
+          .voltageCompensation(12); // needs tuning
+      pivotConfig
+          .absoluteEncoder
+          .positionConversionFactor(360)
+          .inverted(false)
+          .zeroCentered(true); // needs tuning
+      pivotConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning
+          .p(0.01) // needs tuning
+          .d(0) // needs tuning
+          .outputRange(-0.5, 0.5); // needs tuning
+    }
+
+    static {
+      rollerConfig
+          .smartCurrentLimit(40) // needs tuning
+          .idleMode(IdleMode.kBrake) // needs tuning
+          .inverted(false) // needs tuning
+          .voltageCompensation(12); // needs tuning
+      rollerConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning
+          .p(0.01) // needs tuning
+          .d(0) // needs tuning
+          .outputRange(-0.5, 0.5); // needs tuning
+    }
+  }
 }

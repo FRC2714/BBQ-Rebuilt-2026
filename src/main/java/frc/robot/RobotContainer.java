@@ -34,7 +34,7 @@ public class RobotContainer {
   public final DyeRotor m_dyeRotor = new DyeRotor();
   public final Intake m_intake = new Intake();
 
-  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_shooter);
+  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_shooter, m_intake);
 
   private SendableChooser<Command> autoChooser;
 

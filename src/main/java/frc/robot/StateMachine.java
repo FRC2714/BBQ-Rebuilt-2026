@@ -1,18 +1,18 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.DyeRotor;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
 public class StateMachine extends SubsystemBase {
@@ -34,7 +34,8 @@ public class StateMachine extends SubsystemBase {
     Climbing
   }
 
-  public StateMachine(DriveSubsystem drivetrain, Shooter shooter, Intake intake) {
+  public StateMachine(
+      DriveSubsystem drivetrain, Shooter shooter, Intake intake, DyeRotor dyeRotor) {
     m_drivetrain = drivetrain;
     m_shooter = shooter;
     m_intake = intake;

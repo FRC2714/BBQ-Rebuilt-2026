@@ -45,14 +45,31 @@ public class StateMachine extends SubsystemBase {
   }
 
   // Generalization of updating the targets
+  private static final double kLatencyCompensation = 0.1;
+  private static final double kBaselineHorizontalVelocity = 6.0;
+
   private void aimAt(Translation2d target, Translation2d robotPosition, Rotation2d robotHeading) {
-    Translation2d robotToTarget = target.minus(robotPosition);
+    Translation2d robotVelocity = m_drivetrain.getFieldRelativeVelocity();
+
+    Translation2d futurePosition = robotPosition.plus(robotVelocity.times(kLatencyCompensation));
+
+    Translation2d toGoal = target.minus(futurePosition);
+    Translation2d targetDirection = toGoal.div(toGoal.getNorm());
+    Translation2d targetVelocity = targetDirection.times(kBaselineHorizontalVelocity);
+    Translation2d shotVelocity = targetVelocity.minus(robotVelocity);
+
+    double distanceToTarget = toGoal.getNorm();
+
+    Translation2d virtualTarget =
+        futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToTarget));
+
+    Translation2d robotToTarget = virtualTarget.minus(robotPosition);
     Rotation2d fieldAngle = robotToTarget.getAngle();
     Rotation2d turretAngle = fieldAngle.minus(robotHeading);
 
     m_shooter.updateTurretTarget(turretAngle.getDegrees());
-    m_shooter.updateHoodTarget(robotToTarget.getNorm());
-    m_shooter.updateFlywheelTarget(robotToTarget.getNorm());
+    m_shooter.updateHoodTarget(distanceToTarget);
+    m_shooter.updateFlywheelTarget(distanceToTarget);
   }
 
   // intake commands
@@ -70,13 +87,11 @@ public class StateMachine extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Zone based targeting with travel time calculations
     Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
     Rotation2d robotHeading = m_drivetrain.getPose().getRotation();
 
     if (m_drivetrain.isInAllianceZone()) {
-      Translation2d virtualTarget = m_drivetrain.getVirtualTarget();
-      aimAt(virtualTarget, robotPosition, robotHeading);
+      aimAt(Field.getAllianceHub().toTranslation2d(), robotPosition, robotHeading);
       m_publisher.publish();
       return;
     }

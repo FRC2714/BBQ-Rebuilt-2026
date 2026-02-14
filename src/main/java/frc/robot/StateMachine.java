@@ -42,8 +42,6 @@ public class StateMachine extends SubsystemBase {
     m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake);
   }
 
-
-
   public Command preload() {
     return m_dyeRotor
         .start()

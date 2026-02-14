@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.time.Instant;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
@@ -94,12 +92,13 @@ public class RobotContainer {
 
     m_driverController.rightBumper().onTrue(m_stateMachine.extakeSequence());
 
-    //m_driverController.b().onTrue(m_stateMachine.stowSequence());
+    // m_driverController.b().onTrue(m_stateMachine.stowSequence());
 
-    if(Robot.isSimulation())
-    {
-        m_driverController.b().onTrue(new InstantCommand(() -> m_shooter.fuelTrue()))
-        .onFalse(new InstantCommand(() -> m_shooter.fuelFalse()));
+    if (Robot.isSimulation()) {
+      m_driverController
+          .b()
+          .onTrue(new InstantCommand(() -> m_shooter.fuelTrue()))
+          .onFalse(new InstantCommand(() -> m_shooter.fuelFalse()));
     }
 
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());

@@ -59,7 +59,6 @@ public class Shooter extends SubsystemBase {
   public boolean wasZeroed = false;
   private boolean fuelTrigger = false;
 
-
   private InterpolatingTreeMap hoodAngleMap;
   private InterpolatingTreeMap flywheelSpeedMap;
 
@@ -190,7 +189,6 @@ public class Shooter extends SubsystemBase {
   public void fuelFalse() {
     fuelTrigger = false;
   }
-  
 
   public void zeroTurret() {
     if (!wasZeroed && turretMotor.getForwardLimitSwitch().isPressed()) {
@@ -226,7 +224,6 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Flywheel Speed", simFlywheelVelocity);
     SmartDashboard.putNumber("Turret Position", turretCurrentTarget);
     SmartDashboard.putBoolean("Fuel Loaded", fuelTrigger);
-
 
     zeroTurret();
   }

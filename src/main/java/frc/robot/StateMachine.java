@@ -58,13 +58,10 @@ public class StateMachine extends SubsystemBase {
 
   public Command shoot() {
     // Run preload (dye rotor until fuel loaded, then stop) in parallel with
-    // startShooter (spin flywheel until at setpoint). The parallel group finishes
-    // when BOTH branches complete. Then start the dye rotor again to feed the shot.
+    // startShooter (spin flywheel until at setpoint). If startShooter finishes first, just run the
+    // dye rotor immediately.
     return preload()
-        .withDeadline(
-            m_shooter
-                .startShooter()
-                .until(() -> m_shooter.flywheelAtSetpoint() || preload().isFinished()))
+        .withDeadline(m_shooter.startShooter().until(() -> m_shooter.flywheelAtSetpoint()))
         .andThen(m_dyeRotor.start())
         .finallyDo(
             () -> {

@@ -86,14 +86,11 @@ public class RobotContainer {
     m_driverController.a().onTrue(m_shooter.startShooter());
 
     // intake keybinds
-    m_driverController
-        .leftBumper()
-        .whileTrue(m_stateMachine.intakeSequence())
-        .whileFalse(m_stateMachine.stowSequence());
-    m_driverController
-        .rightBumper()
-        .whileTrue(m_stateMachine.extakeSequence())
-        .whileFalse(m_stateMachine.stowSequence());
+    m_driverController.leftBumper().whileTrue(m_stateMachine.intakeSequence());
+
+    m_driverController.rightBumper().whileTrue(m_stateMachine.extakeSequence());
+
+    m_driverController.b().whileTrue(m_stateMachine.stowSequence());
 
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
     // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());

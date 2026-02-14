@@ -19,7 +19,6 @@ public class StateMachine extends SubsystemBase {
   private final Publisher m_publisher;
 
   SparkLimitSwitch fuelBeamBreak;
-  private boolean fuelTrigger = false;
 
   private static State m_state = State.Idle;
 
@@ -43,13 +42,7 @@ public class StateMachine extends SubsystemBase {
     m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake);
   }
 
-  public void fuelTrue() {
-    fuelTrigger = true;
-  }
 
-  public void fuelFalse() {
-    fuelTrigger = false;
-  }
 
   public Command preload() {
     return m_dyeRotor
@@ -117,7 +110,6 @@ public class StateMachine extends SubsystemBase {
 
     SmartDashboard.putString("State", m_state.toString());
 
-    SmartDashboard.putBoolean("Fuel Loaded", fuelTrigger);
     m_publisher.publish();
   }
 }

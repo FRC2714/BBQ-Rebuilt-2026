@@ -57,6 +57,8 @@ public class Shooter extends SubsystemBase {
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
 
   public boolean wasZeroed = false;
+  private boolean fuelTrigger = false;
+
 
   private InterpolatingTreeMap hoodAngleMap;
   private InterpolatingTreeMap flywheelSpeedMap;
@@ -113,8 +115,7 @@ public class Shooter extends SubsystemBase {
 
   public boolean getFuelLimitSwitch() {
     if (Robot.isSimulation()) {
-
-      return true;
+      return fuelTrigger;
     }
     return fuelBeamBreak.isPressed();
   }
@@ -182,6 +183,15 @@ public class Shooter extends SubsystemBase {
     return Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
   }
 
+  public void fuelTrue() {
+    fuelTrigger = true;
+  }
+
+  public void fuelFalse() {
+    fuelTrigger = false;
+  }
+  
+
   public void zeroTurret() {
     if (!wasZeroed && turretMotor.getForwardLimitSwitch().isPressed()) {
       wasZeroed = true;
@@ -215,6 +225,8 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Hood Angle", simHoodPosition);
     SmartDashboard.putNumber("Flywheel Speed", simFlywheelVelocity);
     SmartDashboard.putNumber("Turret Position", turretCurrentTarget);
+    SmartDashboard.putBoolean("Fuel Loaded", fuelTrigger);
+
 
     zeroTurret();
   }

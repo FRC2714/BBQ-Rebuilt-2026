@@ -36,6 +36,7 @@ public class StateMachine extends SubsystemBase {
     m_state = state;
   }
 
+  // Generalization of updating the targets
   private void aimAt(Translation2d target, Translation2d robotPosition, Rotation2d robotHeading) {
     Translation2d robotToTarget = target.minus(robotPosition);
     Rotation2d fieldAngle = robotToTarget.getAngle();

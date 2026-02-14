@@ -84,9 +84,14 @@ public class RobotContainer {
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
-    m_driverController.a().onTrue(m_stateMachine.shoot());
+    m_driverController.a().onTrue(m_shooter.startShooter());
 
-    // m_driverController.a().onTrue(m_shooter.startShooter());
+    // intake keybinds
+    m_driverController.leftBumper().onTrue(m_stateMachine.intakeSequence());
+
+    m_driverController.rightBumper().onTrue(m_stateMachine.extakeSequence());
+
+    m_driverController.b().onTrue(m_stateMachine.stowSequence());
 
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
     // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());

@@ -21,7 +21,11 @@ public class StateMachine extends SubsystemBase {
   SparkLimitSwitch fuelBeamBreak;
   private boolean fuelTrigger = false;
 
-  private State m_state = State.Idle;
+  private static State m_state = State.Idle;
+
+  private static boolean isNotClimbing() {
+    return !(m_state == State.Climbing);
+  }
 
   enum State {
     Idle,
@@ -36,7 +40,7 @@ public class StateMachine extends SubsystemBase {
     m_intake = intake;
     m_dyeRotor = dyeRotor;
 
-    m_publisher = new Publisher(m_drivetrain, m_shooter);
+    m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake);
   }
 
   public void fuelTrue() {
@@ -73,6 +77,20 @@ public class StateMachine extends SubsystemBase {
 
   public void setState(State state) {
     m_state = state;
+  }
+
+  // intake commands
+
+  public Command intakeSequence() {
+    return (m_intake.intake().onlyIf(StateMachine::isNotClimbing));
+  }
+
+  public Command extakeSequence() {
+    return (m_intake.extake().onlyIf(StateMachine::isNotClimbing));
+  }
+
+  public Command stowSequence() {
+    return (m_intake.stow().onlyIf(StateMachine::isNotClimbing));
   }
 
   @Override

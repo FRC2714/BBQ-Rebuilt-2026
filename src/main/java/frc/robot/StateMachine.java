@@ -36,10 +36,6 @@ public class StateMachine extends SubsystemBase {
     m_intake = intake;
     m_dyeRotor = dyeRotor;
 
-    fuelBeamBreak =
-        m_shooter.flywheelMotorLeader
-            .getForwardLimitSwitch(); // Placeholder for actual beam break sensor
-
     m_publisher = new Publisher(m_drivetrain, m_shooter);
   }
 
@@ -54,7 +50,7 @@ public class StateMachine extends SubsystemBase {
   public Command preload() {
     return m_dyeRotor
         .start()
-        .until(() -> fuelTrigger)
+        .until(() -> m_shooter.getFuelLimitSwitch())
         .andThen(m_dyeRotor.stop())
         .withName("preload")
         .andThen(() -> m_state = State.Idle);
@@ -69,16 +65,6 @@ public class StateMachine extends SubsystemBase {
         .andThen(m_dyeRotor.start())
         .withName("shoot")
         .andThen(() -> m_state = State.Shooting);
-
-    // return new InstantCommand(
-    //     () -> {
-    //       preload()
-    //           // .alongWith(m_shooter.startShooter())
-    //           // .until(m_shooter::flywheelAtSetpoint)
-    //           .withTimeout(2)
-    //           .andThen(m_dyeRotor.start())
-    //           .withName("shoot");
-    //     });
   }
 
   public State getState() {
@@ -91,12 +77,8 @@ public class StateMachine extends SubsystemBase {
 
   @Override
   public void periodic() {
-    fuelTrigger = fuelBeamBreak.isPressed();
-    if (fuelTrigger) {
-      fuelTrue();
-    } else {
-      fuelFalse();
-    }
+    // fuelTrigger = fuelBeamBreak.isPressed();
+
     Translation2d virtualTarget = m_drivetrain.getVirtualTarget();
     Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
 

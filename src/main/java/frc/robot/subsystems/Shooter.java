@@ -34,7 +34,7 @@ public class Shooter extends SubsystemBase {
   private SparkClosedLoopController hoodController = hoodMotor.getClosedLoopController();
   private RelativeEncoder hoodRelativeEncoder = hoodMotor.getExternalEncoder();
 
-  public SparkFlex flywheelMotorLeader =
+  private SparkFlex flywheelMotorLeader =
       new SparkFlex(Constants.ShooterConstants.kFlywheelLeaderMotorId, MotorType.kBrushless);
   private SparkClosedLoopController flywheelController =
       flywheelMotorLeader.getClosedLoopController();
@@ -42,6 +42,9 @@ public class Shooter extends SubsystemBase {
 
   private SparkFlex flywheelMotorFollower =
       new SparkFlex(Constants.ShooterConstants.kFlywheelFollowerMotorId, MotorType.kBrushless);
+
+  private SparkLimitSwitch fuelBeamBreak =
+      flywheelMotorLeader.getForwardLimitSwitch(); // Placeholder for actual beam break sensor
 
   private double simFlywheelVelocity = 0.0;
   private double simHoodPosition = 0.0;
@@ -106,6 +109,13 @@ public class Shooter extends SubsystemBase {
     flywheelSpeedMap.put(6.0, 4000.0);
     flywheelSpeedMap.put(7.0, 4400.0);
     flywheelSpeedMap.put(8.0, 4800.0);
+  }
+
+  public boolean getFuelLimitSwitch() {
+    if (Robot.isSimulation()) {
+      return true;
+    }
+    return fuelBeamBreak.isPressed();
   }
 
   public double getTurretPosition() {

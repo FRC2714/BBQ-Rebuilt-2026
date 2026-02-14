@@ -85,10 +85,6 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
     m_driverController.a().onTrue(m_stateMachine.shoot());
-    m_driverController
-        .b()
-        .onTrue(new InstantCommand(() -> m_stateMachine.fuelTrue()))
-        .onFalse(new InstantCommand(() -> m_stateMachine.fuelFalse()));
 
     // m_driverController.a().onTrue(m_shooter.startShooter());
 

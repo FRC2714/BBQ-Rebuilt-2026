@@ -92,11 +92,11 @@ public class RobotContainer {
 
     m_driverController.rightBumper().onTrue(m_stateMachine.extakeSequence());
 
-    // m_driverController.b().onTrue(m_stateMachine.stowSequence());
+    m_driverController.b().onTrue(m_stateMachine.stowSequence());
 
     if (Robot.isSimulation()) {
       m_driverController
-          .b()
+          .y()
           .onTrue(new InstantCommand(() -> m_shooter.fuelTrue()))
           .onFalse(new InstantCommand(() -> m_shooter.fuelFalse()));
     }

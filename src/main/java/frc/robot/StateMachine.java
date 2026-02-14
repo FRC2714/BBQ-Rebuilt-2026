@@ -21,6 +21,7 @@ public class StateMachine extends SubsystemBase {
   SparkLimitSwitch fuelBeamBreak;
 
   private static State m_state = State.Idle;
+  private boolean shooting = false;
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -59,7 +60,26 @@ public class StateMachine extends SubsystemBase {
         .alongWith(m_shooter.startShooter().until(m_shooter::flywheelAtSetpoint))
         .andThen(m_dyeRotor.start())
         .withName("shoot")
-        .andThen(() -> m_state = State.Shooting);
+        .andThen(
+            () -> {
+              m_state = State.Shooting;
+              shooting = true;
+            });
+  }
+
+  public Command stopShoot() {
+    return m_shooter
+        .stopShooter()
+        .withName("stop shooting")
+        .andThen(
+            () -> {
+              m_state = State.Idle;
+              shooting = false;
+            });
+  }
+
+  public Command toggleShoot() {
+    return shooting == false ? shoot() : stopShoot();
   }
 
   public State getState() {

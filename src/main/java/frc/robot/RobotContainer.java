@@ -84,7 +84,7 @@ public class RobotContainer {
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
-    m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
+    m_driverController.a().onTrue(m_stateMachine.toggleShoot());
     m_driverController.x().onTrue(m_stateMachine.preload());
 
     // intake keybinds

@@ -62,7 +62,6 @@ public class RobotContainer {
                         m_driverController.getRightX(), OIConstants.kDriveDeadband),
                     true),
             m_robotDrive));
-
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -84,11 +83,12 @@ public class RobotContainer {
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
-    // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
-    // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());
-    // m_driverController.x().onTrue(m_robotDrive.translationalDynamic());
-    // m_driverController.y().onTrue(m_robotDrive.rotationalDynamic());
+    // intake and extake keybinds
+    m_driverController.a().whileTrue(m_intake.intake()).whileFalse(m_intake.stow()); // intake bind
+    m_driverController.b().whileTrue(m_intake.extake()).whileFalse(m_intake.stow()); // extake bind
 
+    m_driverController.x().onTrue(m_robotDrive.translationalDynamic());
+    m_driverController.y().onTrue(m_robotDrive.rotationalDynamic());
   }
 
   /**

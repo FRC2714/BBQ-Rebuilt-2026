@@ -87,11 +87,44 @@ public class Intake extends SubsystemBase {
         <= IntakeConstants.PivotConstants.kPivotThreshold;
   }
 
+  // Intake Simulation - Mech2d
+  Mechanism2d intakeMech = new Mechanism2d(5, 5);
+  MechanismRoot2d intakeRoot = intakeMech.getRoot("Intake", 3, 2.5);
+
+  MechanismLigament2d intakeBar =
+      intakeRoot.append(
+          new MechanismLigament2d("Intake Roller", 1.5, 90, 15, new Color8Bit(Color.kBlue)));
+
+  MechanismLigament2d intakeRollerMotorSim =
+      intakeBar.append(
+          new MechanismLigament2d("Roller Motor", 0.1, 180, 15, new Color8Bit(Color.kWhite)));
+
+  private double leftCapSimAngle = 0.0;
+
+  private void intakeSim() {
+    intakeBar.setAngle(180);
+    intakeRollerMotorSim.setAngle(180);
+    intakeRollerMotorSim.setAngle(-leftCapSimAngle);
+  }
+
+  private void extakeSim() {
+    intakeBar.setAngle(180);
+    intakeRollerMotorSim.setAngle(180);
+    intakeRollerMotorSim.setAngle(leftCapSimAngle);
+  }
+
+  private void stowSim() {
+    intakeBar.setAngle(90);
+    intakeRollerMotorSim.setAngle(180);
+  }
+
+  // Intake Commands
   public Command intake() {
     return this.run(
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
           pivotExtend();
+          intakeSim();
         });
   }
 
@@ -100,6 +133,7 @@ public class Intake extends SubsystemBase {
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kExtakeRollerPower);
           pivotExtend();
+          extakeSim();
         });
   }
 
@@ -108,35 +142,18 @@ public class Intake extends SubsystemBase {
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
           pivotStow();
+          stowSim();
         });
   }
-
-  Mechanism2d intakeMech = new Mechanism2d(3, 3);
-  MechanismRoot2d intakeRoot = intakeMech.getRoot("Intake", 1, 1.5);
-
-  MechanismLigament2d intakeRoller =
-      intakeRoot.append(
-          new MechanismLigament2d("Intake Roller", 1, 0, 6, new Color8Bit(Color.kAzure)));
-  // Two spokes to make it look like a spinning wheel
-  MechanismLigament2d rollerSpoke1 =
-      intakeRoller.append(
-          new MechanismLigament2d("rollerSpoke1", 0.1, -180, 6, new Color8Bit(Color.kYellow)));
-  MechanismLigament2d rollerSpoke2 =
-      rollerSpoke1.append(
-          new MechanismLigament2d("rollerSpoke2", 0.1, 180, 6, new Color8Bit(Color.kBlue)));
-  private double rollerSimAngle = 0;
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // intakeLigament.setAngle(intakePivotAbsoluteEncoder.getPosition());P
+
     // SmartDashboard.putData("Intake/IntakeMechanism", intakeMech);
     SmartDashboard.putNumber("Intake/Pivot/Current Position", pivotEncoder.getPosition());
     SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
 
-    rollerSimAngle += currentRollerPower * 10;
-
-    rollerSpoke1.setAngle(rollerSimAngle);
-    rollerSpoke2.setAngle(rollerSimAngle + 180); // always opposite
+    leftCapSimAngle += 12;
   }
 }

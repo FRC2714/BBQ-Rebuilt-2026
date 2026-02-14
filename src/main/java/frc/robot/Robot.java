@@ -65,6 +65,7 @@ public class Robot extends TimedRobot {
 
     StatusLogger.start();
     DriverStation.startDataLog(DataLogManager.getLog());
+    DataLogManager.stop();
   }
 
   /**

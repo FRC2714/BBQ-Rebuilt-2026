@@ -53,10 +53,9 @@ public class StateMachine extends SubsystemBase {
     m_shooter.updateTurretTarget(turretAngle.getDegrees());
     m_shooter.updateHoodTarget(robotToTarget.getNorm());
     m_shooter.updateFlywheelTarget(robotToTarget.getNorm());
-  
-}
-  // intake commands
+  }
 
+  // intake commands
   public Command intakeSequence() {
     return (m_intake.intake().onlyIf(StateMachine::isNotClimbing));
   }

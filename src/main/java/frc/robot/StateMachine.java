@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
@@ -59,37 +60,28 @@ public class StateMachine extends SubsystemBase {
     // Run preload (dye rotor until fuel loaded, then stop) in parallel with
     // startShooter (spin flywheel until at setpoint). The parallel group finishes
     // when BOTH branches complete. Then start the dye rotor again to feed the shot.
-    return this.runEnd(
-        () -> {
-          preload()
-              .alongWith(
-                  m_shooter
-                      .startShooter()
-                      .until(() -> m_shooter.flywheelAtSetpoint() || preload().isFinished()))
-              .andThen(
-                  () -> {
-                    m_state = State.Shooting;
-                    shooting = true;
-                  });
-        },
-        () -> {
-          stopShoot();
-        });
+    return preload()
+        .withDeadline(
+            m_shooter
+                .startShooter()
+                .until(() -> m_shooter.flywheelAtSetpoint() || preload().isFinished()))
+        .andThen(m_dyeRotor.start())
+        .finallyDo(
+            () -> {
+              CommandScheduler.getInstance().schedule(stopShoot());
+            });
   }
 
   public Command stopShoot() {
     return m_shooter
         .stopShooter()
+        .alongWith(m_dyeRotor.stop())
         .withName("stop shooting")
         .andThen(
             () -> {
               m_state = State.Idle;
               shooting = false;
             });
-  }
-
-  public Command toggleShoot() {
-    return shooting == false ? shoot() : stopShoot();
   }
 
   public State getState() {

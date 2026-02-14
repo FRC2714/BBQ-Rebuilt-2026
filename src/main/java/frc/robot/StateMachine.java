@@ -59,18 +59,18 @@ public class StateMachine extends SubsystemBase {
     // Run preload (dye rotor until fuel loaded, then stop) in parallel with
     // startShooter (spin flywheel until at setpoint). The parallel group finishes
     // when BOTH branches complete. Then start the dye rotor again to feed the shot.
-          return this.runEnd(
+    return this.runEnd(
         () -> {
-        preload()
-        .alongWith(
-            m_shooter
-                .startShooter()
-                .until(() -> m_shooter.flywheelAtSetpoint() || preload().isFinished()))
-                 .andThen(
-            () -> {
-              m_state = State.Shooting;
-              shooting = true;
-            });
+          preload()
+              .alongWith(
+                  m_shooter
+                      .startShooter()
+                      .until(() -> m_shooter.flywheelAtSetpoint() || preload().isFinished()))
+              .andThen(
+                  () -> {
+                    m_state = State.Shooting;
+                    shooting = true;
+                  });
         },
         () -> {
           stopShoot();

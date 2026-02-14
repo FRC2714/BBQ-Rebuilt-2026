@@ -34,7 +34,7 @@ public class RobotContainer {
   public final DyeRotor m_dyeRotor = new DyeRotor();
   public final Intake m_intake = new Intake();
 
-  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_shooter);
+  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_shooter, m_intake);
 
   private SendableChooser<Command> autoChooser;
 
@@ -84,6 +84,13 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
     m_driverController.a().onTrue(m_shooter.startShooter());
+
+    // intake keybinds
+    m_driverController.leftBumper().onTrue(m_stateMachine.intakeSequence());
+
+    m_driverController.rightBumper().onTrue(m_stateMachine.extakeSequence());
+
+    m_driverController.b().onTrue(m_stateMachine.stowSequence());
 
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
     // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());

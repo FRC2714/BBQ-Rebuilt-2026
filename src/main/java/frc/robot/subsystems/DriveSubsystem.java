@@ -43,7 +43,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Field;
@@ -116,13 +115,6 @@ public class DriveSubsystem extends SubsystemBase {
   public boolean isInAllianceZone() {
     boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
     return isInZone(isRed ? RED_ZONE : BLUE_ZONE);
-  }
-
-  public double getTurretTargetAngle() {
-    if (isInAllianceZone()) {
-      return getAngleToHub();
-    }
-    return 0.0; // placeholder
   }
 
   double xyStdDev;
@@ -649,19 +641,6 @@ public class DriveSubsystem extends SubsystemBase {
     Rotation2d heading = Rotation2d.fromDegrees(getHeading());
     return new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
         .rotateBy(heading);
-  }
-
-  public double getAngleToHub() {
-    Pose2d pose = getPose().plus(Constants.ShooterConstants.turretOffset);
-
-    // Hub position in field coordinates (meters)
-    Translation2d hub = Field.getAllianceHub().toTranslation2d();
-
-    Translation2d robotToHub = hub.minus(pose.getTranslation());
-    Rotation2d angleToHub = robotToHub.getAngle();
-    Rotation2d turretAngle = angleToHub.minus(pose.getRotation());
-
-    return turretAngle.getDegrees();
   }
 
   public Translation2d getVirtualTarget() {

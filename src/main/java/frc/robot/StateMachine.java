@@ -43,9 +43,9 @@ public class StateMachine extends SubsystemBase {
     m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake);
   }
 
-  //problems
-  //doesnt stow (no button for stow)
-  //state doesnt update
+  // problems
+  // doesnt stow (no button for stow)
+  // state doesnt update
 
   public Command preload() {
     return m_dyeRotor
@@ -60,7 +60,10 @@ public class StateMachine extends SubsystemBase {
     // startShooter (spin flywheel until at setpoint). The parallel group finishes
     // when BOTH branches complete. Then start the dye rotor again to feed the shot.
     return preload()
-        .alongWith(m_shooter.startShooter().until(() -> m_shooter.flywheelAtSetpoint() || preload().isFinished()))
+        .alongWith(
+            m_shooter
+                .startShooter()
+                .until(() -> m_shooter.flywheelAtSetpoint() || preload().isFinished()))
         .andThen(m_dyeRotor.start())
         .beforeStarting(() -> m_state = State.Shooting)
         .withName("shoot");

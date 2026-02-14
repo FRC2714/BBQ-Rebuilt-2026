@@ -86,8 +86,6 @@ public class Robot extends TimedRobot {
     var virtualTargetTranslation = m_robotContainer.m_robotDrive.getVirtualTarget();
 
     var robotPose = m_robotContainer.m_robotDrive.getPose();
-    m_robotContainer.m_shooter.updateTurretTarget(
-        m_robotContainer.m_robotDrive.getTurretTargetAngle());
 
     Translation2d robotToVirtualTarget = virtualTargetTranslation.minus(robotPose.getTranslation());
     Rotation2d angleToVirtualTarget = robotToVirtualTarget.getAngle();

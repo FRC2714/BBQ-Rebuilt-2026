@@ -56,7 +56,8 @@ public class StateMachine extends SubsystemBase {
         .start()
         .until(() -> fuelTrigger)
         .andThen(m_dyeRotor.stop())
-        .withName("preload");
+        .withName("preload")
+        .andThen(() -> m_state = State.Idle);
   }
 
   public Command shoot() {
@@ -66,7 +67,8 @@ public class StateMachine extends SubsystemBase {
     return preload()
         .alongWith(m_shooter.startShooter().until(m_shooter::flywheelAtSetpoint))
         .andThen(m_dyeRotor.start())
-        .withName("shoot");
+        .withName("shoot")
+        .andThen(() -> m_state = State.Shooting);
 
     // return new InstantCommand(
     //     () -> {
@@ -112,6 +114,8 @@ public class StateMachine extends SubsystemBase {
     SmartDashboard.putString(
         "State Machine/Current Comamand",
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
+
+    SmartDashboard.putString("State", m_state.toString());
 
     SmartDashboard.putBoolean("Fuel Loaded", fuelTrigger);
     m_publisher.publish();

@@ -3,6 +3,7 @@ package frc.robot;
 import com.revrobotics.spark.SparkLimitSwitch;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -70,8 +71,18 @@ public class StateMachine extends SubsystemBase {
     m_state = state;
   }
 
-  // intake commands
+  // Generalization of updating the targets
+  private void aimAt(Translation2d target, Translation2d robotPosition, Rotation2d robotHeading) {
+    Translation2d robotToTarget = target.minus(robotPosition);
+    Rotation2d fieldAngle = robotToTarget.getAngle();
+    Rotation2d turretAngle = fieldAngle.minus(robotHeading);
 
+    m_shooter.updateTurretTarget(turretAngle.getDegrees());
+    m_shooter.updateHoodTarget(robotToTarget.getNorm());
+    m_shooter.updateFlywheelTarget(robotToTarget.getNorm());
+  }
+
+  // intake commands
   public Command intakeSequence() {
     return (m_intake.intake().onlyIf(StateMachine::isNotClimbing));
   }

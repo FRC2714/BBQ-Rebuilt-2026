@@ -43,13 +43,16 @@ public class StateMachine extends SubsystemBase {
     m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake);
   }
 
+  //problems
+  //doesnt stow (no button for stow)
+  //state doesnt update
+
   public Command preload() {
     return m_dyeRotor
         .start()
         .until(() -> m_shooter.getFuelLimitSwitch())
         .andThen(m_dyeRotor.stop())
-        .withName("preload")
-        .andThen(() -> m_state = State.Idle);
+        .withName("preload");
   }
 
   public Command shoot() {
@@ -57,29 +60,10 @@ public class StateMachine extends SubsystemBase {
     // startShooter (spin flywheel until at setpoint). The parallel group finishes
     // when BOTH branches complete. Then start the dye rotor again to feed the shot.
     return preload()
-        .alongWith(m_shooter.startShooter().until(m_shooter::flywheelAtSetpoint))
+        .alongWith(m_shooter.startShooter().until(() -> m_shooter.flywheelAtSetpoint() || preload().isFinished()))
         .andThen(m_dyeRotor.start())
-        .withName("shoot")
-        .andThen(
-            () -> {
-              m_state = State.Shooting;
-              shooting = true;
-            });
-  }
-
-  public Command stopShoot() {
-    return m_shooter
-        .stopShooter()
-        .withName("stop shooting")
-        .andThen(
-            () -> {
-              m_state = State.Idle;
-              shooting = false;
-            });
-  }
-
-  public Command toggleShoot() {
-    return shooting == false ? shoot() : stopShoot();
+        .beforeStarting(() -> m_state = State.Shooting)
+        .withName("shoot");
   }
 
   public State getState() {

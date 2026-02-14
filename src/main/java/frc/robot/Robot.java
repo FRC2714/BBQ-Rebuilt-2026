@@ -44,19 +44,17 @@ public class Robot extends TimedRobot {
 
     LimelightHelpers.Flush();
 
-    if (!Robot.isSimulation()) {
-      DataLogManager.start();
-      var log = DataLogManager.getLog();
-      log.addSchema(Pose2d.proto);
-      log.addSchema(ChassisSpeeds.proto);
-      log.addSchema(Pose2d.struct);
-      log.addSchema(Pose3d.struct);
+    DataLogManager.start();
+    var log = DataLogManager.getLog();
+    log.addSchema(Pose2d.proto);
+    log.addSchema(ChassisSpeeds.proto);
+    log.addSchema(Pose2d.struct);
+    log.addSchema(Pose3d.struct);
 
-      URCL.start();
+    URCL.start();
 
-      StatusLogger.start();
-      DriverStation.startDataLog(DataLogManager.getLog());
-    }
+    StatusLogger.start();
+    DriverStation.startDataLog(DataLogManager.getLog());
   }
 
   /**

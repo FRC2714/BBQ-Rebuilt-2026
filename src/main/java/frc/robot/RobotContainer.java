@@ -32,7 +32,7 @@ public class RobotContainer {
   public final Shooter m_turret = new Shooter();
   public final DyeRotor m_dyeRotor = new DyeRotor();
 
-  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_turret, m_dyeRotor);
+  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_turret);
 
   private SendableChooser<Command> autoChooser;
 
@@ -81,9 +81,6 @@ public class RobotContainer {
     m_driverController
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
-
-    m_driverController.a().onTrue(m_dyeRotor.start());
-    m_driverController.b().onTrue(m_dyeRotor.stop());
 
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
     // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());

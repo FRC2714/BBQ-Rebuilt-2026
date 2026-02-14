@@ -8,11 +8,6 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -30,7 +25,6 @@ public class DyeRotor extends SubsystemBase {
       new SparkFlex(Constants.DyeRotorConstants.kDyeRotorMotorCanID, MotorType.kBrushless);
   private double dyeRotorCurrentTarget = 0;
   private double rotorAngleDeg = 0;
-  private Pose3d pose = new Pose3d();
 
   /** Creates a new Dyerotor. */
   public DyeRotor() {
@@ -47,27 +41,15 @@ public class DyeRotor extends SubsystemBase {
         () -> {
           dyeRotorCurrentTarget = Constants.DyeRotorConstants.kDyeRotorPower;
           dyeRotorMotor.set(Constants.DyeRotorConstants.kDyeRotorPower);
-          double spinRateDegPerSec = 90.0; // change to taste
-          double spinRateRadPerSec = Math.toRadians(spinRateDegPerSec);
-          double spinAngle = (Timer.getFPGATimestamp() * spinRateRadPerSec) % (2.0 * Math.PI);
         });
   }
-  ;
 
   public Command stop() {
     return this.run(
         () -> {
           dyeRotorCurrentTarget = 0;
           dyeRotorMotor.set(0);
-
-          Pose3d[] finalRobotPose =
-              new Pose3d[] {new Pose3d(0, 0, 0.02, new Rotation3d(0.0, 0.0, 0.0))};
         });
-  }
-
-  public Pose2d getPose() {
-    // Return a default pose at the origin; replace with a real pose provider if available.
-    return new Pose2d();
   }
 
   // Mech2d for DyeRotor
@@ -84,10 +66,6 @@ public class DyeRotor extends SubsystemBase {
               20, // line thickness
               new Color8Bit(Color.kPurple)));
 
-  public Pose3d getDyePose() {
-    return pose;
-  }
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -95,17 +73,5 @@ public class DyeRotor extends SubsystemBase {
     rotorAngleDeg += dyeRotorCurrentTarget * 5; // tune speed
     rotorAngleDeg %= 360; // tune speed
     rotorArm.setAngle(rotorAngleDeg);
-
-    Pose2d currentPose = getPose();
-    pose =
-        new Pose3d(
-            0,
-            0,
-            0.02,
-            new Rotation3d(
-                0.0,
-                0.0,
-                currentPose.getRotation().getRadians() + Units.degreesToRadians(rotorAngleDeg)));
   }
-  ;
 }

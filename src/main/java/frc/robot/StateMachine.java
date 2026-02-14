@@ -11,11 +11,27 @@ public class StateMachine extends SubsystemBase {
   private final Shooter m_shooter;
   private final Publisher m_publisher;
 
+  private State m_state = State.Idle;
+
+  enum State {
+    Idle,
+    Shooting,
+    Climbing
+  }
+
   public StateMachine(DriveSubsystem drivetrain, Shooter shooter) {
     m_drivetrain = drivetrain;
     m_shooter = shooter;
 
     m_publisher = new Publisher(m_drivetrain, m_shooter);
+  }
+
+  public State getState() {
+    return m_state;
+  }
+
+  public void setState(State state) {
+    m_state = state;
   }
 
   @Override

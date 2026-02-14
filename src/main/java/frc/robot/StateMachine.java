@@ -5,9 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -69,7 +67,7 @@ public class StateMachine extends SubsystemBase {
         .alongWith(m_shooter.startShooter().until(m_shooter::flywheelAtSetpoint))
         .andThen(m_dyeRotor.start())
         .withName("shoot");
-    
+
     // return new InstantCommand(
     //     () -> {
     //       preload()
@@ -80,7 +78,6 @@ public class StateMachine extends SubsystemBase {
     //           .withName("shoot");
     //     });
   }
-
 
   public State getState() {
     return m_state;

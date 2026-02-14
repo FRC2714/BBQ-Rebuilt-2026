@@ -15,11 +15,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
 import frc.robot.Constants.ShooterConstants.HoodSetpoints;
 import frc.robot.Constants.ShooterConstants.TurretSetpoints;
+import frc.robot.Robot;
 import frc.robot.utils.InterpolatingTreeMap;
 
 public class Shooter extends SubsystemBase {
@@ -165,7 +165,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean flywheelAtSetpoint() {
-    if(Robot.isSimulation()){
+    if (Robot.isSimulation()) {
       return true;
     }
     return Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;

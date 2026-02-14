@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
 import frc.robot.Constants.ShooterConstants.HoodSetpoints;
@@ -33,7 +34,7 @@ public class Shooter extends SubsystemBase {
   private SparkClosedLoopController hoodController = hoodMotor.getClosedLoopController();
   private RelativeEncoder hoodRelativeEncoder = hoodMotor.getExternalEncoder();
 
-  private SparkFlex flywheelMotorLeader =
+  public SparkFlex flywheelMotorLeader =
       new SparkFlex(Constants.ShooterConstants.kFlywheelLeaderMotorId, MotorType.kBrushless);
   private SparkClosedLoopController flywheelController =
       flywheelMotorLeader.getClosedLoopController();
@@ -161,6 +162,13 @@ public class Shooter extends SubsystemBase {
         () -> {
           setFlywheelSpeed(0);
         });
+  }
+
+  public boolean flywheelAtSetpoint() {
+    if(Robot.isSimulation()){
+      return true;
+    }
+    return Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
   }
 
   public void zeroTurret() {

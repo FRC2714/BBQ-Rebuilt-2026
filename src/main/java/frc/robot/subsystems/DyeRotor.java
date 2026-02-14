@@ -45,7 +45,7 @@ public class DyeRotor extends SubsystemBase {
   }
 
   public Command stop() {
-    return this.run(
+    return this.runOnce(
         () -> {
           dyeRotorCurrentTarget = 0;
           dyeRotorMotor.set(0);

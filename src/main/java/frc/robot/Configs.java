@@ -5,6 +5,7 @@ import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.ShooterConstants;
 
 public final class Configs {
   public static final class MAXSwerveModule {
@@ -62,6 +63,9 @@ public final class Configs {
 
   public static final class Shooter {
     public static final SparkFlexConfig turretConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig hoodConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig flywheelConfigLeader = new SparkFlexConfig();
+    public static final SparkFlexConfig flywheelConfigFollower = new SparkFlexConfig();
 
     static {
       turretConfig
@@ -76,6 +80,29 @@ public final class Configs {
           .p(0.01)
           .d(0)
           .outputRange(-0.5, 0.5);
+
+      hoodConfig
+          .smartCurrentLimit(40)
+          .idleMode(IdleMode.kBrake)
+          .inverted(false)
+          .voltageCompensation(12);
+      hoodConfig.absoluteEncoder.positionConversionFactor(360).inverted(false).zeroCentered(true);
+      hoodConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+          .p(0.01)
+          .d(0)
+          .outputRange(-0.1, 0.1);
+
+      flywheelConfigLeader
+          .smartCurrentLimit(60)
+          .idleMode(IdleMode.kCoast)
+          .inverted(true)
+          .voltageCompensation(12);
+
+      flywheelConfigFollower
+          .idleMode(IdleMode.kCoast)
+          .follow(ShooterConstants.kFlywheelLeaderMotorId, true);
     }
   }
 
@@ -91,6 +118,44 @@ public final class Configs {
       dyeRotorConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder) // needs tuning
+          .p(0.01) // needs tuning
+          .d(0) // needs tuning
+          .outputRange(-0.5, 0.5); // needs tuning
+    }
+  }
+
+  public static final class Intake {
+    public static final SparkFlexConfig pivotConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig rollerConfig = new SparkFlexConfig();
+
+    static {
+      pivotConfig
+          .smartCurrentLimit(40) // needs tuning
+          .idleMode(IdleMode.kBrake) // needs tuning
+          .inverted(false) // needs tuning
+          .voltageCompensation(12); // needs tuning
+      pivotConfig
+          .absoluteEncoder
+          .positionConversionFactor(360)
+          .inverted(false)
+          .zeroCentered(true); // needs tuning
+      pivotConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning
+          .p(0.01) // needs tuning
+          .d(0) // needs tuning
+          .outputRange(-0.5, 0.5); // needs tuning
+    }
+
+    static {
+      rollerConfig
+          .smartCurrentLimit(40) // needs tuning
+          .idleMode(IdleMode.kBrake) // needs tuning
+          .inverted(false) // needs tuning
+          .voltageCompensation(12); // needs tuning
+      rollerConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning
           .p(0.01) // needs tuning
           .d(0) // needs tuning
           .outputRange(-0.5, 0.5); // needs tuning

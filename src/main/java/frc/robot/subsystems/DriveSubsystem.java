@@ -43,7 +43,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Field;
@@ -62,7 +61,6 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 
 public class DriveSubsystem extends SubsystemBase {
-  // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft =
       new MAXSwerveModule(
           DriveConstants.kFrontLeftDrivingCanId,
@@ -87,7 +85,6 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightTurningCanId,
           DriveConstants.kBackRightChassisAngularOffset);
 
-  // The gyro sensor
   private final Canandgyro m_gyro = new Canandgyro(0);
 
   private final Field2d m_field2d = new Field2d();
@@ -118,13 +115,6 @@ public class DriveSubsystem extends SubsystemBase {
   public boolean isInAllianceZone() {
     boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
     return isInZone(isRed ? RED_ZONE : BLUE_ZONE);
-  }
-
-  public double getTurretTargetAngle() {
-    if (isInAllianceZone()) {
-      return getAngleToHub();
-    }
-    return 0.0; // placeholder
   }
 
   double xyStdDev;
@@ -195,6 +185,9 @@ public class DriveSubsystem extends SubsystemBase {
           LimelightConstants.m_stateStdDevs,
           LimelightConstants.m_visionStdDevs);
 
+  private static final double kLatencyCompensation = 0.1;
+  private static final double kBaselineHorizontalVelocity = 6.0;
+
   private double m_driveSysIdVoltage = 0.0;
   private double m_rotationSysIdVoltage = 0.0;
 
@@ -203,7 +196,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
     SmartDashboard.putData("Field", m_field2d);
 
@@ -418,11 +410,6 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
-  /**
-   * Returns the currently-estimated pose of the robot.
-   *
-   * @return The pose.
-   */
   public Pose2d getPose() {
     if (swerveDriveSimulation != null) {
       return swerveDriveSimulation.getActualPoseInSimulationWorld();
@@ -431,11 +418,6 @@ public class DriveSubsystem extends SubsystemBase {
     return m_poseEstimator.getEstimatedPosition();
   }
 
-  /**
-   * Resets the odometry to the specified pose.
-   *
-   * @param pose The pose to which to set the odometry.
-   */
   public void resetOdometry(Pose2d pose) {
     if (swerveDriveSimulation != null) {
       swerveDriveSimulation.resetOdometry(pose);
@@ -452,16 +434,7 @@ public class DriveSubsystem extends SubsystemBase {
         pose);
   }
 
-  /**
-   * Method to drive the robot using joystick info.
-   *
-   * @param xSpeed Speed of the robot in the x direction (forward).
-   * @param ySpeed Speed of the robot in the y direction (sideways).
-   * @param rot Angular rate of the robot.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
-   */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    // Convert the commanded speeds into the correct units for the drivetrain
     double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
@@ -651,23 +624,44 @@ public class DriveSubsystem extends SubsystemBase {
     return m_gyro.getAngularVelocityYaw() * 360 * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
-  public double getAngleToHub() {
-    Pose2d pose = getPose().plus(Constants.ShooterConstants.turretOffset);
+  public ChassisSpeeds getRobotRelativeSpeeds() {
+    if (swerveDriveSimulation != null) {
+      return swerveDriveSimulation.getActualSpeedsRobotRelative();
+    }
 
-    // Hub position in field coordinates (meters)
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(
+        m_frontLeft.getState(),
+        m_frontRight.getState(),
+        m_rearLeft.getState(),
+        m_rearRight.getState());
+  }
+
+  public Translation2d getFieldRelativeVelocity() {
+    ChassisSpeeds robotSpeeds = getRobotRelativeSpeeds();
+    Rotation2d heading = Rotation2d.fromDegrees(getHeading());
+    return new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
+        .rotateBy(heading);
+  }
+
+  public Translation2d getVirtualTarget() {
+    Pose2d pose = getPose();
+    Translation2d robotVelocity = getFieldRelativeVelocity();
     Translation2d hub = Field.getAllianceHub().toTranslation2d();
 
-    // Vector from robot to hub
-    Translation2d robotToHub = hub.minus(pose.getTranslation());
+    Translation2d futurePosition =
+        pose.getTranslation().plus(robotVelocity.times(kLatencyCompensation));
 
-    // Field-relative angle to hub
-    Rotation2d angleToHub = robotToHub.getAngle();
+    Translation2d toGoal = hub.minus(futurePosition);
+    Translation2d targetDirection = toGoal.div(toGoal.getNorm());
 
-    // Turret angle relative to robot forward
-    Rotation2d turretAngle = angleToHub.minus(pose.getRotation());
+    Translation2d targetVelocity = targetDirection.times(kBaselineHorizontalVelocity);
+    Translation2d shotVelocity = targetVelocity.minus(robotVelocity);
 
-    // Return degrees (wrapped to [-180, 180])
-    return turretAngle.getDegrees();
+    double distanceToHub = toGoal.getNorm();
+    Translation2d virtualTarget =
+        futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToHub));
+
+    return virtualTarget;
   }
 
   public Pose3d[] getCameraTargetPoses3d(String limelightName) {
@@ -679,9 +673,5 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     return poses.toArray(new Pose3d[0]);
-  }
-
-  public ChassisSpeeds getRobotRelativeSpeeds() {
-    return DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
   }
 }

@@ -113,6 +113,7 @@ public class Shooter extends SubsystemBase {
 
   public boolean getFuelLimitSwitch() {
     if (Robot.isSimulation()) {
+
       return true;
     }
     return fuelBeamBreak.isPressed();

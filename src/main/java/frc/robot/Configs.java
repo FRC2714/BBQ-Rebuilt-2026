@@ -153,12 +153,6 @@ public final class Configs {
           .idleMode(IdleMode.kBrake) // needs tuning
           .inverted(false) // needs tuning
           .voltageCompensation(12); // needs tuning
-      rollerConfig
-          .closedLoop
-          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning
-          .p(0.01) // needs tuning
-          .d(0) // needs tuning
-          .outputRange(-0.5, 0.5); // needs tuning
     }
   }
 }

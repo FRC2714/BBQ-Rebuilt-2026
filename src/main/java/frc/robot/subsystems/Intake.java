@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.sim.SparkAbsoluteEncoderSim;
 import com.revrobotics.sim.SparkFlexSim;
@@ -15,8 +16,10 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -46,6 +49,7 @@ public class Intake extends SubsystemBase {
   private SparkFlex rollerMotor =
       new SparkFlex(
           Constants.IntakeConstants.RollerConstants.kIntakeRollerCanId, MotorType.kBrushless);
+  private RelativeEncoder rollerEncoder = rollerMotor.getEncoder();
 
   // Simulation
   DCMotor pivotMotorSim = DCMotor.getNeoVortex(1);
@@ -64,6 +68,9 @@ public class Intake extends SubsystemBase {
           Units.degreesToRadians(Constants.IntakeConstants.PivotConstants.kPivotStow + 20),
           true,
           0); // max angle
+  FlywheelSim rollerSim =
+      new FlywheelSim(
+          LinearSystemId.createFlywheelSystem(rollerMotorSim, 0.0005, 1), rollerMotorSim);
 
   // Configs for Intake - NEEDS TUNING
   public Intake() {
@@ -120,32 +127,12 @@ public class Intake extends SubsystemBase {
       intakeBar.append(
           new MechanismLigament2d("Roller Motor", 0.1, 180, 15, new Color8Bit(Color.kWhite)));
 
-  private double leftCapSimAngle = 0.0;
-
-  private void intakeSim() {
-    // intakeBar.setAngle(180);
-    intakeRollerMotorSim.setAngle(180);
-    intakeRollerMotorSim.setAngle(-leftCapSimAngle);
-  }
-
-  private void extakeSim() {
-    // intakeBar.setAngle(180);
-    intakeRollerMotorSim.setAngle(180);
-    intakeRollerMotorSim.setAngle(leftCapSimAngle);
-  }
-
-  private void stowSim() {
-    // intakeBar.setAngle(90);
-    intakeRollerMotorSim.setAngle(180);
-  }
-
   // Intake Commands
   public Command intake() {
     return this.runEnd(
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
           pivotExtend();
-          intakeSim();
         },
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
@@ -157,7 +144,6 @@ public class Intake extends SubsystemBase {
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kExtakeRollerPower);
           pivotExtend();
-          extakeSim();
         },
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
@@ -169,19 +155,18 @@ public class Intake extends SubsystemBase {
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
           pivotStow();
-          stowSim();
         });
   }
 
   @Override
   public void periodic() {
     intakeBar.setAngle(pivotEncoder.getPosition());
+    intakeRollerMotorSim.setAngle(Units.rotationsToDegrees(rollerEncoder.getPosition()));
+    SmartDashboard.putNumber("Intake/Roller/Position", rollerEncoder.getPosition());
 
     // SmartDashboard.putData("Intake/IntakeMechanism", intakeMech);
     SmartDashboard.putNumber("Intake/Pivot/Current Position", pivotEncoder.getPosition());
     SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
-
-    leftCapSimAngle += 12;
   }
 
   @Override
@@ -199,5 +184,12 @@ public class Intake extends SubsystemBase {
         Units.radiansPerSecondToRotationsPerMinute(pivotSim.getVelocityRadPerSec()),
         RobotController.getBatteryVoltage(),
         0.02);
+
+    rollerSim.setInputVoltage(
+        rollerSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+    rollerSim.update(0.02);
+
+    rollerSparkSim.iterate(
+        rollerSim.getAngularVelocityRPM(), RobotController.getBatteryVoltage(), 0.02);
   }
 }

@@ -144,7 +144,7 @@ public final class Configs {
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning
           .p(0.01) // needs tuning
           .d(0) // needs tuning
-          .outputRange(-0.5, 0.5); // needs tuning
+          .outputRange(-1.0, 1); // needs tuning
     }
 
     static {

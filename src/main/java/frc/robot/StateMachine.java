@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
@@ -55,9 +56,14 @@ public class StateMachine extends SubsystemBase {
           .getStructArrayTopic("FinalComponentPoses", Pose3d.struct)
           .publish();
 
-  // problems
-  // doesnt stow (no button for stow)
-  // state doesnt update
+  public Command preloadCommand() {
+    return Commands.runOnce(
+        () -> {
+          if (m_state == State.Shooting) return;
+
+          CommandScheduler.getInstance().schedule(preload());
+        });
+  }
 
   public Command preload() {
     return m_dyeRotor

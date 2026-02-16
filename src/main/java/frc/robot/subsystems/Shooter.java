@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -10,6 +11,10 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -61,6 +66,13 @@ public class Shooter extends SubsystemBase {
 
   private InterpolatingTreeMap hoodAngleMap;
   private InterpolatingTreeMap flywheelSpeedMap;
+
+  // Simulation
+  DCMotor flywheelMotorSim = DCMotor.getNeoVortex(2);
+  SparkFlexSim flywheelSparkSim = new SparkFlexSim(flywheelMotorLeader, flywheelMotorSim);
+  FlywheelSim flywheelSim =
+      new FlywheelSim(
+          LinearSystemId.createFlywheelSystem(flywheelMotorSim, 0.0001, 1), flywheelMotorSim);
 
   public Shooter() {
     turretMotor.configure(
@@ -217,6 +229,13 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
+    flywheelSim.setInputVoltage(
+        flywheelSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+    flywheelSim.update(0.02);
+
+    flywheelSparkSim.iterate(
+        flywheelSim.getAngularVelocityRPM(), RobotController.getBatteryVoltage(), 0.02);
+
     simFlywheelVelocity += (flywheelCurrentTarget - simFlywheelVelocity) * 0.2;
     simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
 

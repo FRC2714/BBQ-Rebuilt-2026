@@ -132,7 +132,7 @@ public class StateMachine extends SubsystemBase {
       zeroRobotPose[i] = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, 0.0, 0.0));
     }
     publisherZeroedComponentPoses.set(zeroRobotPose);
-    Pose3d[] finalRobotPose = new Pose3d[] {m_dyeRotor.getDyePose()};
+    Pose3d[] finalRobotPose = new Pose3d[] {m_dyeRotor.getPose3d()};
     publisherFinalComponentPoses.set(finalRobotPose);
   }
 }

@@ -120,20 +120,26 @@ public class Intake extends SubsystemBase {
 
   // Intake Commands
   public Command intake() {
-    return this.run(
+    return this.runEnd(
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
           pivotExtend();
           intakeSim();
+        },
+        () -> {
+          setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
         });
   }
 
   public Command extake() {
-    return this.run(
+    return this.runEnd(
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kExtakeRollerPower);
           pivotExtend();
           extakeSim();
+        },
+        () -> {
+          setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
         });
   }
 

@@ -24,7 +24,6 @@ public class StateMachine extends SubsystemBase {
   private final Publisher m_publisher;
 
   private static State m_state = State.Idle;
-  private boolean shooting = false;
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -74,7 +73,14 @@ public class StateMachine extends SubsystemBase {
     // dye rotor immediately.
     return preload()
         .withDeadline(m_shooter.startShooter().until(() -> m_shooter.flywheelAtSetpoint()))
-        .andThen(m_dyeRotor.start().alongWith(m_shooter.startShooter()))
+        .andThen(
+            m_shooter
+                .startShooter()
+                .alongWith(m_dyeRotor.start())
+                .beforeStarting(
+                    () -> {
+                      setState(State.Shooting);
+                    }))
         .finallyDo(
             () -> {
               CommandScheduler.getInstance().schedule(stopShoot());
@@ -86,10 +92,9 @@ public class StateMachine extends SubsystemBase {
         .stopShooter()
         .alongWith(m_dyeRotor.stop())
         .withName("stop shooting")
-        .andThen(
+        .beforeStarting(
             () -> {
               m_state = State.Idle;
-              shooting = false;
             });
   }
 

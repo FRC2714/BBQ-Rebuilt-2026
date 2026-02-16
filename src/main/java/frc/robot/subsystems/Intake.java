@@ -116,16 +116,16 @@ public class Intake extends SubsystemBase {
   }
 
   // Intake Simulation - Mech2d
-  Mechanism2d intakeMech = new Mechanism2d(5, 5);
-  MechanismRoot2d intakeRoot = intakeMech.getRoot("Intake", 3, 2.5);
+  Mechanism2d intakeMech = new Mechanism2d(1, 1);
+  MechanismRoot2d intakeRoot = intakeMech.getRoot("Intake", 0.85, 0.1);
 
   MechanismLigament2d intakeBar =
       intakeRoot.append(
-          new MechanismLigament2d("Intake Roller", 1.5, 90, 15, new Color8Bit(Color.kBlue)));
+          new MechanismLigament2d("Intake Roller", 0.25, 90, 3, new Color8Bit(Color.kBlue)));
 
   MechanismLigament2d intakeRollerMotorSim =
       intakeBar.append(
-          new MechanismLigament2d("Roller Motor", 0.1, 180, 15, new Color8Bit(Color.kWhite)));
+          new MechanismLigament2d("Roller Motor", 0.1, 180, 3, new Color8Bit(Color.kWhite)));
 
   // Intake Commands
   public Command intake() {

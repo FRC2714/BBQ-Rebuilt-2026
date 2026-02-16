@@ -100,6 +100,14 @@ public final class Configs {
           .inverted(true)
           .voltageCompensation(12);
 
+      flywheelConfigLeader
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .p(0.001)
+          .outputRange(-1, 1)
+          .feedForward
+          .kV(0.00178);
+
       flywheelConfigFollower
           .idleMode(IdleMode.kCoast)
           .follow(ShooterConstants.kFlywheelLeaderMotorId, true);

@@ -43,7 +43,7 @@ public class Shooter extends SubsystemBase {
       new SparkFlex(Constants.ShooterConstants.kFlywheelLeaderMotorId, MotorType.kBrushless);
   private SparkClosedLoopController flywheelController =
       flywheelMotorLeader.getClosedLoopController();
-  private RelativeEncoder flywheelRelativeEncoder = flywheelMotorLeader.getExternalEncoder();
+  private RelativeEncoder flywheelRelativeEncoder = flywheelMotorLeader.getEncoder();
 
   private SparkFlex flywheelMotorFollower =
       new SparkFlex(Constants.ShooterConstants.kFlywheelFollowerMotorId, MotorType.kBrushless);
@@ -63,6 +63,7 @@ public class Shooter extends SubsystemBase {
 
   public boolean wasZeroed = false;
   private boolean fuelTrigger = false;
+  private boolean isShooting = false;
 
   private InterpolatingTreeMap hoodAngleMap;
   private InterpolatingTreeMap flywheelSpeedMap;
@@ -72,7 +73,7 @@ public class Shooter extends SubsystemBase {
   SparkFlexSim flywheelSparkSim = new SparkFlexSim(flywheelMotorLeader, flywheelMotorSim);
   FlywheelSim flywheelSim =
       new FlywheelSim(
-          LinearSystemId.createFlywheelSystem(flywheelMotorSim, 0.0001, 1), flywheelMotorSim);
+          LinearSystemId.createFlywheelSystem(flywheelMotorSim, 0.001, 1), flywheelMotorSim);
 
   public Shooter() {
     turretMotor.configure(
@@ -157,10 +158,6 @@ public class Shooter extends SubsystemBase {
     flywheelCurrentTarget = interpolated != null ? interpolated : FlywheelSetpoints.kStow;
   }
 
-  public void setFlywheelSpeed(double speed) {
-    flywheelCurrentTarget = speed;
-  }
-
   public double getFlywheelSpeed() {
     return flywheelCurrentTarget;
   }
@@ -176,21 +173,19 @@ public class Shooter extends SubsystemBase {
   public Command startShooter() {
     return this.run(
         () -> {
-          setFlywheelSpeed(Constants.ShooterConstants.FlywheelSetpoints.kStartSpeed);
+          isShooting = true;
         });
   }
 
   public Command stopShooter() {
     return this.run(
         () -> {
-          setFlywheelSpeed(0);
+          isShooting = false;
         });
   }
 
+  // TODO: Debounce this
   public boolean flywheelAtSetpoint() {
-    if (Robot.isSimulation()) {
-      return true;
-    }
     return Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
   }
 
@@ -220,10 +215,13 @@ public class Shooter extends SubsystemBase {
     turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     flywheelController.setSetpoint(
-        flywheelCurrentTarget, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+        isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
 
     SmartDashboard.putNumber("Shooter/Hood Angle", hoodCurrentTarget);
-    SmartDashboard.putNumber("Shooter/Flywheel Speed", flywheelCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Flywheel/Expected Speed", flywheelCurrentTarget);
+    SmartDashboard.putNumber(
+        "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());
+    SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
     SmartDashboard.putNumber("Shooter/Turret Target", turretCurrentTarget);
   }
 

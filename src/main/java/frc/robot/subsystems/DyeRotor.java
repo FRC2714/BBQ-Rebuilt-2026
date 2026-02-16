@@ -8,6 +8,9 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -25,6 +28,7 @@ public class DyeRotor extends SubsystemBase {
       new SparkFlex(Constants.DyeRotorConstants.kDyeRotorMotorCanID, MotorType.kBrushless);
   private double dyeRotorCurrentTarget = 0;
   private double rotorAngleDeg = 0;
+  private Pose3d pose = new Pose3d();
 
   /** Creates a new Dyerotor. */
   public DyeRotor() {
@@ -66,6 +70,10 @@ public class DyeRotor extends SubsystemBase {
               20, // line thickness
               new Color8Bit(Color.kPurple)));
 
+  public Pose3d getPose3d() {
+    return pose;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -73,5 +81,7 @@ public class DyeRotor extends SubsystemBase {
     rotorAngleDeg += dyeRotorCurrentTarget * 5; // tune speed
     rotorAngleDeg %= 360; // tune speed
     rotorArm.setAngle(rotorAngleDeg);
+
+    pose = new Pose3d(0, 0, 0.02, new Rotation3d(0.0, 0.0, Units.degreesToRadians(rotorAngleDeg)));
   }
 }

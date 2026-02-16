@@ -74,7 +74,7 @@ public class StateMachine extends SubsystemBase {
     // dye rotor immediately.
     return preload()
         .withDeadline(m_shooter.startShooter().until(() -> m_shooter.flywheelAtSetpoint()))
-        .andThen(m_dyeRotor.start())
+        .andThen(m_dyeRotor.start().alongWith(m_shooter.startShooter()))
         .finallyDo(
             () -> {
               CommandScheduler.getInstance().schedule(stopShoot());

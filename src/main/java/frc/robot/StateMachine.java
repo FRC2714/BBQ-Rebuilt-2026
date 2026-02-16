@@ -9,6 +9,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
@@ -18,9 +20,9 @@ import frc.robot.subsystems.Shooter;
 public class StateMachine extends SubsystemBase {
   private final DriveSubsystem m_drivetrain;
   private final Shooter m_shooter;
-  private final Publisher m_publisher;
   private final Intake m_intake;
   private final DyeRotor m_dyeRotor;
+  private final Publisher m_publisher;
 
   private static State m_state = State.Idle;
 
@@ -53,6 +55,54 @@ public class StateMachine extends SubsystemBase {
       NetworkTableInstance.getDefault()
           .getStructArrayTopic("FinalComponentPoses", Pose3d.struct)
           .publish();
+
+  public Command preloadCommand() {
+    return Commands.runOnce(
+        () -> {
+          if (m_state == State.Shooting) return;
+
+          CommandScheduler.getInstance().schedule(preload());
+        });
+  }
+
+  public Command preload() {
+    return m_dyeRotor
+        .start()
+        .until(() -> m_shooter.getFuelLimitSwitch())
+        .andThen(m_dyeRotor.stop())
+        .withName("preload");
+  }
+
+  public Command shoot() {
+    // Run preload (dye rotor until fuel loaded, then stop) in parallel with
+    // startShooter (spin flywheel until at setpoint). If startShooter finishes first, just run the
+    // dye rotor immediately.
+    return preload()
+        .withDeadline(m_shooter.startShooter().until(() -> m_shooter.flywheelAtSetpoint()))
+        .andThen(
+            m_shooter
+                .startShooter()
+                .alongWith(m_dyeRotor.start())
+                .beforeStarting(
+                    () -> {
+                      setState(State.Shooting);
+                    }))
+        .finallyDo(
+            () -> {
+              CommandScheduler.getInstance().schedule(stopShoot());
+            });
+  }
+
+  public Command stopShoot() {
+    return m_shooter
+        .stopShooter()
+        .alongWith(m_dyeRotor.stop())
+        .withName("stop shooting")
+        .beforeStarting(
+            () -> {
+              m_state = State.Idle;
+            });
+  }
 
   public State getState() {
     return m_state;
@@ -128,6 +178,13 @@ public class StateMachine extends SubsystemBase {
   @Override
   public void periodic() {
     runTargeting();
+
+    SmartDashboard.putString(
+        "State Machine/Current Comamand",
+        this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
+
+    SmartDashboard.putString("State", m_state.toString());
+
     m_publisher.publish();
 
     Pose3d[] zeroRobotPose = new Pose3d[1];

@@ -19,6 +19,7 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
 import frc.robot.Constants.ShooterConstants.HoodSetpoints;
 import frc.robot.Constants.ShooterConstants.TurretSetpoints;
+import frc.robot.Robot;
 import frc.robot.utils.InterpolatingTreeMap;
 
 public class Shooter extends SubsystemBase {
@@ -42,6 +43,9 @@ public class Shooter extends SubsystemBase {
   private SparkFlex flywheelMotorFollower =
       new SparkFlex(Constants.ShooterConstants.kFlywheelFollowerMotorId, MotorType.kBrushless);
 
+  private SparkLimitSwitch fuelBeamBreak =
+      flywheelMotorLeader.getForwardLimitSwitch(); // Placeholder for actual beam break sensor
+
   private double simFlywheelVelocity = 0.0;
   private double simHoodPosition = 0.0;
 
@@ -53,6 +57,7 @@ public class Shooter extends SubsystemBase {
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
 
   public boolean wasZeroed = false;
+  private boolean fuelTrigger = false;
 
   private InterpolatingTreeMap hoodAngleMap;
   private InterpolatingTreeMap flywheelSpeedMap;
@@ -105,6 +110,13 @@ public class Shooter extends SubsystemBase {
     flywheelSpeedMap.put(6.0, 4000.0);
     flywheelSpeedMap.put(7.0, 4400.0);
     flywheelSpeedMap.put(8.0, 4800.0);
+  }
+
+  public boolean getFuelLimitSwitch() {
+    if (Robot.isSimulation()) {
+      return fuelTrigger;
+    }
+    return fuelBeamBreak.isPressed();
   }
 
   public double getTurretPosition() {
@@ -163,6 +175,21 @@ public class Shooter extends SubsystemBase {
         });
   }
 
+  public boolean flywheelAtSetpoint() {
+    if (Robot.isSimulation()) {
+      return true;
+    }
+    return Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
+  }
+
+  public void fuelTrue() {
+    fuelTrigger = true;
+  }
+
+  public void fuelFalse() {
+    fuelTrigger = false;
+  }
+
   public void zeroTurret() {
     if (!wasZeroed && turretMotor.getForwardLimitSwitch().isPressed()) {
       wasZeroed = true;
@@ -196,6 +223,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Hood Angle", simHoodPosition);
     SmartDashboard.putNumber("Flywheel Speed", simFlywheelVelocity);
     SmartDashboard.putNumber("Turret Position", turretCurrentTarget);
+    SmartDashboard.putBoolean("Fuel Loaded", fuelTrigger);
 
     zeroTurret();
   }

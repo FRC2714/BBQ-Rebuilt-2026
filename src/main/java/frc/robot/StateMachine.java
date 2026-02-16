@@ -103,14 +103,13 @@ public class StateMachine extends SubsystemBase {
     return (m_intake.stow().onlyIf(StateMachine::isNotClimbing));
   }
 
-  @Override
-  public void periodic() {
+  private void runTargeting() {
+
     Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
     Rotation2d robotHeading = m_drivetrain.getPose().getRotation();
 
     if (m_drivetrain.isInAllianceZone()) {
       aimAt(Field.getAllianceHub().toTranslation2d(), robotPosition, robotHeading);
-      m_publisher.publish();
       return;
     }
 
@@ -119,12 +118,16 @@ public class StateMachine extends SubsystemBase {
 
     if (airstrikeX == 0 && airstrikeY == 0) {
       m_shooter.updateTurretTarget(0.0);
-      m_publisher.publish();
       return;
     }
 
     Translation2d airstrikeTarget = new Translation2d(airstrikeX, airstrikeY);
     aimAt(airstrikeTarget, robotPosition, robotHeading);
+  }
+
+  @Override
+  public void periodic() {
+    runTargeting();
     m_publisher.publish();
 
     Pose3d[] zeroRobotPose = new Pose3d[1];
@@ -136,4 +139,3 @@ public class StateMachine extends SubsystemBase {
     publisherFinalComponentPoses.set(finalRobotPose);
   }
 }
-;

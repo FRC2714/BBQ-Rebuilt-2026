@@ -1,8 +1,12 @@
 package frc.robot;
 
-import com.revrobotics.spark.SparkLimitSwitch;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -18,8 +22,6 @@ public class StateMachine extends SubsystemBase {
   private final Intake m_intake;
   private final DyeRotor m_dyeRotor;
   private final Publisher m_publisher;
-
-  SparkLimitSwitch fuelBeamBreak;
 
   private static State m_state = State.Idle;
   private boolean shooting = false;
@@ -43,6 +45,16 @@ public class StateMachine extends SubsystemBase {
 
     m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake);
   }
+
+  StructArrayPublisher<Pose3d> publisherZeroedComponentPoses =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("ZeroedComponentPoses", Pose3d.struct)
+          .publish();
+
+  StructArrayPublisher<Pose3d> publisherFinalComponentPoses =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("FinalComponentPoses", Pose3d.struct)
+          .publish();
 
   // problems
   // doesnt stow (no button for stow)
@@ -90,14 +102,31 @@ public class StateMachine extends SubsystemBase {
   }
 
   // Generalization of updating the targets
+  private static final double kLatencyCompensation = 0.1;
+  private static final double kBaselineHorizontalVelocity = 6.0;
+
   private void aimAt(Translation2d target, Translation2d robotPosition, Rotation2d robotHeading) {
-    Translation2d robotToTarget = target.minus(robotPosition);
+    Translation2d robotVelocity = m_drivetrain.getFieldRelativeVelocity();
+
+    Translation2d futurePosition = robotPosition.plus(robotVelocity.times(kLatencyCompensation));
+
+    Translation2d toGoal = target.minus(futurePosition);
+    Translation2d targetDirection = toGoal.div(toGoal.getNorm());
+    Translation2d targetVelocity = targetDirection.times(kBaselineHorizontalVelocity);
+    Translation2d shotVelocity = targetVelocity.minus(robotVelocity);
+
+    double distanceToTarget = toGoal.getNorm();
+
+    Translation2d virtualTarget =
+        futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToTarget));
+
+    Translation2d robotToTarget = virtualTarget.minus(robotPosition);
     Rotation2d fieldAngle = robotToTarget.getAngle();
     Rotation2d turretAngle = fieldAngle.minus(robotHeading);
 
     m_shooter.updateTurretTarget(turretAngle.getDegrees());
-    m_shooter.updateHoodTarget(robotToTarget.getNorm());
-    m_shooter.updateFlywheelTarget(robotToTarget.getNorm());
+    m_shooter.updateHoodTarget(distanceToTarget);
+    m_shooter.updateFlywheelTarget(distanceToTarget);
   }
 
   // intake commands
@@ -113,23 +142,31 @@ public class StateMachine extends SubsystemBase {
     return (m_intake.stow().onlyIf(StateMachine::isNotClimbing));
   }
 
+  private void runTargeting() {
+
+    Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
+    Rotation2d robotHeading = m_drivetrain.getPose().getRotation();
+
+    if (m_drivetrain.isInAllianceZone()) {
+      aimAt(Field.getAllianceHub().toTranslation2d(), robotPosition, robotHeading);
+      return;
+    }
+
+    double airstrikeX = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/x", 0));
+    double airstrikeY = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/y", 0));
+
+    if (airstrikeX == 0 && airstrikeY == 0) {
+      m_shooter.updateTurretTarget(0.0);
+      return;
+    }
+
+    Translation2d airstrikeTarget = new Translation2d(airstrikeX, airstrikeY);
+    aimAt(airstrikeTarget, robotPosition, robotHeading);
+  }
+
   @Override
   public void periodic() {
-    // fuelTrigger = fuelBeamBreak.isPressed();
-
-    Translation2d virtualTarget = m_drivetrain.getVirtualTarget();
-    Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
-
-    double distanceToTarget = virtualTarget.getDistance(robotPosition);
-
-    // Calculate robot-relative angle to virtual target
-    Translation2d robotToTarget = virtualTarget.minus(robotPosition);
-    Rotation2d fieldAngle = robotToTarget.getAngle();
-    Rotation2d turretAngle = fieldAngle.minus(m_drivetrain.getPose().getRotation());
-
-    m_shooter.updateTurretTarget(turretAngle.getDegrees());
-    m_shooter.updateHoodTarget(distanceToTarget);
-    m_shooter.updateFlywheelTarget(distanceToTarget);
+    runTargeting();
 
     SmartDashboard.putString(
         "State Machine/Current Comamand",
@@ -138,5 +175,13 @@ public class StateMachine extends SubsystemBase {
     SmartDashboard.putString("State", m_state.toString());
 
     m_publisher.publish();
+
+    Pose3d[] zeroRobotPose = new Pose3d[1];
+    for (int i = 0; i < zeroRobotPose.length; i++) {
+      zeroRobotPose[i] = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, 0.0, 0.0));
+    }
+    publisherZeroedComponentPoses.set(zeroRobotPose);
+    Pose3d[] finalRobotPose = new Pose3d[] {m_dyeRotor.getPose3d()};
+    publisherFinalComponentPoses.set(finalRobotPose);
   }
 }

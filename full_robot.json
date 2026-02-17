@@ -1,19 +1,24 @@
 {
   "hubs": [
     {
-      "x": 768,
+      "x": 864,
       "y": 38,
-      "width": 960,
+      "width": 864,
       "height": 1006,
       "state": {
         "sidebar": {
-          "width": 304,
+          "width": 190,
           "expanded": [
             "/Shuffleboard",
             "/SmartDashboard/Field",
             "/Swerve Module States/0",
             "/Swerve Module States",
-            "/SmartDashboard"
+            "/SmartDashboard",
+            "/SmartDashboard/Shooter",
+            "/SmartDashboard/Shooter/Flywheel",
+            "/SmartDashboard/Shooter/Turret",
+            "/turretHeading",
+            "/turretHeading/rotation"
           ]
         },
         "tabs": {
@@ -102,7 +107,7 @@
                   },
                   {
                     "type": "arrow",
-                    "logKey": "NT:turretHeading",
+                    "logKey": "NT:turretPose",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
@@ -242,42 +247,35 @@
                     "options": {
                       "plane": "xz"
                     }
+                  },
+                  {
+                    "type": "robot",
+                    "logKey": "NT:turretPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "Crab Bot"
+                    }
                   }
                 ],
                 "game": "FRC:2026 Field"
               },
               "controllerUUID": "hf15d8z0ckx5jtda29315kgha0s04t0b",
               "renderer": {
-                "cameraIndex": -1,
+                "cameraIndex": -2,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -7.020262807599422,
-                  3.1690385783670965,
-                  -0.4297275019308372
+                  5.656213888295585,
+                  7.229174747141792,
+                  -2.326036127556789
                 ],
                 "cameraTarget": [
-                  -4.017542717614032,
-                  0.032278259185282994,
-                  -0.47672706292991424
+                  0.3399347623194903,
+                  1.8811491601770385,
+                  0.08837201440940591
                 ]
               },
-              "controlsHeight": 488
-            },
-            {
-              "type": 10,
-              "title": "Mechanism",
-              "controller": [
-                {
-                  "type": "mechanism",
-                  "logKey": "NT:/SmartDashboard/Mech2d",
-                  "logType": "Mechanism2d",
-                  "visible": true,
-                  "options": {}
-                }
-              ],
-              "controllerUUID": "2wjok3gzp3rznvh2jy6ethlfy3mrnzdd",
-              "renderer": null,
-              "controlsHeight": 200
+              "controlsHeight": 267
             }
           ]
         }

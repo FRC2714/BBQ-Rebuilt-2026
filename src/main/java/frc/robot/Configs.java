@@ -77,9 +77,8 @@ public final class Configs {
       turretConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          .p(0.01)
-          .d(0)
-          .outputRange(-0.5, 0.5);
+          .p(0.1)
+          .outputRange(-1, 1);
 
       hoodConfig
           .smartCurrentLimit(40)

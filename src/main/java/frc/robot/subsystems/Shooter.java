@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -11,10 +12,14 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,6 +38,7 @@ public class Shooter extends SubsystemBase {
   private SparkClosedLoopController turretController = turretMotor.getClosedLoopController();
 
   private RelativeEncoder turretRelativeEncoder = turretMotor.getExternalEncoder();
+  private AbsoluteEncoder turretAbsoluteEncoder = turretMotor.getAbsoluteEncoder();
 
   private SparkFlex hoodMotor =
       new SparkFlex(Constants.ShooterConstants.kHoodCanId, MotorType.kBrushless);
@@ -74,6 +80,11 @@ public class Shooter extends SubsystemBase {
   FlywheelSim flywheelSim =
       new FlywheelSim(
           LinearSystemId.createFlywheelSystem(flywheelMotorSim, 0.001, 1), flywheelMotorSim);
+
+  DCMotor turretMotorSim = DCMotor.getNEO(1);
+  SparkFlexSim turretSparkSim = new SparkFlexSim(turretMotor, turretMotorSim);
+  LinearSystemSim<N2, N1, N2> turretSim =
+      new LinearSystemSim<>(LinearSystemId.createDCMotorSystem(turretMotorSim, 0.0001, 40));
 
   public Shooter() {
     turretMotor.configure(
@@ -133,7 +144,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public double getTurretPosition() {
-    return turretRelativeEncoder.getPosition();
+    return turretAbsoluteEncoder.getPosition();
   }
 
   public double getHoodPosition() {
@@ -222,7 +233,8 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber(
         "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());
     SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
-    SmartDashboard.putNumber("Shooter/Turret Target", turretCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Turret/Setpoint", turretCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Turret/Position", turretAbsoluteEncoder.getPosition());
   }
 
   @Override
@@ -236,6 +248,14 @@ public class Shooter extends SubsystemBase {
 
     simFlywheelVelocity += (flywheelCurrentTarget - simFlywheelVelocity) * 0.2;
     simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
+
+    turretSim.setInput(turretSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+    turretSim.update(0.02);
+
+    turretSparkSim.iterate(
+        Units.radiansPerSecondToRotationsPerMinute(turretSim.getOutput(1)),
+        RobotController.getBatteryVoltage(),
+        0.02);
 
     SmartDashboard.putNumber("Hood Angle", simHoodPosition);
     SmartDashboard.putNumber("Flywheel Speed", simFlywheelVelocity);

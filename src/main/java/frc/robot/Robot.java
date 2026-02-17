@@ -9,7 +9,6 @@ import com.revrobotics.util.StatusLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
@@ -32,9 +31,6 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-
-  StructPublisher<Pose2d> turretHeading =
-      NetworkTableInstance.getDefault().getStructTopic("turretHeading", Pose2d.struct).publish();
 
   StructPublisher<Pose2d> virtualTarget =
       NetworkTableInstance.getDefault().getStructTopic("virtualTarget", Pose2d.struct).publish();
@@ -87,14 +83,8 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     var virtualTargetTranslation = m_robotContainer.m_robotDrive.getVirtualTarget();
 
-    var robotPose = m_robotContainer.m_robotDrive.getPose();
-
-    Translation2d robotToVirtualTarget = virtualTargetTranslation.minus(robotPose.getTranslation());
-    Rotation2d angleToVirtualTarget = robotToVirtualTarget.getAngle();
-
     CommandScheduler.getInstance().run();
 
-    turretHeading.set(new Pose2d(robotPose.getX(), robotPose.getY(), angleToVirtualTarget));
     virtualTarget.set(new Pose2d(virtualTargetTranslation, new Rotation2d()));
   }
 

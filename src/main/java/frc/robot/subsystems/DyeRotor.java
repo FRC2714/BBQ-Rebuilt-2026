@@ -5,12 +5,18 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -26,9 +32,18 @@ public class DyeRotor extends SubsystemBase {
 
   private SparkFlex dyeRotorMotor =
       new SparkFlex(Constants.DyeRotorConstants.kDyeRotorMotorCanID, MotorType.kBrushless);
+  private RelativeEncoder encoder = dyeRotorMotor.getEncoder();
   private double dyeRotorCurrentTarget = 0;
-  private double rotorAngleDeg = 0;
   private Pose3d pose = new Pose3d();
+
+  // Simulation
+  DCMotor motor = DCMotor.getNeoVortex(1);
+  private SparkFlexSim dyeRotorSim = new SparkFlexSim(dyeRotorMotor, motor);
+  private static final double MOMENT_OF_INERTIA = 0.00032; // kg*m^2
+  private static final double GEARING = 25; // 1:1 if direct drive
+  private FlywheelSim flywheelSim =
+      new FlywheelSim(
+          LinearSystemId.createFlywheelSystem(motor, MOMENT_OF_INERTIA, GEARING), motor);
 
   /** Creates a new Dyerotor. */
   public DyeRotor() {
@@ -76,12 +91,24 @@ public class DyeRotor extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
     SmartDashboard.putNumber("DyeRotor Motor", dyeRotorCurrentTarget);
-    rotorAngleDeg += dyeRotorCurrentTarget * 5; // tune speed
-    rotorAngleDeg %= 360; // tune speed
-    rotorArm.setAngle(rotorAngleDeg);
+    rotorArm.setAngle(Units.rotationsToDegrees(encoder.getPosition()));
 
-    pose = new Pose3d(0, 0, 0.02, new Rotation3d(0.0, 0.0, Units.degreesToRadians(rotorAngleDeg)));
+    pose =
+        new Pose3d(
+            0,
+            0,
+            0.02,
+            new Rotation3d(0.0, 0.0, Units.rotationsToRadians(-encoder.getPosition() / GEARING)));
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    flywheelSim.setInputVoltage(
+        dyeRotorSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+    flywheelSim.update(0.02);
+
+    dyeRotorSim.iterate(
+        flywheelSim.getAngularVelocityRPM() * GEARING, RobotController.getBatteryVoltage(), 0.02);
   }
 }

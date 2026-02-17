@@ -6,7 +6,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -74,7 +73,8 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController.getHID(), Button.kR1.value)
+    m_driverController
+        .leftStick()
         .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
 
     m_driverController
@@ -89,9 +89,9 @@ public class RobotContainer {
     m_driverController.x().onTrue(m_stateMachine.preloadCommand());
 
     // intake keybinds
-    m_driverController.leftBumper().onTrue(m_stateMachine.intakeSequence());
+    m_driverController.leftBumper().whileTrue(m_stateMachine.intakeSequence());
 
-    m_driverController.rightBumper().onTrue(m_stateMachine.extakeSequence());
+    m_driverController.rightBumper().whileTrue(m_stateMachine.extakeSequence());
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
 

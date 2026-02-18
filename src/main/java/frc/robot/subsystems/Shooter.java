@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -38,7 +37,6 @@ public class Shooter extends SubsystemBase {
   private SparkClosedLoopController turretController = turretMotor.getClosedLoopController();
 
   private RelativeEncoder turretRelativeEncoder = turretMotor.getExternalEncoder();
-  private AbsoluteEncoder turretAbsoluteEncoder = turretMotor.getAbsoluteEncoder();
 
   private SparkFlex hoodMotor =
       new SparkFlex(Constants.ShooterConstants.kHoodCanId, MotorType.kBrushless);
@@ -144,7 +142,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public double getTurretPosition() {
-    return turretAbsoluteEncoder.getPosition();
+    return turretRelativeEncoder.getPosition();
   }
 
   public double getHoodPosition() {
@@ -221,6 +219,10 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  public void setTurretAngle(double angle){
+    turretRelativeEncoder.setPosition(angle);
+  }
+
   @Override
   public void periodic() {
     turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
@@ -234,7 +236,7 @@ public class Shooter extends SubsystemBase {
         "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());
     SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
     SmartDashboard.putNumber("Shooter/Turret/Setpoint", turretCurrentTarget);
-    SmartDashboard.putNumber("Shooter/Turret/Position", turretAbsoluteEncoder.getPosition());
+    SmartDashboard.putNumber("Shooter/Turret/Position", turretRelativeEncoder.getPosition());
   }
 
   @Override

@@ -73,11 +73,11 @@ public final class Configs {
           .idleMode(IdleMode.kBrake)
           .inverted(false)
           .voltageCompensation(12);
-      turretConfig.absoluteEncoder.positionConversionFactor(360).inverted(false).zeroCentered(true);
+      turretConfig.externalEncoder.positionConversionFactor(360).inverted(false).countsPerRevolution(8192);
       turretConfig
           .closedLoop
-          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          .p(0.015)
+          .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
+          .p(0.012)
           .outputRange(-.5, .5);
 
       hoodConfig

@@ -84,6 +84,10 @@ public class RobotContainer {
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
+    m_driverController
+        .povRight()
+        .onTrue(new InstantCommand(() -> m_shooter.setTurretAngle(0), m_shooter));
+
     m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
 
     m_driverController.x().onTrue(m_stateMachine.preloadCommand());

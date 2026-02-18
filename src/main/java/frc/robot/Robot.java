@@ -49,6 +49,7 @@ public class Robot extends TimedRobot {
     CanandEventLoop.getInstance();
 
     LimelightHelpers.Flush();
+    m_robotContainer.m_shooter.setTurretAngle(0);
 
     if (!Robot.isSimulation()) {
       DataLogManager.start();

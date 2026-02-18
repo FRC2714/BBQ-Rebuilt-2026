@@ -77,7 +77,7 @@ public final class Configs {
       turretConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
-          .p(0.012)
+          .pid(0.125,0,.1)
           .outputRange(-.5, .5);
 
       hoodConfig

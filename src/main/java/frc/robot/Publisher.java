@@ -11,6 +11,8 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.utils.LimelightHelpers;
+import frc.robot.utils.Vision;
 
 /**
  * Class for publishing useful data to NT that is not necessarily tied to a subsystem. E.g. target
@@ -40,6 +42,34 @@ public class Publisher {
   StructPublisher<Pose2d> turretPose =
       NetworkTableInstance.getDefault().getStructTopic("turretPose", Pose2d.struct).publish();
 
+  /** Pose */
+  StructPublisher<Pose2d> publisher =
+      NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
+
+  StructPublisher<Pose2d> publisherLLright =
+      NetworkTableInstance.getDefault().getStructTopic("poseLLright", Pose2d.struct).publish();
+
+  StructPublisher<Pose2d> publisherLLleft =
+      NetworkTableInstance.getDefault().getStructTopic("poseLLleft", Pose2d.struct).publish();
+
+  StructPublisher<Pose2d> publisherLLfront =
+      NetworkTableInstance.getDefault().getStructTopic("poseLLfront", Pose2d.struct).publish();
+
+  StructArrayPublisher<Pose3d> tagPosesFrontArrayPublisher =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("tagPosesFront", Pose3d.struct)
+          .publish();
+
+  StructArrayPublisher<Pose3d> tagPosesLeftArrayPublisher =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("tagPosesLeft", Pose3d.struct)
+          .publish();
+
+  StructArrayPublisher<Pose3d> tagPosesRightArrayPublisher =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("tagPosesRight", Pose3d.struct)
+          .publish();
+
   public Publisher(DriveSubsystem drivetrain, Shooter shooter, Intake intake, DyeRotor dyeRotor) {
     m_drivetrain = drivetrain;
     m_shooter = shooter;
@@ -66,5 +96,18 @@ public class Publisher {
                 .plus(Rotation2d.fromDegrees(m_shooter.getTurretPosition()))));
 
     virtualTarget.set(new Pose2d(m_drivetrain.getVirtualTarget(), new Rotation2d()));
+
+    publisher.set(m_drivetrain.getPose());
+    var frontLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
+    var leftLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
+    var rightLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
+    publisherLLfront.set(frontLLMeasurement != null ? frontLLMeasurement.pose : new Pose2d());
+    publisherLLleft.set(leftLLMeasurement != null ? leftLLMeasurement.pose : new Pose2d());
+    publisherLLright.set(rightLLMeasurement != null ? rightLLMeasurement.pose : new Pose2d());
+    tagPosesFrontArrayPublisher.set(Vision.getCameraTargetPoses3d("limelight-front"));
+    tagPosesLeftArrayPublisher.set(Vision.getCameraTargetPoses3d("limelight-left"));
+    tagPosesRightArrayPublisher.set(Vision.getCameraTargetPoses3d("limelight-right"));
   }
 }

@@ -8,11 +8,7 @@ import com.reduxrobotics.canand.CanandEventLoop;
 import com.revrobotics.util.StatusLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -33,12 +29,6 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  StructPublisher<Pose2d> turretHeading =
-      NetworkTableInstance.getDefault().getStructTopic("turretHeading", Pose2d.struct).publish();
-
-  StructPublisher<Pose2d> virtualTarget =
-      NetworkTableInstance.getDefault().getStructTopic("virtualTarget", Pose2d.struct).publish();
-
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -54,17 +44,19 @@ public class Robot extends TimedRobot {
 
     LimelightHelpers.Flush();
 
-    DataLogManager.start();
-    var log = DataLogManager.getLog();
-    log.addSchema(Pose2d.proto);
-    log.addSchema(ChassisSpeeds.proto);
-    log.addSchema(Pose2d.struct);
-    log.addSchema(Pose3d.struct);
+    if (!Robot.isSimulation()) {
+      DataLogManager.start();
+      var log = DataLogManager.getLog();
+      log.addSchema(Pose2d.proto);
+      log.addSchema(ChassisSpeeds.proto);
+      log.addSchema(Pose2d.struct);
+      log.addSchema(Pose3d.struct);
 
-    URCL.start();
+      URCL.start();
 
-    StatusLogger.start();
-    DriverStation.startDataLog(DataLogManager.getLog());
+      StatusLogger.start();
+      DriverStation.startDataLog(DataLogManager.getLog());
+    }
   }
 
   /**
@@ -83,17 +75,7 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods. This must be called from the
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
-    var virtualTargetTranslation = m_robotContainer.m_robotDrive.getVirtualTarget();
-
-    var robotPose = m_robotContainer.m_robotDrive.getPose();
-
-    Translation2d robotToVirtualTarget = virtualTargetTranslation.minus(robotPose.getTranslation());
-    Rotation2d angleToVirtualTarget = robotToVirtualTarget.getAngle();
-
     CommandScheduler.getInstance().run();
-
-    turretHeading.set(new Pose2d(robotPose.getX(), robotPose.getY(), angleToVirtualTarget));
-    virtualTarget.set(new Pose2d(virtualTargetTranslation, new Rotation2d()));
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

@@ -6,7 +6,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,7 +33,8 @@ public class RobotContainer {
   public final DyeRotor m_dyeRotor = new DyeRotor();
   public final Intake m_intake = new Intake();
 
-  final StateMachine m_stateMachine = new StateMachine(m_robotDrive, m_shooter, m_intake);
+  final StateMachine m_stateMachine =
+      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor);
 
   private SendableChooser<Command> autoChooser;
 
@@ -73,7 +73,8 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController.getHID(), Button.kR1.value)
+    m_driverController
+        .leftStick()
         .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
 
     m_driverController
@@ -83,14 +84,23 @@ public class RobotContainer {
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
-    m_driverController.a().onTrue(m_shooter.startShooter());
+    m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
+
+    m_driverController.x().onTrue(m_stateMachine.preloadCommand());
 
     // intake keybinds
-    m_driverController.leftBumper().onTrue(m_stateMachine.intakeSequence());
+    m_driverController.leftBumper().whileTrue(m_stateMachine.intakeSequence());
 
-    m_driverController.rightBumper().onTrue(m_stateMachine.extakeSequence());
+    m_driverController.rightBumper().whileTrue(m_stateMachine.extakeSequence());
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
+
+    if (Robot.isSimulation()) {
+      m_driverController
+          .y()
+          .onTrue(new InstantCommand(() -> m_shooter.fuelTrue()))
+          .onFalse(new InstantCommand(() -> m_shooter.fuelFalse()));
+    }
 
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
     // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());

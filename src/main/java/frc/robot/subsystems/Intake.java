@@ -6,12 +6,21 @@ package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.sim.SparkAbsoluteEncoderSim;
+import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -40,6 +49,30 @@ public class Intake extends SubsystemBase {
   private SparkFlex rollerMotor =
       new SparkFlex(
           Constants.IntakeConstants.RollerConstants.kIntakeRollerCanId, MotorType.kBrushless);
+  private RelativeEncoder rollerEncoder = rollerMotor.getEncoder();
+
+  private double pivotSetpoint = 0;
+
+  // Simulation
+  DCMotor pivotMotorSim = DCMotor.getNeoVortex(1);
+  DCMotor rollerMotorSim = DCMotor.getNeoVortex(1);
+  SparkFlexSim pivotSparkSim = new SparkFlexSim(pivotMotor, pivotMotorSim);
+  SparkFlexSim rollerSparkSim = new SparkFlexSim(rollerMotor, rollerMotorSim);
+  SparkAbsoluteEncoderSim pivotEncoderSim = pivotSparkSim.getAbsoluteEncoderSim();
+
+  SingleJointedArmSim pivotSim =
+      new SingleJointedArmSim(
+          pivotMotorSim,
+          40, // gearing
+          SingleJointedArmSim.estimateMOI(0.15, 4.5), // moment of inertia
+          0.15, // length of arm
+          Units.degreesToRadians(0), // min angle
+          Units.degreesToRadians(Constants.IntakeConstants.PivotConstants.kPivotStow + 20),
+          true,
+          0); // max angle
+  FlywheelSim rollerSim =
+      new FlywheelSim(
+          LinearSystemId.createFlywheelSystem(rollerMotorSim, 0.0005, 1), rollerMotorSim);
 
   // Configs for Intake - NEEDS TUNING
   public Intake() {
@@ -52,31 +85,21 @@ public class Intake extends SubsystemBase {
         Configs.Intake.rollerConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-    SmartDashboard.putData("Mech2d", intakeMech);
-    SmartDashboard.putData("Intake Stow", this.stow());
-    SmartDashboard.putData("Intake In", this.intake());
-    SmartDashboard.putData("Intake Out", this.extake());
+    SmartDashboard.putData("Intake/Mech2d", intakeMech);
   }
 
   private void pivotExtend() {
-    intakePivotController.setSetpoint(
-        Constants.IntakeConstants.PivotConstants.kPivotExtend,
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0);
+    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotExtend;
+    intakePivotController.setSetpoint(pivotSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
   private void pivotStow() {
-    intakePivotController.setSetpoint(
-        Constants.IntakeConstants.PivotConstants.kPivotStow,
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0);
+    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotStow;
+    intakePivotController.setSetpoint(pivotSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
-
-  private double currentRollerPower = 0;
 
   private void setRollerPower(double power) {
     rollerMotor.set(power);
-    currentRollerPower = power;
   }
 
   public boolean atSetpoint() {
@@ -88,52 +111,37 @@ public class Intake extends SubsystemBase {
   }
 
   // Intake Simulation - Mech2d
-  Mechanism2d intakeMech = new Mechanism2d(5, 5);
-  MechanismRoot2d intakeRoot = intakeMech.getRoot("Intake", 3, 2.5);
+  Mechanism2d intakeMech = new Mechanism2d(1, 1);
+  MechanismRoot2d intakeRoot = intakeMech.getRoot("Intake", 0.85, 0.1);
 
   MechanismLigament2d intakeBar =
       intakeRoot.append(
-          new MechanismLigament2d("Intake Roller", 1.5, 90, 15, new Color8Bit(Color.kBlue)));
+          new MechanismLigament2d("Intake Roller", 0.25, 90, 3, new Color8Bit(Color.kBlue)));
 
   MechanismLigament2d intakeRollerMotorSim =
       intakeBar.append(
-          new MechanismLigament2d("Roller Motor", 0.1, 180, 15, new Color8Bit(Color.kWhite)));
-
-  private double leftCapSimAngle = 0.0;
-
-  private void intakeSim() {
-    intakeBar.setAngle(180);
-    intakeRollerMotorSim.setAngle(180);
-    intakeRollerMotorSim.setAngle(-leftCapSimAngle);
-  }
-
-  private void extakeSim() {
-    intakeBar.setAngle(180);
-    intakeRollerMotorSim.setAngle(180);
-    intakeRollerMotorSim.setAngle(leftCapSimAngle);
-  }
-
-  private void stowSim() {
-    intakeBar.setAngle(90);
-    intakeRollerMotorSim.setAngle(180);
-  }
+          new MechanismLigament2d("Roller Motor", 0.1, 180, 3, new Color8Bit(Color.kWhite)));
 
   // Intake Commands
   public Command intake() {
-    return this.run(
+    return this.runEnd(
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
           pivotExtend();
-          intakeSim();
+        },
+        () -> {
+          setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
         });
   }
 
   public Command extake() {
-    return this.run(
+    return this.runEnd(
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kExtakeRollerPower);
           pivotExtend();
-          extakeSim();
+        },
+        () -> {
+          setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
         });
   }
 
@@ -142,18 +150,40 @@ public class Intake extends SubsystemBase {
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
           pivotStow();
-          stowSim();
         });
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    intakeBar.setAngle(pivotEncoder.getPosition());
+    intakeRollerMotorSim.setAngle(Units.rotationsToDegrees(rollerEncoder.getPosition()));
 
-    // SmartDashboard.putData("Intake/IntakeMechanism", intakeMech);
-    SmartDashboard.putNumber("Intake/Pivot/Current Position", pivotEncoder.getPosition());
+    SmartDashboard.putNumber("Intake/Pivot/Position", pivotEncoder.getPosition());
+    SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSetpoint);
     SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
+  }
 
-    leftCapSimAngle += 12;
+  @Override
+  public void simulationPeriodic() {
+    pivotSim.setInputVoltage(
+        pivotSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+    pivotSim.update(0.02);
+
+    pivotEncoderSim.iterate(
+        Units.radiansPerSecondToRotationsPerMinute(pivotSim.getVelocityRadPerSec()), 0.02);
+
+    // TODO(jan): I think this should have the gear ratio multiplied, but when it is, the pid goes
+    // crazy
+    pivotSparkSim.iterate(
+        Units.radiansPerSecondToRotationsPerMinute(pivotSim.getVelocityRadPerSec()),
+        RobotController.getBatteryVoltage(),
+        0.02);
+
+    rollerSim.setInputVoltage(
+        rollerSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+    rollerSim.update(0.02);
+
+    rollerSparkSim.iterate(
+        rollerSim.getAngularVelocityRPM(), RobotController.getBatteryVoltage(), 0.02);
   }
 }

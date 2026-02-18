@@ -5,16 +5,20 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
 public class StateMachine extends SubsystemBase {
   private final DriveSubsystem m_drivetrain;
   private final Shooter m_shooter;
-  private final Publisher m_publisher;
   private final Intake m_intake;
+  private final DyeRotor m_dyeRotor;
+  private final Publisher m_publisher;
 
   private static State m_state = State.Idle;
 
@@ -28,12 +32,62 @@ public class StateMachine extends SubsystemBase {
     Climbing
   }
 
-  public StateMachine(DriveSubsystem drivetrain, Shooter shooter, Intake intake) {
+  public StateMachine(
+      DriveSubsystem drivetrain, Shooter shooter, Intake intake, DyeRotor dyeRotor) {
     m_drivetrain = drivetrain;
     m_shooter = shooter;
     m_intake = intake;
+    m_dyeRotor = dyeRotor;
 
-    m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake);
+    m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor);
+  }
+
+  public Command preloadCommand() {
+    return Commands.runOnce(
+        () -> {
+          if (m_state == State.Shooting) return;
+
+          CommandScheduler.getInstance().schedule(preload());
+        });
+  }
+
+  public Command preload() {
+    return m_dyeRotor
+        .start()
+        .until(() -> m_shooter.getFuelLimitSwitch())
+        .andThen(m_dyeRotor.stop())
+        .withName("preload");
+  }
+
+  public Command shoot() {
+    // Run preload (dye rotor until fuel loaded, then stop) in parallel with
+    // startShooter (spin flywheel until at setpoint). If startShooter finishes first, just run the
+    // dye rotor immediately.
+    return preload()
+        .withDeadline(m_shooter.startShooter().until(() -> m_shooter.flywheelAtSetpoint()))
+        .andThen(
+            m_shooter
+                .startShooter()
+                .alongWith(m_dyeRotor.start())
+                .beforeStarting(
+                    () -> {
+                      setState(State.Shooting);
+                    }))
+        .finallyDo(
+            () -> {
+              CommandScheduler.getInstance().schedule(stopShoot());
+            });
+  }
+
+  public Command stopShoot() {
+    return m_shooter
+        .stopShooter()
+        .alongWith(m_dyeRotor.stop())
+        .withName("stop shooting")
+        .beforeStarting(
+            () -> {
+              m_state = State.Idle;
+            });
   }
 
   public State getState() {
@@ -45,14 +99,31 @@ public class StateMachine extends SubsystemBase {
   }
 
   // Generalization of updating the targets
+  private static final double kLatencyCompensation = 0.1;
+  private static final double kBaselineHorizontalVelocity = 6.0;
+
   private void aimAt(Translation2d target, Translation2d robotPosition, Rotation2d robotHeading) {
-    Translation2d robotToTarget = target.minus(robotPosition);
+    Translation2d robotVelocity = m_drivetrain.getFieldRelativeVelocity();
+
+    Translation2d futurePosition = robotPosition.plus(robotVelocity.times(kLatencyCompensation));
+
+    Translation2d toGoal = target.minus(futurePosition);
+    Translation2d targetDirection = toGoal.div(toGoal.getNorm());
+    Translation2d targetVelocity = targetDirection.times(kBaselineHorizontalVelocity);
+    Translation2d shotVelocity = targetVelocity.minus(robotVelocity);
+
+    double distanceToTarget = toGoal.getNorm();
+
+    Translation2d virtualTarget =
+        futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToTarget));
+
+    Translation2d robotToTarget = virtualTarget.minus(robotPosition);
     Rotation2d fieldAngle = robotToTarget.getAngle();
     Rotation2d turretAngle = fieldAngle.minus(robotHeading);
 
     m_shooter.updateTurretTarget(turretAngle.getDegrees());
-    m_shooter.updateHoodTarget(robotToTarget.getNorm());
-    m_shooter.updateFlywheelTarget(robotToTarget.getNorm());
+    m_shooter.updateHoodTarget(distanceToTarget);
+    m_shooter.updateFlywheelTarget(distanceToTarget);
   }
 
   // intake commands
@@ -68,16 +139,13 @@ public class StateMachine extends SubsystemBase {
     return (m_intake.stow().onlyIf(StateMachine::isNotClimbing));
   }
 
-  @Override
-  public void periodic() {
-    // Zone based targeting with travel time calculations
+  private void runTargeting() {
+
     Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
     Rotation2d robotHeading = m_drivetrain.getPose().getRotation();
 
     if (m_drivetrain.isInAllianceZone()) {
-      Translation2d virtualTarget = m_drivetrain.getVirtualTarget();
-      aimAt(virtualTarget, robotPosition, robotHeading);
-      m_publisher.publish();
+      aimAt(Field.getAllianceHub().toTranslation2d(), robotPosition, robotHeading);
       return;
     }
 
@@ -86,12 +154,22 @@ public class StateMachine extends SubsystemBase {
 
     if (airstrikeX == 0 && airstrikeY == 0) {
       m_shooter.updateTurretTarget(0.0);
-      m_publisher.publish();
       return;
     }
 
     Translation2d airstrikeTarget = new Translation2d(airstrikeX, airstrikeY);
     aimAt(airstrikeTarget, robotPosition, robotHeading);
+  }
+
+  @Override
+  public void periodic() {
+    runTargeting();
+
+    SmartDashboard.putString(
+        "State Machine/Current Comamand",
+        this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
+    SmartDashboard.putString("State Machine/State", m_state.toString());
+
     m_publisher.publish();
   }
 }

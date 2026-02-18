@@ -1,8 +1,10 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -10,6 +12,14 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,6 +29,7 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
 import frc.robot.Constants.ShooterConstants.HoodSetpoints;
 import frc.robot.Constants.ShooterConstants.TurretSetpoints;
+import frc.robot.Robot;
 import frc.robot.utils.InterpolatingTreeMap;
 
 public class Shooter extends SubsystemBase {
@@ -27,6 +38,7 @@ public class Shooter extends SubsystemBase {
   private SparkClosedLoopController turretController = turretMotor.getClosedLoopController();
 
   private RelativeEncoder turretRelativeEncoder = turretMotor.getExternalEncoder();
+  private AbsoluteEncoder turretAbsoluteEncoder = turretMotor.getAbsoluteEncoder();
 
   private SparkFlex hoodMotor =
       new SparkFlex(Constants.ShooterConstants.kHoodCanId, MotorType.kBrushless);
@@ -37,10 +49,13 @@ public class Shooter extends SubsystemBase {
       new SparkFlex(Constants.ShooterConstants.kFlywheelLeaderMotorId, MotorType.kBrushless);
   private SparkClosedLoopController flywheelController =
       flywheelMotorLeader.getClosedLoopController();
-  private RelativeEncoder flywheelRelativeEncoder = flywheelMotorLeader.getExternalEncoder();
+  private RelativeEncoder flywheelRelativeEncoder = flywheelMotorLeader.getEncoder();
 
   private SparkFlex flywheelMotorFollower =
       new SparkFlex(Constants.ShooterConstants.kFlywheelFollowerMotorId, MotorType.kBrushless);
+
+  private SparkLimitSwitch fuelBeamBreak =
+      flywheelMotorLeader.getForwardLimitSwitch(); // Placeholder for actual beam break sensor
 
   private double simFlywheelVelocity = 0.0;
   private double simHoodPosition = 0.0;
@@ -53,9 +68,23 @@ public class Shooter extends SubsystemBase {
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
 
   public boolean wasZeroed = false;
+  private boolean fuelTrigger = false;
+  private boolean isShooting = false;
 
   private InterpolatingTreeMap hoodAngleMap;
   private InterpolatingTreeMap flywheelSpeedMap;
+
+  // Simulation
+  DCMotor flywheelMotorSim = DCMotor.getNeoVortex(2);
+  SparkFlexSim flywheelSparkSim = new SparkFlexSim(flywheelMotorLeader, flywheelMotorSim);
+  FlywheelSim flywheelSim =
+      new FlywheelSim(
+          LinearSystemId.createFlywheelSystem(flywheelMotorSim, 0.001, 1), flywheelMotorSim);
+
+  DCMotor turretMotorSim = DCMotor.getNEO(1);
+  SparkFlexSim turretSparkSim = new SparkFlexSim(turretMotor, turretMotorSim);
+  LinearSystemSim<N2, N1, N2> turretSim =
+      new LinearSystemSim<>(LinearSystemId.createDCMotorSystem(turretMotorSim, 0.0001, 40));
 
   public Shooter() {
     turretMotor.configure(
@@ -107,8 +136,15 @@ public class Shooter extends SubsystemBase {
     flywheelSpeedMap.put(8.0, 4800.0);
   }
 
+  public boolean getFuelLimitSwitch() {
+    if (Robot.isSimulation()) {
+      return fuelTrigger;
+    }
+    return fuelBeamBreak.isPressed();
+  }
+
   public double getTurretPosition() {
-    return turretRelativeEncoder.getPosition();
+    return turretAbsoluteEncoder.getPosition();
   }
 
   public double getHoodPosition() {
@@ -133,10 +169,6 @@ public class Shooter extends SubsystemBase {
     flywheelCurrentTarget = interpolated != null ? interpolated : FlywheelSetpoints.kStow;
   }
 
-  public void setFlywheelSpeed(double speed) {
-    flywheelCurrentTarget = speed;
-  }
-
   public double getFlywheelSpeed() {
     return flywheelCurrentTarget;
   }
@@ -152,15 +184,28 @@ public class Shooter extends SubsystemBase {
   public Command startShooter() {
     return this.run(
         () -> {
-          setFlywheelSpeed(Constants.ShooterConstants.FlywheelSetpoints.kStartSpeed);
+          isShooting = true;
         });
   }
 
   public Command stopShooter() {
     return this.run(
         () -> {
-          setFlywheelSpeed(0);
+          isShooting = false;
         });
+  }
+
+  // TODO: Debounce this
+  public boolean flywheelAtSetpoint() {
+    return Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
+  }
+
+  public void fuelTrue() {
+    fuelTrigger = true;
+  }
+
+  public void fuelFalse() {
+    fuelTrigger = false;
   }
 
   public void zeroTurret() {
@@ -181,21 +226,36 @@ public class Shooter extends SubsystemBase {
     turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     flywheelController.setSetpoint(
-        flywheelCurrentTarget, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+        isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
 
-    SmartDashboard.putNumber("Shooter/Hood Angle", hoodCurrentTarget);
-    SmartDashboard.putNumber("Shooter/Flywheel Speed", flywheelCurrentTarget);
-    SmartDashboard.putNumber("Shooter/Turret Target", turretCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Hood/Angle", hoodCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Flywheel/Expected Speed", flywheelCurrentTarget);
+    SmartDashboard.putNumber(
+        "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());
+    SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
+    SmartDashboard.putNumber("Shooter/Turret/Setpoint", turretCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Turret/Position", turretAbsoluteEncoder.getPosition());
   }
 
   @Override
   public void simulationPeriodic() {
+    flywheelSim.setInputVoltage(
+        flywheelSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+    flywheelSim.update(0.02);
+
+    flywheelSparkSim.iterate(
+        flywheelSim.getAngularVelocityRPM(), RobotController.getBatteryVoltage(), 0.02);
+
     simFlywheelVelocity += (flywheelCurrentTarget - simFlywheelVelocity) * 0.2;
     simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
 
-    SmartDashboard.putNumber("Hood Angle", simHoodPosition);
-    SmartDashboard.putNumber("Flywheel Speed", simFlywheelVelocity);
-    SmartDashboard.putNumber("Turret Position", turretCurrentTarget);
+    turretSim.setInput(turretSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+    turretSim.update(0.02);
+
+    turretSparkSim.iterate(
+        Units.radiansPerSecondToRotationsPerMinute(turretSim.getOutput(1)),
+        RobotController.getBatteryVoltage(),
+        0.02);
 
     zeroTurret();
   }

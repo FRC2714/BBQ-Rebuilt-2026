@@ -86,6 +86,11 @@ public class Shooter extends SubsystemBase {
   LinearSystemSim<N2, N1, N2> turretSim =
       new LinearSystemSim<>(LinearSystemId.createDCMotorSystem(turretMotorSim, 0.0001, 40));
 
+  DCMotor hoodMotorSim = DCMotor.getNeo550(1);
+  SparkFlexSim hoodSparkSim = new SparkFlexSim(hoodMotor, hoodMotorSim);
+  LinearSystemSim<N2, N1, N2> hoodSim =
+      new LinearSystemSim<>(LinearSystemId.createDCMotorSystem(hoodMotorSim, 0.001, 10));
+
   public Shooter() {
     turretMotor.configure(
         Configs.Shooter.turretConfig,
@@ -211,7 +216,7 @@ public class Shooter extends SubsystemBase {
 
   // TODO: Deboucne this
   public boolean hoodAtSetpoint() {
-    return Math.abs(simHoodPosition - hoodCurrentTarget) < 1;
+    return Math.abs(hoodRelativeEncoder.getPosition() - hoodCurrentTarget) < 2;
   }
 
   public void fuelTrue() {
@@ -251,8 +256,8 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/Turret/Position", turretAbsoluteEncoder.getPosition());
     SmartDashboard.putBoolean("Shooter/Turret/At Setpoint", turretAtSetpoint());
 
-    SmartDashboard.putNumber("Shooter/Hood/Expected Angle", hoodCurrentTarget);
-    SmartDashboard.putNumber("Shooter/Hood/Actual Angle", hoodRelativeEncoder.getPosition());
+    SmartDashboard.putNumber("Shooter/Hood/Setpoint", hoodCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Hood/Position", hoodRelativeEncoder.getPosition());
     SmartDashboard.putBoolean("Shooter/Hood/At Setpoint", hoodAtSetpoint());
 
     SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());
@@ -275,6 +280,13 @@ public class Shooter extends SubsystemBase {
 
     turretSparkSim.iterate(
         Units.radiansPerSecondToRotationsPerMinute(turretSim.getOutput(1)),
+        RobotController.getBatteryVoltage(),
+        0.02);
+
+    hoodSim.setInput(hoodSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+    hoodSim.update(0.02);
+    hoodSparkSim.iterate(
+        Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1) * 10),
         RobotController.getBatteryVoltage(),
         0.02);
 

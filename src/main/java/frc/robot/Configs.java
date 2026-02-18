@@ -85,13 +85,13 @@ public final class Configs {
           .idleMode(IdleMode.kBrake)
           .inverted(false)
           .voltageCompensation(12);
-      hoodConfig.absoluteEncoder.positionConversionFactor(360).inverted(false).zeroCentered(true);
+      hoodConfig.externalEncoder.positionConversionFactor(360).inverted(false);
       hoodConfig
           .closedLoop
-          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          .p(0.01)
+          .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
+          .p(0.1)
           .d(0)
-          .outputRange(-0.1, 0.1);
+          .outputRange(-1, 1);
 
       flywheelConfigLeader
           .smartCurrentLimit(60)

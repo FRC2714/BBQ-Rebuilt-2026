@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -8,7 +7,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -57,9 +55,6 @@ public class StateMachine extends SubsystemBase {
       NetworkTableInstance.getDefault()
           .getStructArrayTopic("FinalComponentPoses", Pose3d.struct)
           .publish();
-
-  StructPublisher<Pose2d> turretPose =
-      NetworkTableInstance.getDefault().getStructTopic("turretPose", Pose2d.struct).publish();
 
   public Command preloadCommand() {
     return Commands.runOnce(
@@ -190,8 +185,6 @@ public class StateMachine extends SubsystemBase {
 
     SmartDashboard.putString("State", m_state.toString());
 
-    m_publisher.publish();
-
     Pose3d[] zeroRobotPose = new Pose3d[1];
     for (int i = 0; i < zeroRobotPose.length; i++) {
       zeroRobotPose[i] = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, 0.0, 0.0));
@@ -200,13 +193,6 @@ public class StateMachine extends SubsystemBase {
     Pose3d[] finalRobotPose = new Pose3d[] {m_dyeRotor.getPose3d()};
     publisherFinalComponentPoses.set(finalRobotPose);
 
-    turretPose.set(
-        new Pose2d(
-            m_drivetrain.getPose().getX(),
-            m_drivetrain.getPose().getY(),
-            m_drivetrain
-                .getPose()
-                .getRotation()
-                .plus(Rotation2d.fromDegrees(m_shooter.getTurretPosition()))));
+    m_publisher.publish();
   }
 }

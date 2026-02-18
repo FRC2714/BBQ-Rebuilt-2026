@@ -45,7 +45,7 @@ public class StateMachine extends SubsystemBase {
     m_intake = intake;
     m_dyeRotor = dyeRotor;
 
-    m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake);
+    m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor);
   }
 
   StructArrayPublisher<Pose3d> publisherZeroedComponentPoses =

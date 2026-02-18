@@ -1,12 +1,8 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -45,16 +41,6 @@ public class StateMachine extends SubsystemBase {
 
     m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor);
   }
-
-  StructArrayPublisher<Pose3d> publisherZeroedComponentPoses =
-      NetworkTableInstance.getDefault()
-          .getStructArrayTopic("ZeroedComponentPoses", Pose3d.struct)
-          .publish();
-
-  StructArrayPublisher<Pose3d> publisherFinalComponentPoses =
-      NetworkTableInstance.getDefault()
-          .getStructArrayTopic("FinalComponentPoses", Pose3d.struct)
-          .publish();
 
   public Command preloadCommand() {
     return Commands.runOnce(
@@ -184,14 +170,6 @@ public class StateMachine extends SubsystemBase {
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
 
     SmartDashboard.putString("State", m_state.toString());
-
-    Pose3d[] zeroRobotPose = new Pose3d[1];
-    for (int i = 0; i < zeroRobotPose.length; i++) {
-      zeroRobotPose[i] = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, 0.0, 0.0));
-    }
-    publisherZeroedComponentPoses.set(zeroRobotPose);
-    Pose3d[] finalRobotPose = new Pose3d[] {m_dyeRotor.getPose3d()};
-    publisherFinalComponentPoses.set(finalRobotPose);
 
     m_publisher.publish();
   }

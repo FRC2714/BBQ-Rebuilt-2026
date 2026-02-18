@@ -206,7 +206,7 @@ public class Shooter extends SubsystemBase {
 
   // TODO: Debounce this
   public boolean turretAtSetpoint() {
-    return Math.abs(turretRelativeEncoder.getPosition() - turretCurrentTarget) < 2;
+    return Math.abs(turretAbsoluteEncoder.getPosition() - turretCurrentTarget) < 5;
   }
 
   // TODO: Deboucne this
@@ -247,8 +247,8 @@ public class Shooter extends SubsystemBase {
         "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());
     SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
 
-    SmartDashboard.putNumber("Shooter/Turret/Expected Angle", turretCurrentTarget);
-    SmartDashboard.putNumber("Shooter/Turret/Actual Angle", turretRelativeEncoder.getPosition());
+    SmartDashboard.putNumber("Shooter/Turret/Setpoint", turretCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Turret/Position", turretAbsoluteEncoder.getPosition());
     SmartDashboard.putBoolean("Shooter/Turret/At Setpoint", turretAtSetpoint());
 
     SmartDashboard.putNumber("Shooter/Hood/Expected Angle", hoodCurrentTarget);

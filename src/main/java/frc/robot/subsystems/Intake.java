@@ -51,6 +51,8 @@ public class Intake extends SubsystemBase {
           Constants.IntakeConstants.RollerConstants.kIntakeRollerCanId, MotorType.kBrushless);
   private RelativeEncoder rollerEncoder = rollerMotor.getEncoder();
 
+  private double pivotSetpoint = 0;
+
   // Simulation
   DCMotor pivotMotorSim = DCMotor.getNeoVortex(1);
   DCMotor rollerMotorSim = DCMotor.getNeoVortex(1);
@@ -83,24 +85,17 @@ public class Intake extends SubsystemBase {
         Configs.Intake.rollerConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-    SmartDashboard.putData("Mech2d", intakeMech);
-    SmartDashboard.putData("Intake Stow", this.stow());
-    SmartDashboard.putData("Intake In", this.intake());
-    SmartDashboard.putData("Intake Out", this.extake());
+    SmartDashboard.putData("Intake/Mech2d", intakeMech);
   }
 
   private void pivotExtend() {
-    intakePivotController.setSetpoint(
-        Constants.IntakeConstants.PivotConstants.kPivotExtend,
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0);
+    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotExtend;
+    intakePivotController.setSetpoint(pivotSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
   private void pivotStow() {
-    intakePivotController.setSetpoint(
-        Constants.IntakeConstants.PivotConstants.kPivotStow,
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0);
+    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotStow;
+    intakePivotController.setSetpoint(pivotSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
   private void setRollerPower(double power) {
@@ -162,10 +157,9 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     intakeBar.setAngle(pivotEncoder.getPosition());
     intakeRollerMotorSim.setAngle(Units.rotationsToDegrees(rollerEncoder.getPosition()));
-    SmartDashboard.putNumber("Intake/Roller/Position", rollerEncoder.getPosition());
 
-    // SmartDashboard.putData("Intake/IntakeMechanism", intakeMech);
-    SmartDashboard.putNumber("Intake/Pivot/Current Position", pivotEncoder.getPosition());
+    SmartDashboard.putNumber("Intake/Pivot/Position", pivotEncoder.getPosition());
+    SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSetpoint);
     SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
   }
 

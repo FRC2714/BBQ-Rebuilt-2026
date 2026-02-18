@@ -195,7 +195,7 @@ public class Shooter extends SubsystemBase {
         });
   }
 
-  public boolean readyToShoot(){  
+  public boolean readyToShoot() {
     return flywheelAtSetpoint() && turretAtSetpoint() && hoodAtSetpoint();
   }
 
@@ -204,13 +204,13 @@ public class Shooter extends SubsystemBase {
     return Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
   }
 
-  //TODO: Debounce this
+  // TODO: Debounce this
   public boolean turretAtSetpoint() {
     return Math.abs(turretRelativeEncoder.getPosition() - turretCurrentTarget) < 2;
   }
 
-  //TODO: Deboucne this
-  public boolean hoodAtSetpoint(){
+  // TODO: Deboucne this
+  public boolean hoodAtSetpoint() {
     return Math.abs(hoodRelativeEncoder.getPosition() - hoodCurrentTarget) < 1;
   }
 

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
@@ -79,6 +80,28 @@ public class StateMachine extends SubsystemBase {
         .withName("preload");
   }
 
+  public Command shootSequenceReady() {
+    return m_shooter
+        .startShooter()
+        .alongWith(m_dyeRotor.start())
+        .beforeStarting(
+            () -> {
+              setState(State.Shooting);
+            });
+  }
+
+  public Command shootSequenceUnready() {
+    return m_shooter
+        .startShooter()
+        .alongWith(m_dyeRotor.stop())
+        .until(() -> m_shooter.readyToShoot())
+        .andThen(m_dyeRotor.start())
+        .beforeStarting(
+            () -> {
+              setState(State.Shooting);
+            });
+  }
+
   public Command shoot() {
     // Run preload (dye rotor until fuel loaded, then stop) in parallel with
     // startShooter (spin flywheel until at setpoint). If startShooter finishes first, just run the
@@ -86,19 +109,21 @@ public class StateMachine extends SubsystemBase {
     return preload()
         .withDeadline(m_shooter.startShooter().until(() -> m_shooter.flywheelAtSetpoint()))
         .andThen(
-            m_shooter
-                .startShooter()
-                .alongWith(m_dyeRotor.start())
-                .onlyIf(() -> m_shooter.readyToShoot())
-                .beforeStarting(
-                    () -> {
-                      setState(State.Shooting);
-                    }))
+            new ConditionalCommand(
+                shootSequenceReady(), shootSequenceUnready(), () -> m_shooter.readyToShoot()))
         .finallyDo(
             () -> {
               CommandScheduler.getInstance().schedule(stopShoot());
             });
   }
+
+  // m_shooter
+  //     .startShooter()
+  //     .alongWith(m_dyeRotor.start())
+  //     .beforeStarting(
+  //         () -> {
+  //           setState(State.Shooting);
+  //         }))
 
   public Command stopShoot() {
     return m_shooter

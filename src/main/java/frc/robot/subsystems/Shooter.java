@@ -211,7 +211,7 @@ public class Shooter extends SubsystemBase {
 
   // TODO: Deboucne this
   public boolean hoodAtSetpoint() {
-    return Math.abs(hoodRelativeEncoder.getPosition() - hoodCurrentTarget) < 1;
+    return Math.abs(simHoodPosition - hoodCurrentTarget) < 1;
   }
 
   public void fuelTrue() {
@@ -242,16 +242,20 @@ public class Shooter extends SubsystemBase {
     flywheelController.setSetpoint(
         isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
 
-    SmartDashboard.putNumber("Shooter/Hood Angle", hoodCurrentTarget);
     SmartDashboard.putNumber("Shooter/Flywheel/Expected Speed", flywheelCurrentTarget);
     SmartDashboard.putNumber(
         "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());
     SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
+
+    SmartDashboard.putNumber("Shooter/Turret/Expected Angle", turretCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Turret/Actual Angle", turretRelativeEncoder.getPosition());
     SmartDashboard.putBoolean("Shooter/Turret/At Setpoint", turretAtSetpoint());
+
+    SmartDashboard.putNumber("Shooter/Hood/Expected Angle", hoodCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Hood/Actual Angle", hoodRelativeEncoder.getPosition());
     SmartDashboard.putBoolean("Shooter/Hood/At Setpoint", hoodAtSetpoint());
+
     SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());
-    SmartDashboard.putNumber("Shooter/Turret/Setpoint", turretCurrentTarget);
-    SmartDashboard.putNumber("Shooter/Turret/Position", turretAbsoluteEncoder.getPosition());
   }
 
   @Override

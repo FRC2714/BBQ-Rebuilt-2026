@@ -19,6 +19,8 @@ public class Publisher {
   private final Intake m_intake;
   private final DyeRotor m_dyeRotor;
 
+  StructPublisher<Pose2d> virtualTarget =
+      NetworkTableInstance.getDefault().getStructTopic("virtualTarget", Pose2d.struct).publish();
   StructPublisher<Pose2d> turretPose =
       NetworkTableInstance.getDefault().getStructTopic("turretPose", Pose2d.struct).publish();
 
@@ -38,5 +40,7 @@ public class Publisher {
                 .getPose()
                 .getRotation()
                 .plus(Rotation2d.fromDegrees(m_shooter.getTurretPosition()))));
+
+    virtualTarget.set(new Pose2d(m_drivetrain.getVirtualTarget(), new Rotation2d()));
   }
 }

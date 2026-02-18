@@ -8,10 +8,7 @@ import com.reduxrobotics.canand.CanandEventLoop;
 import com.revrobotics.util.StatusLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -31,9 +28,6 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-
-  StructPublisher<Pose2d> virtualTarget =
-      NetworkTableInstance.getDefault().getStructTopic("virtualTarget", Pose2d.struct).publish();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -81,11 +75,7 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods. This must be called from the
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
-    var virtualTargetTranslation = m_robotContainer.m_robotDrive.getVirtualTarget();
-
     CommandScheduler.getInstance().run();
-
-    virtualTarget.set(new Pose2d(virtualTargetTranslation, new Rotation2d()));
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

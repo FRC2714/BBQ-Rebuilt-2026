@@ -70,15 +70,16 @@ public class StateMachine extends SubsystemBase {
         });
   }
 
+
+  //when robot has no balls, preload keeps running until shooter shoots
   public Command preload() {
-    return m_dyeRotor
-        .start()
+    return m_dyeRotor.start()
         .until(() -> m_shooter.getFuelLimitSwitch())
         .andThen(m_dyeRotor.stop())
         .withName("preload");
   }
 
-  public Command shoot() {
+  public Command  shoot() {
     // Run preload (dye rotor until fuel loaded, then stop) in parallel with
     // startShooter (spin flywheel until at setpoint). If startShooter finishes first, just run the
     // dye rotor immediately.
@@ -87,7 +88,7 @@ public class StateMachine extends SubsystemBase {
         .andThen(
             m_shooter
                 .startShooter()
-                .alongWith(m_dyeRotor.start())
+                .alongWith(m_dyeRotor.start()).onlyIf(() -> m_shooter.readyToShoot())
                 .beforeStarting(
                     () -> {
                       setState(State.Shooting);

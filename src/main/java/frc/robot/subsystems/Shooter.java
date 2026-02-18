@@ -195,9 +195,23 @@ public class Shooter extends SubsystemBase {
         });
   }
 
+  public boolean readyToShoot(){  
+    return flywheelAtSetpoint() && turretAtSetpoint() && hoodAtSetpoint();
+  }
+
   // TODO: Debounce this
   public boolean flywheelAtSetpoint() {
     return Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
+  }
+
+  //TODO: Debounce this
+  public boolean turretAtSetpoint() {
+    return Math.abs(turretRelativeEncoder.getPosition() - turretCurrentTarget) < 2;
+  }
+
+  //TODO: Deboucne this
+  public boolean hoodAtSetpoint(){
+    return Math.abs(hoodRelativeEncoder.getPosition() - hoodCurrentTarget) < 1;
   }
 
   public void fuelTrue() {
@@ -233,6 +247,9 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber(
         "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());
     SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
+    SmartDashboard.putBoolean("Shooter/Turret/At Setpoint", turretAtSetpoint());
+    SmartDashboard.putBoolean("Shooter/Hood/At Setpoint", hoodAtSetpoint());
+    SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());
     SmartDashboard.putNumber("Shooter/Turret/Setpoint", turretCurrentTarget);
     SmartDashboard.putNumber("Shooter/Turret/Position", turretAbsoluteEncoder.getPosition());
   }

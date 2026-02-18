@@ -12,6 +12,8 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -74,6 +76,12 @@ public class Shooter extends SubsystemBase {
   private InterpolatingTreeMap hoodAngleMap;
   private InterpolatingTreeMap flywheelSpeedMap;
 
+  private Debouncer flywheelDebouncer =
+      new Debouncer(ShooterConstants.kFlywheelDebounceTimeSeconds, DebounceType.kFalling);
+  private Debouncer turretDebouncer =
+      new Debouncer(ShooterConstants.kTurretDebounceTimeSeconds, DebounceType.kFalling);
+  private Debouncer hoodDebouncer =
+      new Debouncer(ShooterConstants.kHoodDebounceTimeSeconds, DebounceType.kFalling);
   // Simulation
   DCMotor flywheelMotorSim = DCMotor.getNeoVortex(2);
   SparkFlexSim flywheelSparkSim = new SparkFlexSim(flywheelMotorLeader, flywheelMotorSim);
@@ -204,19 +212,20 @@ public class Shooter extends SubsystemBase {
     return flywheelAtSetpoint() && turretAtSetpoint() && hoodAtSetpoint();
   }
 
-  // TODO: Debounce this
   public boolean flywheelAtSetpoint() {
-    return Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
+    boolean atSetpoint =
+        Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
+    return flywheelDebouncer.calculate(atSetpoint);
   }
 
-  // TODO: Debounce this
   public boolean turretAtSetpoint() {
-    return Math.abs(turretAbsoluteEncoder.getPosition() - turretCurrentTarget) < 5;
+    boolean atSetpoint = Math.abs(turretAbsoluteEncoder.getPosition() - turretCurrentTarget) < 5;
+    return turretDebouncer.calculate(atSetpoint);
   }
 
-  // TODO: Deboucne this
   public boolean hoodAtSetpoint() {
-    return Math.abs(hoodRelativeEncoder.getPosition() - hoodCurrentTarget) < 2;
+    boolean atSetpoint = Math.abs(hoodRelativeEncoder.getPosition() - hoodCurrentTarget) < 2;
+    return hoodDebouncer.calculate(atSetpoint);
   }
 
   public void fuelTrue() {

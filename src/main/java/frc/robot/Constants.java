@@ -134,6 +134,10 @@ public final class Constants {
     public static final int kFlywheelLeaderMotorId = 32;
     public static final int kFlywheelFollowerMotorId = 33;
 
+    public static final double kFlywheelDebounceTimeSeconds = 0.1;
+    public static final double kTurretDebounceTimeSeconds = 0.1;
+    public static final double kHoodDebounceTimeSeconds = 0.1;
+
     public static final class TurretSetpoints {
       public static final double kStow = 15.2;
     }

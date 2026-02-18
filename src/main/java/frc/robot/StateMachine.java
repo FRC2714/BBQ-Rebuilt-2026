@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -43,6 +43,16 @@ public class StateMachine extends SubsystemBase {
     m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor);
   }
 
+  public void configureBindings() {
+    Trigger pauseShooter =
+        new Trigger(() -> m_state == State.Shooting && !m_shooter.readyToShoot());
+    pauseShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.pause()));
+
+    Trigger resumeShooter =
+        new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
+    resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
+  }
+
   public Command preloadCommand() {
     return Commands.runOnce(
         () -> {
@@ -52,7 +62,6 @@ public class StateMachine extends SubsystemBase {
         });
   }
 
-  // when robot has no balls, preload keeps running until shooter shoots
   public Command preload() {
     return m_dyeRotor
         .start()
@@ -61,50 +70,25 @@ public class StateMachine extends SubsystemBase {
         .withName("preload");
   }
 
-  public Command shootSequenceReady() {
-    return m_shooter
-        .startShooter()
-        .alongWith(m_dyeRotor.start())
-        .beforeStarting(
-            () -> {
-              setState(State.Shooting);
-            });
-  }
-
-  public Command shootSequenceUnready() {
-    return m_shooter
-        .startShooter()
-        .alongWith(m_dyeRotor.stop())
-        .until(() -> m_shooter.readyToShoot())
-        .andThen(m_dyeRotor.start())
-        .beforeStarting(
-            () -> {
-              setState(State.Shooting);
-            });
-  }
-
   public Command shoot() {
     // Run preload (dye rotor until fuel loaded, then stop) in parallel with
     // startShooter (spin flywheel until at setpoint). If startShooter finishes first, just run the
     // dye rotor immediately.
     return preload()
-        .withDeadline(m_shooter.startShooter().until(() -> m_shooter.flywheelAtSetpoint()))
+        .withDeadline(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()))
         .andThen(
-            new ConditionalCommand(
-                shootSequenceReady(), shootSequenceUnready(), () -> m_shooter.readyToShoot()))
+            m_shooter
+                .startShooter()
+                .alongWith(m_dyeRotor.start())
+                .beforeStarting(
+                    () -> {
+                      setState(State.Shooting);
+                    }))
         .finallyDo(
             () -> {
               CommandScheduler.getInstance().schedule(stopShoot());
             });
   }
-
-  // m_shooter
-  //     .startShooter()
-  //     .alongWith(m_dyeRotor.start())
-  //     .beforeStarting(
-  //         () -> {
-  //           setState(State.Shooting);
-  //         }))
 
   public Command stopShoot() {
     return m_shooter

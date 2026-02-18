@@ -290,11 +290,6 @@ public class Shooter extends SubsystemBase {
         RobotController.getBatteryVoltage(),
         0.02);
 
-    SmartDashboard.putNumber("Hood Angle", simHoodPosition);
-    SmartDashboard.putNumber("Flywheel Speed", simFlywheelVelocity);
-    SmartDashboard.putNumber("Turret Position", turretCurrentTarget);
-    SmartDashboard.putBoolean("Fuel Loaded", fuelTrigger);
-
     zeroTurret();
   }
 }

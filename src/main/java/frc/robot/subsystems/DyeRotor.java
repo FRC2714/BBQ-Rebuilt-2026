@@ -52,7 +52,7 @@ public class DyeRotor extends SubsystemBase {
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     rotorArm.setAngle(45);
-    SmartDashboard.putData("Dye Rotor Mech", mech2d);
+    SmartDashboard.putData("Dye Rotor/Mech2d", mech2d);
   }
 
   public Command start() {
@@ -91,7 +91,7 @@ public class DyeRotor extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("DyeRotor Motor", dyeRotorCurrentTarget);
+    SmartDashboard.putNumber("Dye Rotor/Setpoint", dyeRotorCurrentTarget);
     rotorArm.setAngle(Units.rotationsToDegrees(encoder.getPosition()));
 
     pose =

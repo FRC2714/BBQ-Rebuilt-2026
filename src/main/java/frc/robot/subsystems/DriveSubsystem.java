@@ -344,10 +344,6 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
-    SmartDashboard.putNumber("heading", getHeading());
-    SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("std dev xy", xyStdDev);
-    SmartDashboard.putNumber("omegaRps", omegaRps);
 
     if (Robot.isReal()) {
       publisherModuleStates.set(

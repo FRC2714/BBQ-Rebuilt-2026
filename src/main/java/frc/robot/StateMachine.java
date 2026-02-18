@@ -168,8 +168,7 @@ public class StateMachine extends SubsystemBase {
     SmartDashboard.putString(
         "State Machine/Current Comamand",
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
-
-    SmartDashboard.putString("State", m_state.toString());
+    SmartDashboard.putString("State Machine/State", m_state.toString());
 
     m_publisher.publish();
   }

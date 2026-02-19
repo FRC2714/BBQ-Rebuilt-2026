@@ -29,6 +29,8 @@ public class Simulation {
   private SwerveDriveSimulation swerveDriveSimulation;
   private IntakeSimulation intakeSimulation;
 
+  private boolean isPreloaded = false;
+
   private StructArrayPublisher<Pose3d> successfulShotsTrajectory =
       NetworkTableInstance.getDefault()
           .getStructArrayTopic("Simulation/Successful Shots Trajectory", Pose3d.struct)
@@ -82,7 +84,10 @@ public class Simulation {
 
   public void shootFuel(
       Rotation2d turretAngle, LinearVelocity initialVelocity, Angle shootingAngle) {
-    if (getFuelCount() == 0) return;
+    if (getFuelCount() == 0) {
+      setPreloaded(false);
+      return;
+    }
 
     intakeSimulation.obtainGamePieceFromIntake();
 
@@ -107,6 +112,14 @@ public class Simulation {
 
   public IntakeSimulation getIntakeSimulation() {
     return intakeSimulation;
+  }
+
+  public void setPreloaded(boolean preloaded) {
+    isPreloaded = preloaded;
+  }
+
+  public boolean isPreloaded() {
+    return isPreloaded;
   }
 
   public void publish() {

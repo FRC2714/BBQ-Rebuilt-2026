@@ -32,6 +32,7 @@ import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
 import frc.robot.Constants.ShooterConstants.HoodSetpoints;
 import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 import frc.robot.Robot;
+import frc.robot.Simulation;
 import frc.robot.utils.InterpolatingTreeMap;
 
 public class Shooter extends SubsystemBase {
@@ -70,7 +71,6 @@ public class Shooter extends SubsystemBase {
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
 
   public boolean wasZeroed = false;
-  private boolean fuelTrigger = false;
   private boolean isShooting = false;
 
   private InterpolatingTreeMap hoodAngleMap;
@@ -145,7 +145,7 @@ public class Shooter extends SubsystemBase {
 
   public boolean getFuelLimitSwitch() {
     if (Robot.isSimulation()) {
-      return fuelTrigger;
+      return Simulation.getInstance().isPreloaded();
     }
     return fuelBeamBreak.isPressed();
   }
@@ -220,14 +220,6 @@ public class Shooter extends SubsystemBase {
   public boolean hoodAtSetpoint() {
     boolean atSetpoint = Math.abs(hoodRelativeEncoder.getPosition() - hoodCurrentTarget) < 2;
     return hoodDebouncer.calculate(atSetpoint);
-  }
-
-  public void fuelTrue() {
-    fuelTrigger = true;
-  }
-
-  public void fuelFalse() {
-    fuelTrigger = false;
   }
 
   public void zeroTurret() {

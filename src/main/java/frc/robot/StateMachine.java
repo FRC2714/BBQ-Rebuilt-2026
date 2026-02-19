@@ -49,6 +49,8 @@ public class StateMachine extends SubsystemBase {
     m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor);
 
     if (Robot.isSimulation()) {
+      // Simulate fuel being shot out of robot
+      // TODO: Adjust number of rotations it takes to index 1 ball
       new Trigger(
               () ->
                   m_state == State.Shooting
@@ -71,6 +73,16 @@ public class StateMachine extends SubsystemBase {
                             Degrees.of(m_shooter.getHoodAngle()));
                     startShootingRotorPosition = m_dyeRotor.getRotorPosition();
                   }));
+
+      // Simulate the time time it takes for fuel to get from dye rotor to shooter
+      new Trigger(
+              () ->
+                  m_state != State.Shooting
+                      && m_dyeRotor.isRunning()
+                      && Simulation.getInstance().getFuelCount() != 0)
+          .onTrue(
+              Commands.waitSeconds(0.25)
+                  .andThen(() -> Simulation.getInstance().setPreloaded(true)));
     }
   }
 

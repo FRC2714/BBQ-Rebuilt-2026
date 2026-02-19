@@ -103,6 +103,10 @@ public class DyeRotor extends SubsystemBase {
     return pose;
   }
 
+  public double getRotorPosition() {
+    return encoder.getPosition() / GEARING;
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Dye Rotor/Setpoint", dyeRotorCurrentTarget);

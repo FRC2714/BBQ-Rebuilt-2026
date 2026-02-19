@@ -1,13 +1,13 @@
 {
   "hubs": [
     {
-      "x": -8,
-      "y": -8,
-      "width": 2576,
-      "height": 1408,
+      "x": 423,
+      "y": 38,
+      "width": 1305,
+      "height": 1006,
       "state": {
         "sidebar": {
-          "width": 500,
+          "width": 331,
           "expanded": [
             "/Shuffleboard",
             "/SmartDashboard/Field",
@@ -22,7 +22,10 @@
             "/SmartDashboard/State Machine",
             "/SmartDashboard/Dye Rotor",
             "/SmartDashboard/Intake",
-            "/PathPlanner"
+            "/PathPlanner",
+            "/Simulation",
+            "/SmartDashboard/Simulation",
+            "/SmartDashboard/Shooter/Hood"
           ]
         },
         "tabs": {
@@ -226,26 +229,55 @@
                       "model": "KitBot",
                       "color": "#ff00ff"
                     }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:Simulation/Fuel",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "variant": "Fuel"
+                    }
+                  },
+                  {
+                    "type": "trajectory",
+                    "logKey": "NT:Simulation/Successful Shots Trajectory",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "trajectory",
+                    "logKey": "NT:Simulation/Missed Shots Trajectory",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "size": "normal"
+                    }
                   }
                 ],
                 "game": "FRC:2026 Field"
               },
               "controllerUUID": "hf15d8z0ckx5jtda29315kgha0s04t0b",
               "renderer": {
-                "cameraIndex": -1,
+                "cameraIndex": -2,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -3.171984247548139,
-                  7.10910806774352,
-                  -6.897489077729889
+                  -2.2784160060620477,
+                  2.6435466396162544,
+                  -3.328343737344961
                 ],
                 "cameraTarget": [
-                  -3.6702516888351875,
-                  0.9003510297405082,
-                  -0.9546829925797649
+                  0,
+                  0.5,
+                  0
                 ]
               },
-              "controlsHeight": 625
+              "controlsHeight": 325
             },
             {
               "type": 9,

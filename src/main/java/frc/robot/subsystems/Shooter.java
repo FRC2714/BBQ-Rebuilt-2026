@@ -127,14 +127,8 @@ public class Shooter extends SubsystemBase {
 
   // CHANGE LATER
   public void populateHoodAngleMap() {
-    hoodAngleMap.put(1.0, 5.0);
-    hoodAngleMap.put(2.0, 8.0);
-    hoodAngleMap.put(3.0, 12.0);
-    hoodAngleMap.put(4.0, 18.0);
-    hoodAngleMap.put(5.0, 26.0);
-    hoodAngleMap.put(6.0, 34.0);
-    hoodAngleMap.put(7.0, 42.0);
-    hoodAngleMap.put(8.0, 50.0);
+    hoodAngleMap.put(1.0, ShooterConstants.kHoodMaxAngle);
+    hoodAngleMap.put(8.0, ShooterConstants.kHoodMinAngle);
   }
 
   // CHANGE LATER
@@ -183,7 +177,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public double getFlywheelSpeed() {
-    return flywheelCurrentTarget;
+    return flywheelRelativeEncoder.getVelocity();
   }
 
   public void setHoodAngle(double angle) {

@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -27,7 +26,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
@@ -46,13 +44,9 @@ import frc.robot.Constants.LimelightConstants;
 import frc.robot.Field;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
+import frc.robot.Simulation;
 import frc.robot.utils.LimelightHelpers;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 
 public class DriveSubsystem extends SubsystemBase {
   private final MAXSwerveModule m_frontLeft =
@@ -123,15 +117,6 @@ public class DriveSubsystem extends SubsystemBase {
           .getStructArrayTopic("Expected Swerve Module States", SwerveModuleState.struct)
           .publish();
 
-  final DriveTrainSimulationConfig driveTrainSimulationConfig =
-      DriveTrainSimulationConfig.Default()
-          .withGyro(COTS.ofPigeon2())
-          .withSwerveModule(
-              COTS.ofMAXSwerve(
-                  DCMotor.getNeoVortex(1), DCMotor.getNeo550(1), COTS.WHEELS.COLSONS.cof, 1))
-          .withTrackLengthTrackWidth(
-              Meters.of(DriveConstants.kWheelBase), Meters.of(DriveConstants.kTrackWidth));
-
   SelfControlledSwerveDriveSimulation swerveDriveSimulation;
 
   // Odometry class for tracking robot pose
@@ -166,13 +151,7 @@ public class DriveSubsystem extends SubsystemBase {
     if (Robot.isSimulation()) {
       swerveDriveSimulation =
           new SelfControlledSwerveDriveSimulation(
-              new SwerveDriveSimulation(
-                  driveTrainSimulationConfig, new Pose2d(3, 3, new Rotation2d())));
-
-      SimulatedArena.overrideInstance(new Arena2026Rebuilt(false));
-
-      SimulatedArena.getInstance()
-          .addDriveTrainSimulation(swerveDriveSimulation.getDriveTrainSimulation());
+              Simulation.getInstance().getSwerveDriveSimulation());
     }
 
     RobotConfig config;

@@ -34,6 +34,8 @@ public class DyeRotor extends SubsystemBase {
       new SparkFlex(Constants.DyeRotorConstants.kDyeRotorMotorCanID, MotorType.kBrushless);
   private RelativeEncoder encoder = dyeRotorMotor.getEncoder();
   private double dyeRotorCurrentTarget = 0;
+  private boolean paused = false;
+
   private Pose3d pose = new Pose3d();
 
   // Simulation
@@ -57,10 +59,14 @@ public class DyeRotor extends SubsystemBase {
 
   public Command start() {
     return this.run(
-        () -> {
-          dyeRotorCurrentTarget = Constants.DyeRotorConstants.kDyeRotorPower;
-          dyeRotorMotor.set(Constants.DyeRotorConstants.kDyeRotorPower);
-        });
+            () -> {
+              dyeRotorCurrentTarget = paused ? 0 : Constants.DyeRotorConstants.kDyeRotorPower;
+              dyeRotorMotor.set(dyeRotorCurrentTarget);
+            })
+        .beforeStarting(
+            () -> {
+              paused = false;
+            });
   }
 
   public Command stop() {
@@ -69,6 +75,14 @@ public class DyeRotor extends SubsystemBase {
           dyeRotorCurrentTarget = 0;
           dyeRotorMotor.set(0);
         });
+  }
+
+  public void pause() {
+    paused = true;
+  }
+
+  public void resume() {
+    paused = false;
   }
 
   // Mech2d for DyeRotor

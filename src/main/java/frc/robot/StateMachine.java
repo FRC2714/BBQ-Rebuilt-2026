@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -42,6 +43,16 @@ public class StateMachine extends SubsystemBase {
     m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor);
   }
 
+  public void configureBindings() {
+    Trigger pauseShooter =
+        new Trigger(() -> m_state == State.Shooting && !m_shooter.readyToShoot());
+    pauseShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.pause()));
+
+    Trigger resumeShooter =
+        new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
+    resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
+  }
+
   public Command preloadCommand() {
     return Commands.runOnce(
         () -> {
@@ -64,7 +75,7 @@ public class StateMachine extends SubsystemBase {
     // startShooter (spin flywheel until at setpoint). If startShooter finishes first, just run the
     // dye rotor immediately.
     return preload()
-        .withDeadline(m_shooter.startShooter().until(() -> m_shooter.flywheelAtSetpoint()))
+        .withDeadline(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()))
         .andThen(
             m_shooter
                 .startShooter()

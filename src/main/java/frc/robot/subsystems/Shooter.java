@@ -12,6 +12,8 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -74,6 +76,12 @@ public class Shooter extends SubsystemBase {
   private InterpolatingTreeMap hoodAngleMap;
   private InterpolatingTreeMap flywheelSpeedMap;
 
+  private Debouncer flywheelDebouncer =
+      new Debouncer(ShooterConstants.kFlywheelDebounceTimeSeconds, DebounceType.kFalling);
+  private Debouncer turretDebouncer =
+      new Debouncer(ShooterConstants.kTurretDebounceTimeSeconds, DebounceType.kFalling);
+  private Debouncer hoodDebouncer =
+      new Debouncer(ShooterConstants.kHoodDebounceTimeSeconds, DebounceType.kFalling);
   // Simulation
   DCMotor flywheelMotorSim = DCMotor.getNeoVortex(2);
   SparkFlexSim flywheelSparkSim = new SparkFlexSim(flywheelMotorLeader, flywheelMotorSim);
@@ -85,6 +93,11 @@ public class Shooter extends SubsystemBase {
   SparkFlexSim turretSparkSim = new SparkFlexSim(turretMotor, turretMotorSim);
   LinearSystemSim<N2, N1, N2> turretSim =
       new LinearSystemSim<>(LinearSystemId.createDCMotorSystem(turretMotorSim, 0.0001, 40));
+
+  DCMotor hoodMotorSim = DCMotor.getNeo550(1);
+  SparkFlexSim hoodSparkSim = new SparkFlexSim(hoodMotor, hoodMotorSim);
+  LinearSystemSim<N2, N1, N2> hoodSim =
+      new LinearSystemSim<>(LinearSystemId.createDCMotorSystem(hoodMotorSim, 0.001, 10));
 
   public Shooter() {
     turretMotor.configure(
@@ -195,9 +208,24 @@ public class Shooter extends SubsystemBase {
         });
   }
 
-  // TODO: Debounce this
+  public boolean readyToShoot() {
+    return flywheelAtSetpoint() && turretAtSetpoint() && hoodAtSetpoint();
+  }
+
   public boolean flywheelAtSetpoint() {
-    return Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
+    boolean atSetpoint =
+        Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
+    return flywheelDebouncer.calculate(atSetpoint);
+  }
+
+  public boolean turretAtSetpoint() {
+    boolean atSetpoint = Math.abs(turretAbsoluteEncoder.getPosition() - turretCurrentTarget) < 5;
+    return turretDebouncer.calculate(atSetpoint);
+  }
+
+  public boolean hoodAtSetpoint() {
+    boolean atSetpoint = Math.abs(hoodRelativeEncoder.getPosition() - hoodCurrentTarget) < 2;
+    return hoodDebouncer.calculate(atSetpoint);
   }
 
   public void fuelTrue() {
@@ -228,13 +256,20 @@ public class Shooter extends SubsystemBase {
     flywheelController.setSetpoint(
         isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
 
-    SmartDashboard.putNumber("Shooter/Hood/Angle", hoodCurrentTarget);
     SmartDashboard.putNumber("Shooter/Flywheel/Expected Speed", flywheelCurrentTarget);
     SmartDashboard.putNumber(
         "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());
     SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
+
     SmartDashboard.putNumber("Shooter/Turret/Setpoint", turretCurrentTarget);
     SmartDashboard.putNumber("Shooter/Turret/Position", turretAbsoluteEncoder.getPosition());
+    SmartDashboard.putBoolean("Shooter/Turret/At Setpoint", turretAtSetpoint());
+
+    SmartDashboard.putNumber("Shooter/Hood/Setpoint", hoodCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Hood/Position", hoodRelativeEncoder.getPosition());
+    SmartDashboard.putBoolean("Shooter/Hood/At Setpoint", hoodAtSetpoint());
+
+    SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());
   }
 
   @Override
@@ -254,6 +289,13 @@ public class Shooter extends SubsystemBase {
 
     turretSparkSim.iterate(
         Units.radiansPerSecondToRotationsPerMinute(turretSim.getOutput(1)),
+        RobotController.getBatteryVoltage(),
+        0.02);
+
+    hoodSim.setInput(hoodSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+    hoodSim.update(0.02);
+    hoodSparkSim.iterate(
+        Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1) * 10),
         RobotController.getBatteryVoltage(),
         0.02);
 

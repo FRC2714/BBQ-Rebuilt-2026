@@ -32,6 +32,7 @@ import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
 import frc.robot.Constants.ShooterConstants.HoodSetpoints;
 import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 import frc.robot.Robot;
+import frc.robot.Simulation;
 import frc.robot.utils.InterpolatingTreeMap;
 
 public class Shooter extends SubsystemBase {
@@ -70,7 +71,6 @@ public class Shooter extends SubsystemBase {
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
 
   public boolean wasZeroed = false;
-  private boolean fuelTrigger = false;
   private boolean isShooting = false;
 
   private InterpolatingTreeMap hoodAngleMap;
@@ -127,14 +127,8 @@ public class Shooter extends SubsystemBase {
 
   // CHANGE LATER
   public void populateHoodAngleMap() {
-    hoodAngleMap.put(1.0, 5.0);
-    hoodAngleMap.put(2.0, 8.0);
-    hoodAngleMap.put(3.0, 12.0);
-    hoodAngleMap.put(4.0, 18.0);
-    hoodAngleMap.put(5.0, 26.0);
-    hoodAngleMap.put(6.0, 34.0);
-    hoodAngleMap.put(7.0, 42.0);
-    hoodAngleMap.put(8.0, 50.0);
+    hoodAngleMap.put(1.0, ShooterConstants.kHoodMaxAngle);
+    hoodAngleMap.put(8.0, ShooterConstants.kHoodMinAngle);
   }
 
   // CHANGE LATER
@@ -151,7 +145,7 @@ public class Shooter extends SubsystemBase {
 
   public boolean getFuelLimitSwitch() {
     if (Robot.isSimulation()) {
-      return fuelTrigger;
+      return Simulation.getInstance().isPreloaded();
     }
     return fuelBeamBreak.isPressed();
   }
@@ -183,7 +177,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public double getFlywheelSpeed() {
-    return flywheelCurrentTarget;
+    return flywheelRelativeEncoder.getVelocity();
   }
 
   public void setHoodAngle(double angle) {
@@ -226,14 +220,6 @@ public class Shooter extends SubsystemBase {
   public boolean hoodAtSetpoint() {
     boolean atSetpoint = Math.abs(hoodRelativeEncoder.getPosition() - hoodCurrentTarget) < 2;
     return hoodDebouncer.calculate(atSetpoint);
-  }
-
-  public void fuelTrue() {
-    fuelTrigger = true;
-  }
-
-  public void fuelFalse() {
-    fuelTrigger = false;
   }
 
   public void zeroTurret() {

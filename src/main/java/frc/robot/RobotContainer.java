@@ -97,13 +97,6 @@ public class RobotContainer {
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
 
-    if (Robot.isSimulation()) {
-      m_driverController
-          .y()
-          .onTrue(new InstantCommand(() -> m_shooter.fuelTrue()))
-          .onFalse(new InstantCommand(() -> m_shooter.fuelFalse()));
-    }
-
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
     // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());
     // m_driverController.x().onTrue(m_robotDrive.translationalDynamic());

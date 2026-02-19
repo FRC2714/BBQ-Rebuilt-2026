@@ -33,6 +33,7 @@ import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Robot;
+import frc.robot.Simulation;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
@@ -128,9 +129,13 @@ public class Intake extends SubsystemBase {
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
           pivotExtend();
+
+          if (Robot.isSimulation()) Simulation.getInstance().startIntake();
         },
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
+
+          if (Robot.isSimulation()) Simulation.getInstance().stopIntake();
         });
   }
 

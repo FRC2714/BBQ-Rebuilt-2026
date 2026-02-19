@@ -109,5 +109,7 @@ public class Publisher {
     tagPosesFrontArrayPublisher.set(Vision.getCameraTargetPoses3d("limelight-front"));
     tagPosesLeftArrayPublisher.set(Vision.getCameraTargetPoses3d("limelight-left"));
     tagPosesRightArrayPublisher.set(Vision.getCameraTargetPoses3d("limelight-right"));
+
+    if (Robot.isSimulation()) Simulation.getInstance().publish();
   }
 }

@@ -1,8 +1,12 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -27,6 +31,8 @@ public class StateMachine extends SubsystemBase {
     return !(m_state == State.Climbing);
   }
 
+  private double startShootingRotorPosition = 0;
+
   enum State {
     Idle,
     Shooting,
@@ -41,6 +47,43 @@ public class StateMachine extends SubsystemBase {
     m_dyeRotor = dyeRotor;
 
     m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor);
+
+    if (Robot.isSimulation()) {
+      // Simulate fuel being shot out of robot
+      // TODO: Adjust number of rotations it takes to index 1 ball
+      new Trigger(
+              () ->
+                  m_state == State.Shooting
+                      && m_dyeRotor.getRotorPosition() - startShootingRotorPosition > 0.5)
+          .onTrue(
+              Commands.runOnce(
+                  () -> {
+                    LinearVelocity exitVelocity =
+                        MetersPerSecond.of(
+                            Units.rotationsPerMinuteToRadiansPerSecond(m_shooter.getFlywheelSpeed())
+                                * Units.inchesToMeters(1.5));
+
+                    Simulation.getInstance()
+                        .shootFuel(
+                            m_drivetrain
+                                .getPose()
+                                .getRotation()
+                                .plus(Rotation2d.fromDegrees(m_shooter.getTurretPosition())),
+                            exitVelocity,
+                            Degrees.of(m_shooter.getHoodAngle()));
+                    startShootingRotorPosition = m_dyeRotor.getRotorPosition();
+                  }));
+
+      // Simulate the time time it takes for fuel to get from dye rotor to shooter
+      new Trigger(
+              () ->
+                  m_state != State.Shooting
+                      && m_dyeRotor.isRunning()
+                      && Simulation.getInstance().getFuelCount() != 0)
+          .onTrue(
+              Commands.waitSeconds(0.25)
+                  .andThen(() -> Simulation.getInstance().setPreloaded(true)));
+    }
   }
 
   public void configureBindings() {
@@ -82,6 +125,7 @@ public class StateMachine extends SubsystemBase {
                 .alongWith(m_dyeRotor.start())
                 .beforeStarting(
                     () -> {
+                      startShootingRotorPosition = m_dyeRotor.getRotorPosition();
                       setState(State.Shooting);
                     }))
         .finallyDo(

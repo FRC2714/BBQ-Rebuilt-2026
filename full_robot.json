@@ -1,13 +1,13 @@
 {
   "hubs": [
     {
-      "x": 864,
-      "y": 38,
-      "width": 864,
-      "height": 1006,
+      "x": -8,
+      "y": -8,
+      "width": 2576,
+      "height": 1408,
       "state": {
         "sidebar": {
-          "width": 190,
+          "width": 500,
           "expanded": [
             "/Shuffleboard",
             "/SmartDashboard/Field",
@@ -18,11 +18,15 @@
             "/SmartDashboard/Shooter/Flywheel",
             "/SmartDashboard/Shooter/Turret",
             "/turretHeading",
-            "/turretHeading/rotation"
+            "/turretHeading/rotation",
+            "/SmartDashboard/State Machine",
+            "/SmartDashboard/Dye Rotor",
+            "/SmartDashboard/Intake",
+            "/PathPlanner"
           ]
         },
         "tabs": {
-          "selected": 3,
+          "selected": 2,
           "tabs": [
             {
               "type": 0,
@@ -121,42 +125,7 @@
               },
               "controllerUUID": "gfi5132ykkfeyajjfsccn0rv4tno97ii",
               "renderer": null,
-              "controlsHeight": 306
-            },
-            {
-              "type": 9,
-              "title": "Swerve",
-              "controller": {
-                "sources": [
-                  {
-                    "type": "states",
-                    "logKey": "NT:Expected Swerve Module States",
-                    "logType": "SwerveModuleState[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#0000ff",
-                      "arrangement": "0,1,2,3"
-                    }
-                  },
-                  {
-                    "type": "states",
-                    "logKey": "NT:Swerve Module States",
-                    "logType": "SwerveModuleState[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#ff0000",
-                      "arrangement": "0,1,2,3"
-                    }
-                  }
-                ],
-                "maxSpeed": 5,
-                "sizeX": 0.65,
-                "sizeY": 0.65,
-                "orientation": 1
-              },
-              "controllerUUID": "w3cbno0zydmkpnrj4yazvsre970f92xu",
-              "renderer": null,
-              "controlsHeight": 200
+              "controlsHeight": 109
             },
             {
               "type": 3,
@@ -216,7 +185,7 @@
                     "type": "swerveStates",
                     "logKey": "NT:Expected Swerve Module States",
                     "logType": "SwerveModuleState[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#0000ff",
                       "arrangement": "0,1,2,3"
@@ -226,7 +195,7 @@
                     "type": "swerveStates",
                     "logKey": "NT:Swerve Module States",
                     "logType": "SwerveModuleState[]",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "color": "#ff0000",
                       "arrangement": "0,1,2,3"
@@ -241,7 +210,7 @@
                   },
                   {
                     "type": "mechanism",
-                    "logKey": "NT:/SmartDashboard/Mech2d",
+                    "logKey": "NT:/SmartDashboard/Intake/Mech2d",
                     "logType": "Mechanism2d",
                     "visible": true,
                     "options": {
@@ -249,12 +218,13 @@
                     }
                   },
                   {
-                    "type": "robot",
+                    "type": "ghost",
                     "logKey": "NT:turretPose",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
-                      "model": "Crab Bot"
+                      "model": "KitBot",
+                      "color": "#ff00ff"
                     }
                   }
                 ],
@@ -262,20 +232,55 @@
               },
               "controllerUUID": "hf15d8z0ckx5jtda29315kgha0s04t0b",
               "renderer": {
-                "cameraIndex": -2,
+                "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  5.656213888295585,
-                  7.229174747141792,
-                  -2.326036127556789
+                  -3.171984247548139,
+                  7.10910806774352,
+                  -6.897489077729889
                 ],
                 "cameraTarget": [
-                  0.3399347623194903,
-                  1.8811491601770385,
-                  0.08837201440940591
+                  -3.6702516888351875,
+                  0.9003510297405082,
+                  -0.9546829925797649
                 ]
               },
-              "controlsHeight": 267
+              "controlsHeight": 625
+            },
+            {
+              "type": 9,
+              "title": "Swerve",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "states",
+                    "logKey": "NT:Expected Swerve Module States",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "states",
+                    "logKey": "NT:Swerve Module States",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  }
+                ],
+                "maxSpeed": 5,
+                "sizeX": 0.65,
+                "sizeY": 0.65,
+                "orientation": 1
+              },
+              "controllerUUID": "w3cbno0zydmkpnrj4yazvsre970f92xu",
+              "renderer": null,
+              "controlsHeight": 200
             }
           ]
         }

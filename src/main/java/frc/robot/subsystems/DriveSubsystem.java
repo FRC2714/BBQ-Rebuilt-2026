@@ -5,7 +5,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -130,10 +130,7 @@ public class DriveSubsystem extends SubsystemBase {
               COTS.ofMAXSwerve(
                   DCMotor.getNeoVortex(1), DCMotor.getNeo550(1), COTS.WHEELS.COLSONS.cof, 1))
           .withTrackLengthTrackWidth(
-              Inches.of(DriveConstants.kWheelBase), Inches.of(DriveConstants.kTrackWidth))
-          .withBumperSize(
-              Inches.of(DriveConstants.kWheelBase + 6.0),
-              Inches.of(DriveConstants.kTrackWidth + 6.0));
+              Meters.of(DriveConstants.kWheelBase), Meters.of(DriveConstants.kTrackWidth));
 
   SelfControlledSwerveDriveSimulation swerveDriveSimulation;
 

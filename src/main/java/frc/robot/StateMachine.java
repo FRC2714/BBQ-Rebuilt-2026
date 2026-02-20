@@ -17,7 +17,6 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
-import frc.robot.Constants.DriveConstants;
 
 public class StateMachine extends SubsystemBase {
   private final DriveSubsystem m_drivetrain;
@@ -25,7 +24,6 @@ public class StateMachine extends SubsystemBase {
   private final Intake m_intake;
   private final DyeRotor m_dyeRotor;
   private final Publisher m_publisher;
-  
 
   private static State m_state = State.Idle;
 
@@ -34,7 +32,6 @@ public class StateMachine extends SubsystemBase {
   }
 
   private double startShootingRotorPosition = 0;
-  
 
   enum State {
     Idle,
@@ -134,7 +131,7 @@ public class StateMachine extends SubsystemBase {
                     }))
         .finallyDo(
             () -> {
-              m_drivetrain.setShootingStateFalse(); 
+              m_drivetrain.setShootingStateFalse();
               CommandScheduler.getInstance().schedule(stopShoot());
             });
   }

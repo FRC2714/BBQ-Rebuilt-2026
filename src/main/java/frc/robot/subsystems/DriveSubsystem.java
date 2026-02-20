@@ -108,8 +108,7 @@ public class DriveSubsystem extends SubsystemBase {
   double xyStdDev;
 
   private boolean shooting = false;
-  private double xSpeedSim = 0.0;
-  private double ySpeedSim = 0.0;
+  
 
   // Publisher for robot pose for use with AdvantageScope
   StructArrayPublisher<SwerveModuleState> publisherModuleStates =
@@ -380,8 +379,6 @@ public class DriveSubsystem extends SubsystemBase {
       xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond / 2;
       ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond / 2;
       rotDelivered = rot * DriveConstants.kMaxAngularSpeed / 2;
-      xSpeedSim = xSpeedDelivered;
-      ySpeedSim = ySpeedDelivered;
     }
 
     var swerveModuleStates =
@@ -466,13 +463,6 @@ public class DriveSubsystem extends SubsystemBase {
     shooting = false;
   }
 
-  public double getXSpeed() {
-    return xSpeedSim;
-  }
-
-  public double getYSpeed() {
-    return ySpeedSim;
-  }
 
   public void driveRobotRelative(ChassisSpeeds speeds) {
     drive(speeds, false);

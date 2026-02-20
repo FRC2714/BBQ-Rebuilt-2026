@@ -226,8 +226,7 @@ public class StateMachine extends SubsystemBase {
         "State Machine/Current Comamand",
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
     SmartDashboard.putString("State Machine/State", m_state.toString());
-    SmartDashboard.putNumber("xSpeedSim", m_drivetrain.getXSpeed());
-    SmartDashboard.putNumber("ySpeedSim", m_drivetrain.getYSpeed());
+   
 
     m_publisher.publish();
   }

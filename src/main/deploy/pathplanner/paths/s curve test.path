@@ -3,32 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.3469518072289155,
-        "y": 7.335168674698796
+        "x": 6.718265060240964,
+        "y": 6.94177108433735
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.977222848598387,
-        "y": 7.425739288108212
+        "x": 9.07865060240964,
+        "y": 6.788783132530121
       },
       "isLocked": false,
-      "linkedName": "depot start"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.701759036144578,
-        "y": 5.532096385542169
+        "x": 6.543421686746988,
+        "y": 0.9752409638554218
       },
       "prevControl": {
-        "x": 7.313599264389942,
-        "y": 7.162367426911642
+        "x": 4.008192771084338,
+        "y": 1.4014216867469889
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "depot mid nz"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.28343558282209036,
+      "rotationDegrees": -179.40758389465373
+    },
+    {
+      "waypointRelativePos": 0.6220858895705503,
+      "rotationDegrees": 0.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -42,10 +51,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -1.1461943096648242
+    "rotation": -177.49229827293377
   },
   "reversed": false,
-  "folder": "depot to NZ",
+  "folder": "grab depot",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

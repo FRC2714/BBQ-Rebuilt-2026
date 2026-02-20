@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4125106990014262,
-        "y": 4.170855920114123
+        "x": 1.8117228915662649,
+        "y": 5.357253012048193
       },
       "isLocked": false,
       "linkedName": "depot intake"
@@ -57,16 +57,20 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "mid nz"
     }
   ],
   "rotationTargets": [
+    {
+      "waypointRelativePos": 0.7079754601227,
+      "rotationDegrees": 0.0
+    },
     {
       "waypointRelativePos": 1,
       "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 2,
+      "waypointRelativePos": 2.028220858895705,
       "rotationDegrees": 0.0
     }
   ],

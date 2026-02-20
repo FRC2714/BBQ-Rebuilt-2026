@@ -21,6 +21,12 @@
           "data": {
             "pathName": "intake depot to nz"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of deep nz to depot intake"
+          }
         }
       ]
     }

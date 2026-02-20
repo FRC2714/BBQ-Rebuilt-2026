@@ -233,7 +233,7 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  public void setTurretAngle(double angle){
+  public void setTurretAngle(double angle) {
     turretRelativeEncoder.setPosition(angle);
   }
 

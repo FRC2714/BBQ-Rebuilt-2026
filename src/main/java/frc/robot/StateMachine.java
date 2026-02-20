@@ -25,8 +25,6 @@ public class StateMachine extends SubsystemBase {
   private final Intake m_intake;
   private final DyeRotor m_dyeRotor;
   private final Publisher m_publisher;
-  private final double xSpeed = 0;
-  private final double ySpeed = 0;
   
 
   private static State m_state = State.Idle;
@@ -36,6 +34,7 @@ public class StateMachine extends SubsystemBase {
   }
 
   private double startShootingRotorPosition = 0;
+  
 
   enum State {
     Idle,
@@ -131,12 +130,11 @@ public class StateMachine extends SubsystemBase {
                     () -> {
                       startShootingRotorPosition = m_dyeRotor.getRotorPosition();
                       setState(State.Shooting);
-                       drive(xSpeed, ySpeed) {
-                        m_drivetrain.drive(new ChassisSpeeds(xSpeed, ySpeed, 2.4));
-                      }
+                      m_drivetrain.setShootingStateTrue();
                     }))
         .finallyDo(
             () -> {
+              m_drivetrain.setShootingStateFalse(); 
               CommandScheduler.getInstance().schedule(stopShoot());
             });
   }
@@ -231,8 +229,8 @@ public class StateMachine extends SubsystemBase {
         "State Machine/Current Comamand",
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
     SmartDashboard.putString("State Machine/State", m_state.toString());
-    SmartDashboard.putData("xSpeed", xSpeed);
-    SmartDashboard.putData("ySpeed", ySpeed);
+    SmartDashboard.putNumber("xSpeedSim", m_drivetrain.getXSpeed());
+    SmartDashboard.putNumber("ySpeedSim", m_drivetrain.getYSpeed());
 
     m_publisher.publish();
   }

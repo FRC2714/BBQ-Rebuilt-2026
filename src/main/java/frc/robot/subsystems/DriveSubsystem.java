@@ -107,6 +107,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   double xyStdDev;
 
+  private boolean shooting = false;
+  private double xSpeedSim = 0.0;
+  private double ySpeedSim = 0.0;
+
   // Publisher for robot pose for use with AdvantageScope
   StructArrayPublisher<SwerveModuleState> publisherModuleStates =
       NetworkTableInstance.getDefault()
@@ -372,6 +376,15 @@ public class DriveSubsystem extends SubsystemBase {
 
     double driverRelativeHeading = getHeading() - m_driverHeadingOffsetDeg;
 
+    if(shooting)
+    {
+        xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond/2;
+        ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond/2;
+        rotDelivered = rot * DriveConstants.kMaxAngularSpeed/2; 
+        xSpeedSim = xSpeedDelivered;
+        ySpeedSim = ySpeedDelivered;
+    }
+
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
             fieldRelative
@@ -438,12 +451,33 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
+
   /** Sets the wheels into an X formation to prevent movement. */
   public void setX() {
     m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+  }
+
+  public void setShootingStateTrue()
+  {
+    shooting = true;
+  }
+
+  public void setShootingStateFalse()
+  {
+    shooting = false;
+  }
+
+  public double getXSpeed()
+  {
+    return xSpeedSim;
+  }
+
+  public double getYSpeed()
+  {
+    return ySpeedSim;
   }
 
   public void driveRobotRelative(ChassisSpeeds speeds) {

@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -44,6 +46,14 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    // NAMED COMMANDS FOR PATHPLANNER
+    NamedCommands.registerCommand("SCORE", m_stateMachine.shoot());
+    NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShoot());
+    NamedCommands.registerCommand("INTAKE", m_stateMachine.intakeSequence());
+    NamedCommands.registerCommand("EXTAKE", m_stateMachine.extakeSequence());
+    NamedCommands.registerCommand("STOW_INTAKE", m_stateMachine.stowSequence());
+    NamedCommands.registerCommand("PRELOAD", m_stateMachine.preloadCommand());
+    
     // Configure the button bindings
     configureButtonBindings();
 

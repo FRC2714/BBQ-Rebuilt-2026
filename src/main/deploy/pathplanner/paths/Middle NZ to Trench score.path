@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.88243686868687,
-        "y": 2.6508459595959595
+        "x": 7.776581116852938,
+        "y": 3.653206160933883
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.168642857142856,
-        "y": 1.7998928571428574
+        "x": 7.062787105308924,
+        "y": 2.802253058480781
       },
       "isLocked": false,
       "linkedName": "Intake Middle NZ"
@@ -48,7 +48,7 @@
   "folder": "outpost to NZ",
   "idealStartingState": {
     "velocity": 5.0,
-    "rotation": 54.68878656036678
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

@@ -5,41 +5,27 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Shoot From Start"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "SCORE"
-                }
-              }
-            ]
+            "pathName": "Shoot From Start"
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Move to Near NZ"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "INTAKE"
-                }
-              }
-            ]
+            "name": "SCORE"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Move to Near NZ"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "INTAKE"
           }
         },
         {
@@ -63,14 +49,14 @@
                 "data": {
                   "pathName": "Move to Middle NZ"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "INTAKE"
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "INTAKE"
           }
         },
         {

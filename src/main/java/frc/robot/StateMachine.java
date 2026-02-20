@@ -25,6 +25,13 @@ public class StateMachine extends SubsystemBase {
   private final DyeRotor m_dyeRotor;
   private final Publisher m_publisher;
 
+  // withTimeout constants in seconds for auton (right now arbitrary, needs to be tested)
+  private final double SHOOT_WAIT = 1.5;
+  private final double STOP_SHOOT_WAIT = 0.5;
+  private final double INTAKE_WAIT = 1.75;
+  private final double EXTAKE_WAIT = 1.75;
+  private final double STOW_WAIT = 0.75;
+
   private static State m_state = State.Idle;
 
   private static boolean isNotClimbing() {
@@ -52,16 +59,14 @@ public class StateMachine extends SubsystemBase {
       // Simulate fuel being shot out of robot
       // TODO: Adjust number of rotations it takes to index 1 ball
       new Trigger(
-              () ->
-                  m_state == State.Shooting
-                      && m_dyeRotor.getRotorPosition() - startShootingRotorPosition > 0.5)
+          () -> m_state == State.Shooting
+              && m_dyeRotor.getRotorPosition() - startShootingRotorPosition > 0.5)
           .onTrue(
               Commands.runOnce(
                   () -> {
-                    LinearVelocity exitVelocity =
-                        MetersPerSecond.of(
-                            Units.rotationsPerMinuteToRadiansPerSecond(m_shooter.getFlywheelSpeed())
-                                * Units.inchesToMeters(1.5));
+                    LinearVelocity exitVelocity = MetersPerSecond.of(
+                        Units.rotationsPerMinuteToRadiansPerSecond(m_shooter.getFlywheelSpeed())
+                            * Units.inchesToMeters(1.5));
 
                     Simulation.getInstance()
                         .shootFuel(
@@ -76,10 +81,9 @@ public class StateMachine extends SubsystemBase {
 
       // Simulate the time time it takes for fuel to get from dye rotor to shooter
       new Trigger(
-              () ->
-                  m_state != State.Shooting
-                      && m_dyeRotor.isRunning()
-                      && Simulation.getInstance().getFuelCount() != 0)
+          () -> m_state != State.Shooting
+              && m_dyeRotor.isRunning()
+              && Simulation.getInstance().getFuelCount() != 0)
           .onTrue(
               Commands.waitSeconds(0.25)
                   .andThen(() -> Simulation.getInstance().setPreloaded(true)));
@@ -87,35 +91,18 @@ public class StateMachine extends SubsystemBase {
   }
 
   public void configureBindings() {
-    Trigger pauseShooter =
-        new Trigger(() -> m_state == State.Shooting && !m_shooter.readyToShoot());
+    Trigger pauseShooter = new Trigger(() -> m_state == State.Shooting && !m_shooter.readyToShoot());
     pauseShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.pause()));
 
-    Trigger resumeShooter =
-        new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
+    Trigger resumeShooter = new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
     resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
   }
 
-  public Command preloadCommand() {
-    return Commands.runOnce(
-        () -> {
-          if (m_state == State.Shooting) return;
-
-          CommandScheduler.getInstance().schedule(preload());
-        });
-  }
-
-  public Command preload() {
-    return m_dyeRotor
-        .start()
-        .until(() -> m_shooter.getFuelLimitSwitch())
-        .andThen(m_dyeRotor.stop())
-        .withName("preload");
-  }
-
+  // Teleop commands
   public Command shoot() {
     // Run preload (dye rotor until fuel loaded, then stop) in parallel with
-    // startShooter (spin flywheel until at setpoint). If startShooter finishes first, just run the
+    // startShooter (spin flywheel until at setpoint). If startShooter finishes
+    // first, just run the
     // dye rotor immediately.
     return preload()
         .withDeadline(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()))
@@ -145,6 +132,80 @@ public class StateMachine extends SubsystemBase {
             });
   }
 
+  public Command preloadCommand() {
+    return Commands.runOnce(
+        () -> {
+          if (m_state == State.Shooting)
+            return;
+
+          CommandScheduler.getInstance().schedule(preload());
+        });
+  }
+
+  public Command preload() {
+    return m_dyeRotor
+        .start()
+        .until(() -> m_shooter.getFuelLimitSwitch())
+        .andThen(m_dyeRotor.stop())
+        .withName("preload");
+  }
+
+  // intake commands (teleop)
+  public Command intakeSequence() {
+    return (m_intake.intake().onlyIf(StateMachine::isNotClimbing));
+  }
+
+  public Command extakeSequence() {
+    return (m_intake.extake().onlyIf(StateMachine::isNotClimbing));
+  }
+
+  public Command stowSequence() {
+    return (m_intake.stow().onlyIf(StateMachine::isNotClimbing));
+  }
+
+  // Auto commands
+  public Command shootAuto() {
+    return preload()
+        .withDeadline(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()))
+        .andThen(
+            m_shooter
+                .startShooter()
+                .alongWith(m_dyeRotor.start())
+                .beforeStarting(
+                    () -> {
+                      startShootingRotorPosition = m_dyeRotor.getRotorPosition();
+                      setState(State.Shooting);
+                    })
+                .withTimeout(SHOOT_WAIT))
+        .andThen(stopShootAuto());
+  }
+
+  public Command stopShootAuto() {
+    return m_shooter
+        .stopShooter()
+        .alongWith(m_dyeRotor.stop())
+        .withName("stop shooting in auto")
+        .withTimeout(STOP_SHOOT_WAIT)
+        .beforeStarting(
+            () -> {
+              m_state = State.Idle;
+            });
+  }
+
+  // intake commands (auto)
+  public Command intakeSequenceAuto() {
+    return m_intake.intake().withTimeout(INTAKE_WAIT);
+  }
+
+  public Command extakeSequenceAuto() {
+    return (m_intake.extake().onlyIf(StateMachine::isNotClimbing).withTimeout(EXTAKE_WAIT));
+  }
+
+  public Command stowSequenceAuto() {
+    return (m_intake.stow().onlyIf(StateMachine::isNotClimbing).withTimeout(STOW_WAIT));
+  }
+
+  // State helpers
   public State getState() {
     return m_state;
   }
@@ -169,8 +230,7 @@ public class StateMachine extends SubsystemBase {
 
     double distanceToTarget = toGoal.getNorm();
 
-    Translation2d virtualTarget =
-        futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToTarget));
+    Translation2d virtualTarget = futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToTarget));
 
     Translation2d robotToTarget = virtualTarget.minus(robotPosition);
     Rotation2d fieldAngle = robotToTarget.getAngle();
@@ -179,19 +239,6 @@ public class StateMachine extends SubsystemBase {
     m_shooter.updateTurretTarget(turretAngle.getDegrees());
     m_shooter.updateHoodTarget(distanceToTarget);
     m_shooter.updateFlywheelTarget(distanceToTarget);
-  }
-
-  // intake commands
-  public Command intakeSequence() {
-    return (m_intake.intake().onlyIf(StateMachine::isNotClimbing));
-  }
-
-  public Command extakeSequence() {
-    return (m_intake.extake().onlyIf(StateMachine::isNotClimbing));
-  }
-
-  public Command stowSequence() {
-    return (m_intake.stow().onlyIf(StateMachine::isNotClimbing));
   }
 
   private void runTargeting() {

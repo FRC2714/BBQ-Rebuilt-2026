@@ -46,11 +46,12 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // NAMED COMMANDS FOR PATHPLANNER
-    NamedCommands.registerCommand("SCORE", m_stateMachine.shoot());
-    NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShoot());
-    NamedCommands.registerCommand("INTAKE", m_stateMachine.intakeSequence());
-    NamedCommands.registerCommand("EXTAKE", m_stateMachine.extakeSequence());
-    NamedCommands.registerCommand("STOW_INTAKE", m_stateMachine.stowSequence());
+    NamedCommands.registerCommand("SCORE", m_stateMachine.shootAuto());
+    NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShootAuto());
+    NamedCommands.registerCommand("INTAKE", m_stateMachine.intakeSequenceAuto());
+    NamedCommands.registerCommand("INTAKE_AUTO", m_stateMachine.intakeSequence());
+    NamedCommands.registerCommand("EXTAKE", m_stateMachine.extakeSequenceAuto());
+    NamedCommands.registerCommand("STOW_INTAKE", m_stateMachine.stowSequenceAuto());
     NamedCommands.registerCommand("PRELOAD", m_stateMachine.preloadCommand());
 
     // Configure the button bindings

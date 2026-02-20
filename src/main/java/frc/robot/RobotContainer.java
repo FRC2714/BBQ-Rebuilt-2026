@@ -73,6 +73,8 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    m_stateMachine.configureBindings();
+
     m_driverController
         .leftStick()
         .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
@@ -98,13 +100,6 @@ public class RobotContainer {
     m_driverController.rightBumper().whileTrue(m_stateMachine.extakeSequence());
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
-
-    if (Robot.isSimulation()) {
-      m_driverController
-          .y()
-          .onTrue(new InstantCommand(() -> m_shooter.fuelTrue()))
-          .onFalse(new InstantCommand(() -> m_shooter.fuelFalse()));
-    }
 
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
     // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());

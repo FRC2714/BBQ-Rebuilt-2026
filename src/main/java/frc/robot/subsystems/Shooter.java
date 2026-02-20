@@ -11,6 +11,8 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -29,6 +31,7 @@ import frc.robot.Constants.ShooterConstants.FlywheelSetpoints;
 import frc.robot.Constants.ShooterConstants.HoodSetpoints;
 import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 import frc.robot.Robot;
+import frc.robot.Simulation;
 import frc.robot.utils.InterpolatingTreeMap;
 
 public class Shooter extends SubsystemBase {
@@ -66,12 +69,17 @@ public class Shooter extends SubsystemBase {
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
 
   public boolean wasZeroed = false;
-  private boolean fuelTrigger = false;
   private boolean isShooting = false;
 
   private InterpolatingTreeMap hoodAngleMap;
   private InterpolatingTreeMap flywheelSpeedMap;
 
+  private Debouncer flywheelDebouncer =
+      new Debouncer(ShooterConstants.kFlywheelDebounceTimeSeconds, DebounceType.kFalling);
+  private Debouncer turretDebouncer =
+      new Debouncer(ShooterConstants.kTurretDebounceTimeSeconds, DebounceType.kFalling);
+  private Debouncer hoodDebouncer =
+      new Debouncer(ShooterConstants.kHoodDebounceTimeSeconds, DebounceType.kFalling);
   // Simulation
   DCMotor flywheelMotorSim = DCMotor.getNeoVortex(2);
   SparkFlexSim flywheelSparkSim = new SparkFlexSim(flywheelMotorLeader, flywheelMotorSim);
@@ -83,6 +91,11 @@ public class Shooter extends SubsystemBase {
   SparkFlexSim turretSparkSim = new SparkFlexSim(turretMotor, turretMotorSim);
   LinearSystemSim<N2, N1, N2> turretSim =
       new LinearSystemSim<>(LinearSystemId.createDCMotorSystem(turretMotorSim, 0.0001, 40));
+
+  DCMotor hoodMotorSim = DCMotor.getNeo550(1);
+  SparkFlexSim hoodSparkSim = new SparkFlexSim(hoodMotor, hoodMotorSim);
+  LinearSystemSim<N2, N1, N2> hoodSim =
+      new LinearSystemSim<>(LinearSystemId.createDCMotorSystem(hoodMotorSim, 0.001, 10));
 
   public Shooter() {
     turretMotor.configure(
@@ -112,14 +125,8 @@ public class Shooter extends SubsystemBase {
 
   // CHANGE LATER
   public void populateHoodAngleMap() {
-    hoodAngleMap.put(1.0, 5.0);
-    hoodAngleMap.put(2.0, 8.0);
-    hoodAngleMap.put(3.0, 12.0);
-    hoodAngleMap.put(4.0, 18.0);
-    hoodAngleMap.put(5.0, 26.0);
-    hoodAngleMap.put(6.0, 34.0);
-    hoodAngleMap.put(7.0, 42.0);
-    hoodAngleMap.put(8.0, 50.0);
+    hoodAngleMap.put(1.0, ShooterConstants.kHoodMaxAngle);
+    hoodAngleMap.put(8.0, ShooterConstants.kHoodMinAngle);
   }
 
   // CHANGE LATER
@@ -136,7 +143,7 @@ public class Shooter extends SubsystemBase {
 
   public boolean getFuelLimitSwitch() {
     if (Robot.isSimulation()) {
-      return fuelTrigger;
+      return Simulation.getInstance().isPreloaded();
     }
     return fuelBeamBreak.isPressed();
   }
@@ -168,7 +175,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public double getFlywheelSpeed() {
-    return flywheelCurrentTarget;
+    return flywheelRelativeEncoder.getVelocity();
   }
 
   public void setHoodAngle(double angle) {
@@ -193,17 +200,24 @@ public class Shooter extends SubsystemBase {
         });
   }
 
-  // TODO: Debounce this
+  public boolean readyToShoot() {
+    return flywheelAtSetpoint() && turretAtSetpoint() && hoodAtSetpoint();
+  }
+
   public boolean flywheelAtSetpoint() {
-    return Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
+    boolean atSetpoint =
+        Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
+    return flywheelDebouncer.calculate(atSetpoint);
   }
 
-  public void fuelTrue() {
-    fuelTrigger = true;
+  public boolean turretAtSetpoint() {
+    boolean atSetpoint = Math.abs(turretAbsoluteEncoder.getPosition() - turretCurrentTarget) < 5;
+    return turretDebouncer.calculate(atSetpoint);
   }
 
-  public void fuelFalse() {
-    fuelTrigger = false;
+  public boolean hoodAtSetpoint() {
+    boolean atSetpoint = Math.abs(hoodRelativeEncoder.getPosition() - hoodCurrentTarget) < 2;
+    return hoodDebouncer.calculate(atSetpoint);
   }
 
   public void zeroTurret() {
@@ -230,13 +244,20 @@ public class Shooter extends SubsystemBase {
     flywheelController.setSetpoint(
         isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
 
-    SmartDashboard.putNumber("Shooter/Hood/Angle", hoodCurrentTarget);
     SmartDashboard.putNumber("Shooter/Flywheel/Expected Speed", flywheelCurrentTarget);
     SmartDashboard.putNumber(
         "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());
     SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
+
     SmartDashboard.putNumber("Shooter/Turret/Setpoint", turretCurrentTarget);
     SmartDashboard.putNumber("Shooter/Turret/Position", turretRelativeEncoder.getPosition());
+    SmartDashboard.putBoolean("Shooter/Turret/At Setpoint", turretAtSetpoint());
+
+    SmartDashboard.putNumber("Shooter/Hood/Setpoint", hoodCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Hood/Position", hoodRelativeEncoder.getPosition());
+    SmartDashboard.putBoolean("Shooter/Hood/At Setpoint", hoodAtSetpoint());
+
+    SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());
   }
 
   @Override
@@ -256,6 +277,13 @@ public class Shooter extends SubsystemBase {
 
     turretSparkSim.iterate(
         Units.radiansPerSecondToRotationsPerMinute(turretSim.getOutput(1)),
+        RobotController.getBatteryVoltage(),
+        0.02);
+
+    hoodSim.setInput(hoodSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+    hoodSim.update(0.02);
+    hoodSparkSim.iterate(
+        Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1) * 10),
         RobotController.getBatteryVoltage(),
         0.02);
 

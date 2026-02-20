@@ -211,7 +211,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean turretAtSetpoint() {
-    boolean atSetpoint = Math.abs(turretAbsoluteEncoder.getPosition() - turretCurrentTarget) < 5;
+    boolean atSetpoint = Math.abs(turretRelativeEncoder.getPosition() - turretCurrentTarget) < 5;
     return turretDebouncer.calculate(atSetpoint);
   }
 

@@ -127,9 +127,11 @@ public class StateMachine extends SubsystemBase {
                     () -> {
                       startShootingRotorPosition = m_dyeRotor.getRotorPosition();
                       setState(State.Shooting);
+                      m_drivetrain.setShootingStateTrue();
                     }))
         .finallyDo(
             () -> {
+              m_drivetrain.setShootingStateFalse();
               CommandScheduler.getInstance().schedule(stopShoot());
             });
   }

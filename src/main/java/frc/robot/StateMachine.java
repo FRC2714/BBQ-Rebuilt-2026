@@ -59,14 +59,16 @@ public class StateMachine extends SubsystemBase {
       // Simulate fuel being shot out of robot
       // TODO: Adjust number of rotations it takes to index 1 ball
       new Trigger(
-          () -> m_state == State.Shooting
-              && m_dyeRotor.getRotorPosition() - startShootingRotorPosition > 0.5)
+              () ->
+                  m_state == State.Shooting
+                      && m_dyeRotor.getRotorPosition() - startShootingRotorPosition > 0.5)
           .onTrue(
               Commands.runOnce(
                   () -> {
-                    LinearVelocity exitVelocity = MetersPerSecond.of(
-                        Units.rotationsPerMinuteToRadiansPerSecond(m_shooter.getFlywheelSpeed())
-                            * Units.inchesToMeters(1.5));
+                    LinearVelocity exitVelocity =
+                        MetersPerSecond.of(
+                            Units.rotationsPerMinuteToRadiansPerSecond(m_shooter.getFlywheelSpeed())
+                                * Units.inchesToMeters(1.5));
 
                     Simulation.getInstance()
                         .shootFuel(
@@ -81,9 +83,10 @@ public class StateMachine extends SubsystemBase {
 
       // Simulate the time time it takes for fuel to get from dye rotor to shooter
       new Trigger(
-          () -> m_state != State.Shooting
-              && m_dyeRotor.isRunning()
-              && Simulation.getInstance().getFuelCount() != 0)
+              () ->
+                  m_state != State.Shooting
+                      && m_dyeRotor.isRunning()
+                      && Simulation.getInstance().getFuelCount() != 0)
           .onTrue(
               Commands.waitSeconds(0.25)
                   .andThen(() -> Simulation.getInstance().setPreloaded(true)));
@@ -91,10 +94,12 @@ public class StateMachine extends SubsystemBase {
   }
 
   public void configureBindings() {
-    Trigger pauseShooter = new Trigger(() -> m_state == State.Shooting && !m_shooter.readyToShoot());
+    Trigger pauseShooter =
+        new Trigger(() -> m_state == State.Shooting && !m_shooter.readyToShoot());
     pauseShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.pause()));
 
-    Trigger resumeShooter = new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
+    Trigger resumeShooter =
+        new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
     resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
   }
 
@@ -135,8 +140,7 @@ public class StateMachine extends SubsystemBase {
   public Command preloadCommand() {
     return Commands.runOnce(
         () -> {
-          if (m_state == State.Shooting)
-            return;
+          if (m_state == State.Shooting) return;
 
           CommandScheduler.getInstance().schedule(preload());
         });
@@ -230,7 +234,8 @@ public class StateMachine extends SubsystemBase {
 
     double distanceToTarget = toGoal.getNorm();
 
-    Translation2d virtualTarget = futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToTarget));
+    Translation2d virtualTarget =
+        futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToTarget));
 
     Translation2d robotToTarget = virtualTarget.minus(robotPosition);
     Rotation2d fieldAngle = robotToTarget.getAngle();

@@ -108,7 +108,6 @@ public class DriveSubsystem extends SubsystemBase {
   double xyStdDev;
 
   private boolean shooting = false;
-  
 
   // Publisher for robot pose for use with AdvantageScope
   StructArrayPublisher<SwerveModuleState> publisherModuleStates =
@@ -462,7 +461,6 @@ public class DriveSubsystem extends SubsystemBase {
   public void setShootingStateFalse() {
     shooting = false;
   }
-
 
   public void driveRobotRelative(ChassisSpeeds speeds) {
     drive(speeds, false);

@@ -33,10 +33,15 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "INTAKE_AUTO",
-      "waypointRelativePos": 0.1853879232542209,
+      "name": "INTAKE",
+      "waypointRelativePos": 0.46323080198459754,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "INTAKE"
+        }
+      }
     }
   ],
   "globalConstraints": {

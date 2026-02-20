@@ -23,12 +23,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "INTAKE"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Near NZ to Trench score"
@@ -41,22 +35,9 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Move to Middle NZ"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "INTAKE"
+            "pathName": "Move to Middle NZ"
           }
         },
         {

@@ -69,7 +69,7 @@ public final class Configs {
 
     static {
       turretConfig
-          .smartCurrentLimit(40)
+          .smartCurrentLimit(20)
           .idleMode(IdleMode.kBrake)
           .inverted(false)
           .voltageCompensation(12);
@@ -81,8 +81,8 @@ public final class Configs {
       turretConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
-          .pid(0.01, 0, 0)
-          .outputRange(-.5, .5);
+          .pid(0.08, 0, 0)
+          .outputRange(-1, 1);
 
       hoodConfig
           .smartCurrentLimit(40)

@@ -126,6 +126,8 @@ public final class Constants {
     public static final Transform2d turretOffset =
         new Transform2d(
             Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));
+    public static final double kTurretGearRatio = 52.5;
+    public static final double kTurretMOI = 0.0722989441;
 
     public static final int kHoodCanId = 31; // TBD
     public static final double kHoodMaxAngle = 72.276537;

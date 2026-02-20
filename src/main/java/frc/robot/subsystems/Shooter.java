@@ -87,10 +87,12 @@ public class Shooter extends SubsystemBase {
       new FlywheelSim(
           LinearSystemId.createFlywheelSystem(flywheelMotorSim, 0.001, 1), flywheelMotorSim);
 
-  DCMotor turretMotorSim = DCMotor.getNEO(1);
+  DCMotor turretMotorSim = DCMotor.getNeo550(1);
   SparkFlexSim turretSparkSim = new SparkFlexSim(turretMotor, turretMotorSim);
   LinearSystemSim<N2, N1, N2> turretSim =
-      new LinearSystemSim<>(LinearSystemId.createDCMotorSystem(turretMotorSim, 0.0001, 40));
+      new LinearSystemSim<>(
+          LinearSystemId.createDCMotorSystem(
+              turretMotorSim, ShooterConstants.kTurretMOI, ShooterConstants.kTurretGearRatio));
 
   DCMotor hoodMotorSim = DCMotor.getNeo550(1);
   SparkFlexSim hoodSparkSim = new SparkFlexSim(hoodMotor, hoodMotorSim);
@@ -276,7 +278,9 @@ public class Shooter extends SubsystemBase {
     turretSim.update(0.02);
 
     turretSparkSim.iterate(
-        Units.radiansPerSecondToRotationsPerMinute(turretSim.getOutput(1)),
+        Units.radiansPerSecondToRotationsPerMinute(turretSim.getOutput(1))
+            * ShooterConstants.kTurretGearRatio
+            * 2, // This is hack to make the turret reach the target faster in simulation
         RobotController.getBatteryVoltage(),
         0.02);
 

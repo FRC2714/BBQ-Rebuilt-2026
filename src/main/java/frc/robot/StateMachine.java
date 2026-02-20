@@ -17,6 +17,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.Constants.DriveConstants;
 
 public class StateMachine extends SubsystemBase {
   private final DriveSubsystem m_drivetrain;
@@ -24,6 +25,9 @@ public class StateMachine extends SubsystemBase {
   private final Intake m_intake;
   private final DyeRotor m_dyeRotor;
   private final Publisher m_publisher;
+  private final double xSpeed = 0;
+  private final double ySpeed = 0;
+  
 
   private static State m_state = State.Idle;
 
@@ -127,6 +131,9 @@ public class StateMachine extends SubsystemBase {
                     () -> {
                       startShootingRotorPosition = m_dyeRotor.getRotorPosition();
                       setState(State.Shooting);
+                       drive(xSpeed, ySpeed) {
+                        m_drivetrain.drive(new ChassisSpeeds(xSpeed, ySpeed, 2.4));
+                      }
                     }))
         .finallyDo(
             () -> {
@@ -224,6 +231,8 @@ public class StateMachine extends SubsystemBase {
         "State Machine/Current Comamand",
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
     SmartDashboard.putString("State Machine/State", m_state.toString());
+    SmartDashboard.putData("xSpeed", xSpeed);
+    SmartDashboard.putData("ySpeed", ySpeed);
 
     m_publisher.publish();
   }

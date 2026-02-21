@@ -88,7 +88,9 @@ public class RobotContainer {
 
     m_driverController
         .povRight()
-        .onTrue(new InstantCommand(() -> m_shooter.setTurretAngle(0), m_shooter));
+        .onTrue(m_shooter.zeroTurretSequence());
+
+    
 
     m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
 

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.204696428571428,
-        "y": 0.618
+        "x": 3.409418988811309,
+        "y": 2.506
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.0025,
-        "y": 0.4393928571428569
+        "x": 5.3230586010485395,
+        "y": 2.5552000162742226
       },
       "isLocked": false,
       "linkedName": "Trench Score Position"
     },
     {
       "anchor": {
-        "x": 8.171757454201028,
-        "y": 2.5490167812771265
+        "x": 8.273435326470269,
+        "y": 2.506
       },
       "prevControl": {
-        "x": 7.101317699511273,
-        "y": 2.005147192532538
+        "x": 6.969399394218378,
+        "y": 2.4729343830966286
       },
       "nextControl": null,
       "isLocked": false,
@@ -54,7 +54,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 54.68878656036678
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "outpost to NZ",

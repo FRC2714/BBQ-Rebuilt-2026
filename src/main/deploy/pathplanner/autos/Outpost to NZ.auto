@@ -13,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "SCORE"
+            "name": "SCORE_INITAL"
           }
         },
         {

@@ -25,13 +25,6 @@ public class StateMachine extends SubsystemBase {
   private final DyeRotor m_dyeRotor;
   private final Publisher m_publisher;
 
-  // withTimeout constants in seconds for auton (right now arbitrary, needs to be tested)
-  private final double SHOOT_WAIT = 1.5;
-  private final double STOP_SHOOT_WAIT = 0.5;
-  private final double INTAKE_WAIT = 1.75;
-  private final double EXTAKE_WAIT = 1.75;
-  private final double STOW_WAIT = 0.75;
-
   private static State m_state = State.Idle;
 
   private static boolean isNotClimbing() {
@@ -168,28 +161,28 @@ public class StateMachine extends SubsystemBase {
   }
 
   // Auto commands
-  public Command shootAuto() {
+  public Command shootAuto(double shootTimeout, double stopTimeout) {
     return preload()
         .withDeadline(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()))
         .andThen(
             m_shooter
                 .startShooter()
                 .alongWith(m_dyeRotor.start())
+                .withTimeout(shootTimeout)
                 .beforeStarting(
                     () -> {
                       startShootingRotorPosition = m_dyeRotor.getRotorPosition();
                       setState(State.Shooting);
                     })
-                .withTimeout(SHOOT_WAIT))
-        .andThen(stopShootAuto());
+                .andThen(stopShootAuto(stopTimeout)));
   }
 
-  public Command stopShootAuto() {
+  public Command stopShootAuto(double timeout) {
     return m_shooter
         .stopShooter()
         .alongWith(m_dyeRotor.stop())
         .withName("stop shooting in auto")
-        .withTimeout(STOP_SHOOT_WAIT)
+        .withTimeout(timeout)
         .beforeStarting(
             () -> {
               m_state = State.Idle;
@@ -197,16 +190,16 @@ public class StateMachine extends SubsystemBase {
   }
 
   // intake commands (auto)
-  public Command intakeSequenceAuto() {
-    return m_intake.intake().withTimeout(INTAKE_WAIT);
+  public Command intakeSequenceAuto(double timeout) {
+    return m_intake.intake().withTimeout(timeout);
   }
 
-  public Command extakeSequenceAuto() {
-    return (m_intake.extake().onlyIf(StateMachine::isNotClimbing).withTimeout(EXTAKE_WAIT));
+  public Command extakeSequenceAuto(double timeout) {
+    return (m_intake.extake().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout));
   }
 
-  public Command stowSequenceAuto() {
-    return (m_intake.stow().onlyIf(StateMachine::isNotClimbing).withTimeout(STOW_WAIT));
+  public Command stowSequenceAuto(double timeout) {
+    return (m_intake.stow().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout));
   }
 
   // State helpers

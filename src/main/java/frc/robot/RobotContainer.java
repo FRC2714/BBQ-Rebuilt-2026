@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
@@ -46,11 +47,21 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // NAMED COMMANDS FOR PATHPLANNER
-    NamedCommands.registerCommand("SCORE", m_stateMachine.shootAuto());
-    NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShootAuto());
+    NamedCommands.registerCommand(
+        "SCORE",
+        m_stateMachine.shootAuto(
+            AutoConstants.kShootTimeout, AutoConstants.kStopShootTimeout));
+    NamedCommands.registerCommand(
+        "SCORE_INITAL",
+        m_stateMachine.shootAuto(
+            AutoConstants.kShootInitialTimeout, AutoConstants.kStopShootTimeout));
+    NamedCommands.registerCommand(
+        "STOP_SHOOTING", m_stateMachine.stopShootAuto(AutoConstants.kStopShootTimeout));
     NamedCommands.registerCommand("INTAKE", m_stateMachine.intakeSequence());
-    NamedCommands.registerCommand("EXTAKE", m_stateMachine.extakeSequenceAuto());
-    NamedCommands.registerCommand("STOW_INTAKE", m_stateMachine.stowSequenceAuto());
+    NamedCommands.registerCommand(
+        "EXTAKE", m_stateMachine.extakeSequenceAuto(AutoConstants.kExtakeTimeout));
+    NamedCommands.registerCommand(
+        "STOW_INTAKE", m_stateMachine.stowSequenceAuto(AutoConstants.kStowTimeout));
     NamedCommands.registerCommand("PRELOAD", m_stateMachine.preloadCommand());
 
     // Configure the button bindings

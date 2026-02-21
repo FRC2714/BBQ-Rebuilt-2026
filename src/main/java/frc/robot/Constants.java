@@ -107,6 +107,14 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
         new TrapezoidProfile.Constraints(
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+
+    // Command timeouts in seconds (needs to be tested)
+    public static final double kShootInitialTimeout = 1.5;
+    public static final double kShootTimeout = 2.5;
+    public static final double kStopShootTimeout = 0.5;
+    public static final double kIntakeTimeout = 1.75;
+    public static final double kExtakeTimeout = 1.75;
+    public static final double kStowTimeout = 0.75;
   }
 
   public static final class NeoMotorConstants {

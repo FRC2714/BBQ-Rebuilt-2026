@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.204696428571428,
-        "y": 0.618
+        "x": 3.409418988811309,
+        "y": 2.506
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.676781491880064,
-        "y": 0.5362076416015622
+        "x": 7.714551484284576,
+        "y": 2.5499303521050334
       },
       "isLocked": false,
       "linkedName": "Trench Score Position"
     },
     {
       "anchor": {
-        "x": 7.776581116852938,
-        "y": 3.653206160933883
+        "x": 8.069006234628183,
+        "y": 3.9854927526403356
       },
       "prevControl": {
-        "x": 8.075031126799407,
-        "y": 1.0358431226942275
+        "x": 8.041012065746166,
+        "y": 2.045519505253545
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,8 +30,8 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.700337848249507,
-      "rotationDegrees": 90.0
+      "waypointRelativePos": 0.36415011773328343,
+      "rotationDegrees": 0.0
     }
   ],
   "constraintZones": [],

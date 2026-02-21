@@ -98,10 +98,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   private boolean isInZone(double[] zone) {
     Translation2d pos = getPose().getTranslation();
-    return (pos.getX() - ROBOT_BUFFER_X >= zone[0]
-        && pos.getY() - ROBOT_BUFFER_Y >= zone[1]
-        && pos.getX() + ROBOT_BUFFER_X <= zone[2]
-        && pos.getY() + ROBOT_BUFFER_Y <= zone[3]);
+    // Robot is in zone if ANY part overlaps (standard rectangle overlap check)
+    return (pos.getX() + ROBOT_BUFFER_X > zone[0]
+        && pos.getX() - ROBOT_BUFFER_X < zone[2]
+        && pos.getY() + ROBOT_BUFFER_Y > zone[1]
+        && pos.getY() - ROBOT_BUFFER_Y < zone[3]);
   }
 
   public boolean isInAllianceZone() {

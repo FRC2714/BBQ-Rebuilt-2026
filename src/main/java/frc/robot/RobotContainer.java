@@ -90,6 +90,9 @@ public class RobotContainer {
         .povRight()
         .onTrue(m_shooter.zeroTurretSequence());
 
+            m_driverController
+        .povDown()
+        .onTrue(new InstantCommand(() -> m_shooter.disableLimitSwitchAutoZeroing()));
     
 
     m_driverController.a().toggleOnTrue(m_stateMachine.shoot());

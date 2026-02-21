@@ -10,6 +10,9 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
+import com.revrobotics.spark.config.SparkFlexConfig;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -237,6 +240,8 @@ public class Shooter extends SubsystemBase {
     }
   }
   public Command zeroTurretSequence() {
+    if(!wasZeroed){
+    wasZeroed = true;
     return new RunCommand(
       () -> {
         turretMotor.set(1);
@@ -244,6 +249,16 @@ public class Shooter extends SubsystemBase {
       this)
       .until(() -> turretMotor.getForwardLimitSwitch().isPressed())
       .andThen(new InstantCommand(() -> turretMotor.set(0), this));
+    } else {
+      return new InstantCommand();
+    }
+    }
+
+    public void disableLimitSwitchAutoZeroing(){
+      SparkFlexConfig disableLimitSwitchZeroingConfig = new SparkFlexConfig();
+      disableLimitSwitchZeroingConfig.limitSwitch.forwardLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotor);
+      turretMotor.configure(disableLimitSwitchZeroingConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+
     }
   
 
@@ -272,6 +287,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putBoolean("Shooter/Hood/At Setpoint", hoodAtSetpoint());
 
     SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());
+    SmartDashboard.putBoolean("Shooter/Turret/wasZeroed", wasZeroed);
   }
 
   @Override

@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -26,6 +28,9 @@ public class StateMachine extends SubsystemBase {
   private final Publisher m_publisher;
 
   private static State m_state = State.Idle;
+
+  CommandXboxController m_driverController =
+    new CommandXboxController(OIConstants.kDriverControllerPort);
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -94,6 +99,14 @@ public class StateMachine extends SubsystemBase {
     Trigger resumeShooter =
         new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
     resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
+
+    Trigger stopPreload = 
+      new Trigger(() -> m_state != State.Climbing && m_shooter.getFuelLimitSwitch()).and(m_driverController.x());
+    stopPreload.onTrue(Commands.runOnce(() -> this.preloadCommand().cancel()));
+
+    Trigger startPreload = 
+      new Trigger(() -> m_state != State.Climbing && !m_shooter.getFuelLimitSwitch()).and(m_driverController.x());
+    startPreload.onTrue(Commands.runOnce(() -> this.preloadCommand()));
   }
 
   public Command preloadCommand() {

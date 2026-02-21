@@ -73,6 +73,8 @@ public class Shooter extends SubsystemBase {
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
 
   public boolean wasZeroed = false;
+  public boolean turretUpdated = false;
+
   private boolean isShooting = false;
 
   private InterpolatingTreeMap hoodAngleMap;
@@ -255,6 +257,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void disableLimitSwitchAutoZeroing() {
+    turretUpdated = true;
     SparkFlexConfig disableLimitSwitchZeroingConfig = new SparkFlexConfig();
     disableLimitSwitchZeroingConfig.limitSwitch.forwardLimitSwitchTriggerBehavior(
         Behavior.kKeepMovingMotor);
@@ -277,6 +280,10 @@ public class Shooter extends SubsystemBase {
     flywheelController.setSetpoint(
         isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
 
+    if(turretMotor.getForwardLimitSwitch().isPressed() || turretMotor.getReverseLimitSwitch().isPressed()){
+      disableLimitSwitchAutoZeroing();
+    }
+
     SmartDashboard.putNumber("Shooter/Flywheel/Expected Speed", flywheelCurrentTarget);
     SmartDashboard.putNumber(
         "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());
@@ -292,6 +299,8 @@ public class Shooter extends SubsystemBase {
 
     SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());
     SmartDashboard.putBoolean("Shooter/Turret/wasZeroed", wasZeroed);
+        SmartDashboard.putBoolean("Shooter/Turret/turret Updated with limitswitch?", turretUpdated);
+
   }
 
   @Override

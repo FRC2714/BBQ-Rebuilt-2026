@@ -41,7 +41,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
-import frc.robot.Constants.RobotDimensions;
 import frc.robot.Field;
 import frc.robot.FieldConstants;
 import frc.robot.Robot;
@@ -91,12 +90,18 @@ public class DriveSubsystem extends SubsystemBase {
     FieldConstants.fieldWidth,
   };
 
+  private static final double ROBOT_BUFFER_X =
+      (DriveConstants.kWheelBase / 2.0) + DriveConstants.kBumperThickness;
+
+  private static final double ROBOT_BUFFER_Y =
+      (DriveConstants.kTrackWidth / 2.0) + DriveConstants.kBumperThickness;
+
   private boolean isInZone(double[] zone) {
     Translation2d pos = getPose().getTranslation();
-    return (pos.getX() - RobotDimensions.kHalfLengthWithBumpers >= zone[0]
-        && pos.getY() - RobotDimensions.kHalfWidthWithBumpers >= zone[1]
-        && pos.getX() + RobotDimensions.kHalfLengthWithBumpers <= zone[2]
-        && pos.getY() + RobotDimensions.kHalfWidthWithBumpers <= zone[3]);
+    return (pos.getX() - ROBOT_BUFFER_X >= zone[0]
+        && pos.getY() - ROBOT_BUFFER_Y >= zone[1]
+        && pos.getX() + ROBOT_BUFFER_X <= zone[2]
+        && pos.getY() + ROBOT_BUFFER_Y <= zone[3]);
   }
 
   public boolean isInAllianceZone() {

@@ -281,8 +281,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());
 
     turretPose3d =
-        new Pose3d(
-            0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
+        new Pose3d(0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
 
     hoodPose3d =
         new Pose3d(0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getHoodPosition())));

@@ -14,6 +14,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -82,6 +84,11 @@ public class Shooter extends SubsystemBase {
       new Debouncer(ShooterConstants.kTurretDebounceTimeSeconds, DebounceType.kFalling);
   private Debouncer hoodDebouncer =
       new Debouncer(ShooterConstants.kHoodDebounceTimeSeconds, DebounceType.kFalling);
+
+  private Pose3d turretPose3d = new Pose3d();
+  private Pose3d hoodPose3d = new Pose3d();
+  private Pose3d flyWheelPose3d = new Pose3d();
+
   // Simulation
   DCMotor flywheelMotorSim = DCMotor.getNeoVortex(2);
   SparkFlexSim flywheelSparkSim = new SparkFlexSim(flywheelMotorLeader, flywheelMotorSim);
@@ -156,6 +163,10 @@ public class Shooter extends SubsystemBase {
 
   public double getHoodPosition() {
     return hoodRelativeEncoder.getPosition();
+  }
+
+  public double getFlyWheelPosition() {
+    return flywheelRelativeEncoder.getPosition();
   }
 
   public void updateTurretTarget(double updateValue) {
@@ -235,6 +246,18 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  public Pose3d getTurretPose3d() {
+    return turretPose3d;
+  }
+
+  public Pose3d getHoodPose3d() {
+    return hoodPose3d;
+  }
+
+  public Pose3d getFlyWheelPose3d() {
+    return flyWheelPose3d;
+  }
+
   @Override
   public void periodic() {
     turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
@@ -256,6 +279,17 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putBoolean("Shooter/Hood/At Setpoint", hoodAtSetpoint());
 
     SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());
+
+    turretPose3d =
+        new Pose3d(
+            0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
+
+    hoodPose3d =
+        new Pose3d(0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getHoodPosition())));
+
+    flyWheelPose3d =
+        new Pose3d(
+            0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getFlyWheelPosition())));
   }
 
   @Override

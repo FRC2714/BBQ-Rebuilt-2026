@@ -12,7 +12,6 @@ import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
 import com.revrobotics.spark.config.SparkFlexConfig;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -26,8 +25,8 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
@@ -239,29 +238,33 @@ public class Shooter extends SubsystemBase {
       wasZeroed = false;
     }
   }
+
   public Command zeroTurretSequence() {
-    if(!wasZeroed){
-    wasZeroed = true;
-    return new RunCommand(
-      () -> {
-        turretMotor.set(1);
-      },
-      this)
-      .until(() -> turretMotor.getForwardLimitSwitch().isPressed())
-      .andThen(new InstantCommand(() -> turretMotor.set(0), this));
+    if (!wasZeroed) {
+      wasZeroed = true;
+      return new RunCommand(
+              () -> {
+                turretMotor.set(1);
+              },
+              this)
+          .until(() -> turretMotor.getForwardLimitSwitch().isPressed())
+          .andThen(new InstantCommand(() -> turretMotor.set(0), this));
     } else {
       return new InstantCommand();
     }
-    }
+  }
 
-    public void disableLimitSwitchAutoZeroing(){
-      SparkFlexConfig disableLimitSwitchZeroingConfig = new SparkFlexConfig();
-      disableLimitSwitchZeroingConfig.limitSwitch.forwardLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotor);
-            disableLimitSwitchZeroingConfig.limitSwitch.reverseLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotor);
-      turretMotor.configure(disableLimitSwitchZeroingConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-
-    }
-  
+  public void disableLimitSwitchAutoZeroing() {
+    SparkFlexConfig disableLimitSwitchZeroingConfig = new SparkFlexConfig();
+    disableLimitSwitchZeroingConfig.limitSwitch.forwardLimitSwitchTriggerBehavior(
+        Behavior.kKeepMovingMotor);
+    disableLimitSwitchZeroingConfig.limitSwitch.reverseLimitSwitchTriggerBehavior(
+        Behavior.kKeepMovingMotor);
+    turretMotor.configure(
+        disableLimitSwitchZeroingConfig,
+        ResetMode.kNoResetSafeParameters,
+        PersistMode.kNoPersistParameters);
+  }
 
   public void setTurretAngle(double angle) {
     turretRelativeEncoder.setPosition(angle);

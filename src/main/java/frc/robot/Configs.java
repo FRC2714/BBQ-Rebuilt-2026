@@ -2,10 +2,9 @@ package frc.robot;
 
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
+import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
-
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.ShooterConstants;
 
@@ -85,12 +84,16 @@ public final class Configs {
           .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
           .pid(0.08, 0, 0)
           .outputRange(-1, 1);
-        turretConfig.limitSwitch.forwardLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotorAndSetPosition)
-        .forwardLimitSwitchPosition(ShooterConstants.kFwdLimitSwitchOffset)
-        .limitSwitchPositionSensor(FeedbackSensor.kAlternateOrExternalEncoder);
-        turretConfig.limitSwitch.reverseLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotorAndSetPosition)
-        .reverseLimitSwitchPosition(ShooterConstants.kRevLimitSwitchOffset)
-                .limitSwitchPositionSensor(FeedbackSensor.kAlternateOrExternalEncoder);
+      turretConfig
+          .limitSwitch
+          .forwardLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotorAndSetPosition)
+          .forwardLimitSwitchPosition(ShooterConstants.kFwdLimitSwitchOffset)
+          .limitSwitchPositionSensor(FeedbackSensor.kAlternateOrExternalEncoder);
+      turretConfig
+          .limitSwitch
+          .reverseLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotorAndSetPosition)
+          .reverseLimitSwitchPosition(ShooterConstants.kRevLimitSwitchOffset)
+          .limitSwitchPositionSensor(FeedbackSensor.kAlternateOrExternalEncoder);
 
       hoodConfig
           .smartCurrentLimit(40)

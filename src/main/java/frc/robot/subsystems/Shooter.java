@@ -257,6 +257,7 @@ public class Shooter extends SubsystemBase {
     public void disableLimitSwitchAutoZeroing(){
       SparkFlexConfig disableLimitSwitchZeroingConfig = new SparkFlexConfig();
       disableLimitSwitchZeroingConfig.limitSwitch.forwardLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotor);
+            disableLimitSwitchZeroingConfig.limitSwitch.reverseLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotor);
       turretMotor.configure(disableLimitSwitchZeroingConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
     }

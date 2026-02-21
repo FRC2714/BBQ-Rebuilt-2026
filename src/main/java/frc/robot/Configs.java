@@ -86,8 +86,11 @@ public final class Configs {
           .pid(0.08, 0, 0)
           .outputRange(-1, 1);
         turretConfig.limitSwitch.forwardLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotorAndSetPosition)
-        .forwardLimitSwitchPosition(ShooterConstants.kLimitSwitchOffset)
+        .forwardLimitSwitchPosition(ShooterConstants.kFwdLimitSwitchOffset)
         .limitSwitchPositionSensor(FeedbackSensor.kAlternateOrExternalEncoder);
+        turretConfig.limitSwitch.reverseLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotorAndSetPosition)
+        .reverseLimitSwitchPosition(ShooterConstants.kRevLimitSwitchOffset)
+                .limitSwitchPositionSensor(FeedbackSensor.kAlternateOrExternalEncoder);
 
       hoodConfig
           .smartCurrentLimit(40)

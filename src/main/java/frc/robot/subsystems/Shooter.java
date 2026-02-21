@@ -293,7 +293,7 @@ public class Shooter extends SubsystemBase {
             0,
             new Rotation3d(
                 0.0,
-                0,
+                Units.rotationsToRadians(flywheelRelativeEncoder.getPosition()),
                 Units.degreesToRadians(getTurretPosition())));
   }
 

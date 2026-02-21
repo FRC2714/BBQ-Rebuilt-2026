@@ -284,11 +284,11 @@ public class Shooter extends SubsystemBase {
         new Pose3d(0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
 
     hoodPose3d =
-        new Pose3d(0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getHoodPosition())));
+        new Pose3d(0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
 
     flyWheelPose3d =
         new Pose3d(
-            0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getFlyWheelPosition())));
+            0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
   }
 
   @Override

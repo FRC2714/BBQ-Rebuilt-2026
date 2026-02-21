@@ -280,7 +280,8 @@ public class Shooter extends SubsystemBase {
     flywheelController.setSetpoint(
         isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
 
-    if(turretMotor.getForwardLimitSwitch().isPressed() || turretMotor.getReverseLimitSwitch().isPressed()){
+    if (turretMotor.getForwardLimitSwitch().isPressed()
+        || turretMotor.getReverseLimitSwitch().isPressed()) {
       disableLimitSwitchAutoZeroing();
     }
 
@@ -299,8 +300,7 @@ public class Shooter extends SubsystemBase {
 
     SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());
     SmartDashboard.putBoolean("Shooter/Turret/wasZeroed", wasZeroed);
-        SmartDashboard.putBoolean("Shooter/Turret/turret Updated with limitswitch?", turretUpdated);
-
+    SmartDashboard.putBoolean("Shooter/Turret/turret Updated with limitswitch?", turretUpdated);
   }
 
   @Override

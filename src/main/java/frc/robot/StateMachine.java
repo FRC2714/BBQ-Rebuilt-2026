@@ -161,20 +161,20 @@ public class StateMachine extends SubsystemBase {
   }
 
   // Auto commands
-  public Command shootAuto(double shootTimeout, double stopTimeout) {
+
+  // For event markers — just starts shooting, no timeout (gets cancelled when path ends)
+  public Command startShootingAuto() {
     return preload()
         .withDeadline(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()))
         .andThen(
             m_shooter
                 .startShooter()
                 .alongWith(m_dyeRotor.start())
-                .withTimeout(shootTimeout)
                 .beforeStarting(
                     () -> {
                       startShootingRotorPosition = m_dyeRotor.getRotorPosition();
                       setState(State.Shooting);
-                    })
-                .andThen(stopShootAuto(stopTimeout)));
+                    }));
   }
 
   public Command stopShootAuto(double timeout) {
@@ -200,6 +200,16 @@ public class StateMachine extends SubsystemBase {
 
   public Command stowSequenceAuto(double timeout) {
     return (m_intake.stow().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout));
+  }
+
+  // For sequential use after paths — controls shooting duration then stops
+  public Command waitForScore(double shootTimeout, double stopTimeout) {
+    return m_shooter
+        .startShooter()
+        .alongWith(m_dyeRotor.start())
+        .withTimeout(shootTimeout)
+        .andThen(stopShootAuto(stopTimeout))
+        .onlyIf(() -> m_state == State.Shooting);
   }
 
   // State helpers

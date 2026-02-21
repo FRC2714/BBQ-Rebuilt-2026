@@ -47,14 +47,8 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // NAMED COMMANDS FOR PATHPLANNER
-    NamedCommands.registerCommand(
-        "SCORE",
-        m_stateMachine.shootAuto(
-            AutoConstants.kShootTimeout, AutoConstants.kStopShootTimeout));
-    NamedCommands.registerCommand(
-        "SCORE_INITAL",
-        m_stateMachine.shootAuto(
-            AutoConstants.kShootInitialTimeout, AutoConstants.kStopShootTimeout));
+    NamedCommands.registerCommand("SCORE", m_stateMachine.startShootingAuto());
+    NamedCommands.registerCommand("SCORE_INITAL", m_stateMachine.startShootingAuto());
     NamedCommands.registerCommand(
         "STOP_SHOOTING", m_stateMachine.stopShootAuto(AutoConstants.kStopShootTimeout));
     NamedCommands.registerCommand("INTAKE", m_stateMachine.intakeSequence());
@@ -63,6 +57,13 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "STOW_INTAKE", m_stateMachine.stowSequenceAuto(AutoConstants.kStowTimeout));
     NamedCommands.registerCommand("PRELOAD", m_stateMachine.preloadCommand());
+    NamedCommands.registerCommand(
+        "WAIT_FOR_SCORE",
+        m_stateMachine.waitForScore(AutoConstants.kShootTimeout, AutoConstants.kStopShootTimeout));
+    NamedCommands.registerCommand(
+        "WAIT_FOR_SCORE_INITIAL",
+        m_stateMachine.waitForScore(
+            AutoConstants.kShootInitialTimeout, AutoConstants.kStopShootTimeout));
 
     // Configure the button bindings
     configureButtonBindings();

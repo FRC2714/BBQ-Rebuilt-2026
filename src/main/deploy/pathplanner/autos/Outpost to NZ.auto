@@ -7,25 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Shoot From Start"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "WAIT_FOR_SCORE_INITIAL"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "Move to Near NZ"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Near NZ to Trench score"
+            "pathName": "Near NZ to Score"
           }
         },
         {
@@ -37,13 +25,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Move to Middle NZ"
+            "pathName": "Move to Middle-1 NZ"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Middle NZ to Trench score"
+            "pathName": "Middle-1 NZ to Trench score"
           }
         },
         {

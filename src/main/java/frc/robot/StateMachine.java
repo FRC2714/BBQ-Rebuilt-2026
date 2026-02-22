@@ -54,7 +54,7 @@ public class StateMachine extends SubsystemBase {
       new Trigger(
               () ->
                   m_state == State.Shooting
-                      && m_dyeRotor.getRotorPosition() - startShootingRotorPosition > 0.5)
+                      && m_dyeRotor.getRotorPosition() - startShootingRotorPosition > 0.25)
           .onTrue(
               Commands.runOnce(
                   () -> {

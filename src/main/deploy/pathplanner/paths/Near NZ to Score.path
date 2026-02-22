@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.069006234628183,
-        "y": 3.9854927526403356
+        "x": 8.273435326470269,
+        "y": 2.5057999437120224
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.35521222308417,
-        "y": 3.1345396501872336
+        "x": 8.023436584559972,
+        "y": 2.5050068212315226
       },
       "isLocked": false,
-      "linkedName": "Intake Middle NZ"
+      "linkedName": "Intake Near NZ"
     },
     {
       "anchor": {
-        "x": 3.409418988811309,
-        "y": 2.506
+        "x": 3.3549181431965023,
+        "y": 2.5057999437120224
       },
       "prevControl": {
-        "x": 5.644526131668451,
-        "y": 2.327392857142857
+        "x": 5.457026095790901,
+        "y": 2.50631776651831
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "SCORE",
-      "waypointRelativePos": 0.81,
+      "waypointRelativePos": 0.81118904583827,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -60,7 +60,7 @@
   "folder": "outpost to NZ",
   "idealStartingState": {
     "velocity": 5.0,
-    "rotation": 90.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

@@ -42,7 +42,7 @@ public class DyeRotor extends SubsystemBase {
   DCMotor motor = DCMotor.getNeoVortex(1);
   private SparkFlexSim dyeRotorSim = new SparkFlexSim(dyeRotorMotor, motor);
   private static final double MOMENT_OF_INERTIA = 0.00032; // kg*m^2
-  private static final double GEARING = 25; // 1:1 if direct drive
+  private static final double GEARING = 56.25; // 1:1 if direct drive
   private FlywheelSim flywheelSim =
       new FlywheelSim(
           LinearSystemId.createFlywheelSystem(motor, MOMENT_OF_INERTIA, GEARING), motor);

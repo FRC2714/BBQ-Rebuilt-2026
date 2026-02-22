@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.409418988811309,
+        "x": 3.742674580610335,
         "y": 2.506
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.3230586010485395,
+        "x": 5.6563141928475655,
         "y": 2.5552000162742226
       },
       "isLocked": false,
-      "linkedName": "Trench Score Position"
+      "linkedName": null
     },
     {
       "anchor": {

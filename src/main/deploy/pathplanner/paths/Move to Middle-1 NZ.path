@@ -3,43 +3,48 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.273435326470269,
+        "x": 3.3549181431965023,
         "y": 2.5057999437120224
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.023436584559972,
-        "y": 2.5050068212315226
+        "x": 7.824409807990579,
+        "y": 2.0550673878811643
       },
       "isLocked": false,
-      "linkedName": "Intake Near NZ"
+      "linkedName": "Trench Score Position"
     },
     {
       "anchor": {
-        "x": 3.409418988811309,
-        "y": 2.506
+        "x": 7.879735172892113,
+        "y": 3.998922862544604
       },
       "prevControl": {
-        "x": 5.511526941405709,
-        "y": 2.506517822806287
+        "x": 7.688617715274587,
+        "y": 2.0412736389793738
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Trench Score Position"
+      "linkedName": "Intake Middle NZ"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.34459940592447913,
+      "rotationDegrees": 59.99999999999999
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "SCORE",
-      "waypointRelativePos": 0.81118904583827,
+      "name": "INTAKE",
+      "waypointRelativePos": 0.3402955837159361,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "SCORE"
+          "name": "INTAKE"
         }
       }
     }
@@ -54,7 +59,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": "outpost to NZ",

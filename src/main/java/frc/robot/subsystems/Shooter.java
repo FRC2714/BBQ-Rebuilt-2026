@@ -15,7 +15,6 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.numbers.N1;
@@ -100,9 +99,6 @@ public class Shooter extends SubsystemBase {
   private static final InterpolatingTreeMap<Double, ShooterParams> shooterMap =
       new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShooterParams::interpolate);
 
-  private static final InterpolatingDoubleTreeMap velocityToDistanceMap =
-      new InterpolatingDoubleTreeMap();
-
   static {
     shooterMap.put(2.0, new ShooterParams(2400.0, 72.276537, 0.94));
     shooterMap.put(3.0, new ShooterParams(2600.0, 68.0, 1.0));
@@ -113,17 +109,9 @@ public class Shooter extends SubsystemBase {
     shooterMap.put(8.0, new ShooterParams(3500.0, 54.276537, 1.33));
   }
 
-  static {
-    // Populate velocityToDistanceMap based on shooterMap
-    for (Double distance : new Double[] {2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0}) {
-      ShooterParams params = shooterMap.get(distance);
-      double velocity = distance / params.timeOfFlight;
-      velocityToDistanceMap.put(velocity, distance);
-    }
-  }
-
   /**
-   * Courtesy of https://blog.eeshwark.com/robotblog/shooting-on-the-fly-pt2
+   * Courtesy of https://blog.eeshwark.com/robotblog/shooting-on-the-fly-pt2 and
+   * https://frc-docs--3242.org.readthedocs.build/en/3242/docs/software/advanced-controls/fire-control/dynamic-shooting.html
    *
    * @param robotPosition
    * @param robotHeading
@@ -137,34 +125,55 @@ public class Shooter extends SubsystemBase {
       Translation2d robotVelocity,
       Translation2d goalPosition,
       double latencyCompensation) {
-    // 1. Project future position
+
+    // 1. Project future position using latency compensation
     Translation2d futurePos = robotPosition.plus(robotVelocity.times(latencyCompensation));
 
-    // 2. Get target vector
-    Translation2d toGoal = goalPosition.minus(futurePos);
-    double distance = toGoal.getNorm();
-    Translation2d targetDirection = toGoal.div(distance);
+    // Relative position and velocity of the target from the robot's perspective.
+    // The target (goal) is stationary, so its velocity relative to the robot is
+    // simply the negation of the robot's velocity.
+    Translation2d relativePosition = goalPosition.minus(futurePos);
+    Translation2d relativeVelocity = robotVelocity.times(-1);
 
-    // 3. Look up baseline velocity from table
-    ShooterParams baseline = shooterMap.get(distance);
-    double baselineVelocity = distance / baseline.timeOfFlight;
+    // 2-4. Iteratively refine the shot using time-of-flight.
+    // We begin with the raw distance to the target, then on each iteration we
+    // predict where the target will be when the gamepiece arrives and re-look-up
+    // the TOF for that adjusted position. We stop when TOF has converged.
+    double timeOfFlight = 0.0;
+    Translation2d adjustedRelativePosition = relativePosition;
 
-    // 4. Build target velocity vector
-    Translation2d targetVelocity = targetDirection.times(baselineVelocity);
+    final int MAX_ITERATIONS = 10;
+    final double CONVERGENCE_THRESHOLD = 0.001; // seconds
 
-    // 5. THE MAGIC: subtract robot velocity
-    Translation2d shotVelocity = targetVelocity.minus(robotVelocity);
+    for (int i = 0; i < MAX_ITERATIONS; i++) {
+      double distance = adjustedRelativePosition.getNorm();
+      ShooterParams params = shooterMap.get(distance);
+      double newTimeOfFlight = params.timeOfFlight;
 
-    // 6. Extract results
-    Rotation2d turretAngle = shotVelocity.getAngle();
-    double requiredVelocity = shotVelocity.getNorm();
+      // Check convergence before updating so we exit with the stable TOF value
+      if (Math.abs(newTimeOfFlight - timeOfFlight) < CONVERGENCE_THRESHOLD) {
+        timeOfFlight = newTimeOfFlight;
+        break;
+      }
 
-    // 7. Use table in reverse: velocity → effective distance → RPM
-    double effectiveDistance = velocityToDistanceMap.get(requiredVelocity);
-    double requiredRpm = shooterMap.get(effectiveDistance).rpm;
-    double requiredHoodAngle = shooterMap.get(effectiveDistance).hoodAngle;
+      timeOfFlight = newTimeOfFlight;
 
-    // return new ShooterCommand(turretAngle, requiredRpm, requiredHoodAngle);
+      // Predict where the target will be (relative to the robot) when the
+      // gamepiece arrives: shift the relative position by relative velocity * TOF
+      adjustedRelativePosition = relativePosition.plus(relativeVelocity.times(timeOfFlight));
+    }
+
+    // 5. Once converged, look up control variables for the adjusted position
+    double adjustedDistance = adjustedRelativePosition.getNorm();
+    ShooterParams adjustedParams = shooterMap.get(adjustedDistance);
+
+    // Aim toward the predicted future position of the target rather than its
+    // current position, accounting for relative motion over the time of flight
+    Rotation2d turretAngle = adjustedRelativePosition.getAngle();
+    double requiredRpm = adjustedParams.rpm;
+    double requiredHoodAngle = adjustedParams.hoodAngle;
+
+    // 6. Set outputs
     this.flywheelCurrentTarget = requiredRpm;
     this.hoodCurrentTarget = requiredHoodAngle;
     this.turretCurrentTarget = turretAngle.relativeTo(robotHeading).getDegrees();

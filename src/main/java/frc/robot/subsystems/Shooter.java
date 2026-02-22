@@ -104,19 +104,18 @@ public class Shooter extends SubsystemBase {
       new InterpolatingDoubleTreeMap();
 
   static {
-    shooterMap.put(1.0, new ShooterParams(2500.0, 72.276537, 1.0));
-    shooterMap.put(2.0, new ShooterParams(2600.0, 70.0, 1.1));
-    shooterMap.put(3.0, new ShooterParams(2700.0, 68.0, 1.2));
-    shooterMap.put(4.0, new ShooterParams(2800.0, 66.0, 1.3));
-    shooterMap.put(5.0, new ShooterParams(2900.0, 64.0, 1.4));
-    shooterMap.put(6.0, new ShooterParams(3000.0, 62.0, 1.5));
-    shooterMap.put(7.0, new ShooterParams(3100.0, 60.0, 1.6));
-    shooterMap.put(8.0, new ShooterParams(3200.0, 54.276537, 1.7));
+    shooterMap.put(2.0, new ShooterParams(2400.0, 72.276537, 0.94));
+    shooterMap.put(3.0, new ShooterParams(2600.0, 68.0, 1.0));
+    shooterMap.put(4.0, new ShooterParams(2850.0, 66.0, 1.19));
+    shooterMap.put(5.0, new ShooterParams(3050.0, 64.0, 1.26));
+    shooterMap.put(6.0, new ShooterParams(3200.0, 62.0, 1.4));
+    shooterMap.put(7.0, new ShooterParams(3375.0, 60.0, 1.4));
+    shooterMap.put(8.0, new ShooterParams(3500.0, 54.276537, 1.33));
   }
 
   static {
     // Populate velocityToDistanceMap based on shooterMap
-    for (Double distance : new Double[] {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0}) {
+    for (Double distance : new Double[] {2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0}) {
       ShooterParams params = shooterMap.get(distance);
       double velocity = distance / params.timeOfFlight;
       velocityToDistanceMap.put(velocity, distance);

@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -176,7 +177,11 @@ public class Shooter extends SubsystemBase {
     // 6. Set outputs
     this.flywheelCurrentTarget = requiredRpm;
     this.hoodCurrentTarget = requiredHoodAngle;
-    this.turretCurrentTarget = turretAngle.relativeTo(robotHeading).getDegrees();
+    this.turretCurrentTarget =
+        MathUtil.clamp(
+            turretAngle.relativeTo(robotHeading).getDegrees(),
+            Constants.ShooterConstants.kTurretMinRange,
+            Constants.ShooterConstants.kTurretMaxRange);
   }
 
   private Debouncer flywheelDebouncer =
@@ -253,6 +258,10 @@ public class Shooter extends SubsystemBase {
 
   public double getHoodAngle() {
     return hoodCurrentTarget;
+  }
+
+  public void setIsShooting(boolean shooting) {
+    isShooting = shooting;
   }
 
   public Command startShooter() {

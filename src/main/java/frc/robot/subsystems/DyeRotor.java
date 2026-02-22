@@ -77,12 +77,27 @@ public class DyeRotor extends SubsystemBase {
         });
   }
 
+  public void startDirect() {
+    paused = false;
+    dyeRotorCurrentTarget = Constants.DyeRotorConstants.kDyeRotorPower;
+    dyeRotorMotor.set(dyeRotorCurrentTarget);
+  }
+
+  public void stopDirect() {
+    dyeRotorCurrentTarget = 0;
+    dyeRotorMotor.set(0);
+  }
+
   public void pause() {
     paused = true;
+    dyeRotorCurrentTarget = 0;
+    dyeRotorMotor.set(0);
   }
 
   public void resume() {
     paused = false;
+    dyeRotorCurrentTarget = Constants.DyeRotorConstants.kDyeRotorPower;
+    dyeRotorMotor.set(dyeRotorCurrentTarget);
   }
 
   // Mech2d for DyeRotor

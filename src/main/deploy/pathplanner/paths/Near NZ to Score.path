@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "SCORE",
-      "waypointRelativePos": 0.81118904583827,
+      "waypointRelativePos": 0.735531220800457,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

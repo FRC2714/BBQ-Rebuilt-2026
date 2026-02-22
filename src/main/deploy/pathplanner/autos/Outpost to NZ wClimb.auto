@@ -31,13 +31,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Middle-1 NZ to Trench score"
+            "pathName": "Middle-1 NZ to Score wClimb"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "WAIT_FOR_SCORE"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CLIMB"
           }
         }
       ]

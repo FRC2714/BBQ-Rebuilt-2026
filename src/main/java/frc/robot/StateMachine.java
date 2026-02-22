@@ -163,33 +163,29 @@ public class StateMachine extends SubsystemBase {
 
   // Auto commands
 
-  // For event markers — just starts shooting, no timeout (gets cancelled when path ends)
+  // Event marker commands must have ZERO subsystem requirements. The auto's
+  // SequentialCommandGroup claims Shooter + DyeRotor (from WAIT_FOR_SCORE), so any
+  // independently scheduled command requiring those subsystems cancels the entire auto.
+  // Instead, we set flags directly — Shooter.periodic() drives the flywheel via isShooting.
   public Command startShootingAuto() {
-    return preload()
-        .withDeadline(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()))
-        .andThen(
-            m_shooter
-                .startShooter()
-                .alongWith(m_dyeRotor.start())
-                .beforeStarting(
-                    () -> {
-                      startShootingRotorPosition = m_dyeRotor.getRotorPosition();
-                      setState(State.Shooting);
-                      m_drivetrain.setShootingStateTrue();
-                    }));
+    return Commands.runOnce(
+        () -> {
+          startShootingRotorPosition = m_dyeRotor.getRotorPosition();
+          setState(State.Shooting);
+          m_drivetrain.setShootingStateTrue();
+          m_shooter.setIsShooting(true);
+          m_dyeRotor.startDirect();
+        });
   }
 
-  public Command stopShootAuto(double timeout) {
-    return m_shooter
-        .stopShooter()
-        .alongWith(m_dyeRotor.stop())
-        .withName("stop shooting in auto")
-        .withTimeout(timeout)
-        .beforeStarting(
-            () -> {
-              m_state = State.Idle;
-              m_drivetrain.setShootingStateFalse();
-            });
+  public Command stopShootAuto() {
+    return Commands.runOnce(
+        () -> {
+          m_state = State.Idle;
+          m_drivetrain.setShootingStateFalse();
+          m_shooter.setIsShooting(false);
+          m_dyeRotor.stopDirect();
+        });
   }
 
   // intake commands (auto)
@@ -206,12 +202,12 @@ public class StateMachine extends SubsystemBase {
   }
 
   // For sequential use after paths — controls shooting duration then stops
-  public Command waitForScore(double shootTimeout, double stopTimeout) {
+  public Command waitForScore(double shootTimeout) {
     return m_shooter
         .startShooter()
         .alongWith(m_dyeRotor.start())
         .withTimeout(shootTimeout)
-        .andThen(stopShootAuto(stopTimeout))
+        .andThen(stopShootAuto())
         .onlyIf(() -> m_state == State.Shooting);
   }
 

@@ -8,38 +8,33 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.824409807990579,
-        "y": 2.0550673878811643
+        "x": 5.835528786207153,
+        "y": 2.678457298410805
       },
       "isLocked": false,
       "linkedName": "Trench Score Position"
     },
     {
       "anchor": {
-        "x": 7.879735172892113,
-        "y": 3.998922862544604
+        "x": 8.831623567891368,
+        "y": 4.305189677835749
       },
       "prevControl": {
-        "x": 7.688617715274587,
-        "y": 2.0412736389793738
+        "x": 8.318886302697205,
+        "y": 4.438750175291279
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "Intake Middle NZ"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.34459940592447913,
-      "rotationDegrees": 59.99999999999999
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "INTAKE",
-      "waypointRelativePos": 0.3402955837159361,
+      "waypointRelativePos": 0.3259796791888298,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -59,7 +54,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 19.048198504654927
   },
   "reversed": false,
   "folder": "outpost to NZ",

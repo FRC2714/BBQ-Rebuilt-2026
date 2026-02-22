@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.urcl.URCL;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -255,7 +257,7 @@ public class Shooter extends SubsystemBase {
                 turretMotor.set(1);
               },
               this)
-          .until(() -> turretMotor.getForwardLimitSwitch().isPressed())
+          .until(() -> turretMotor.getForwardLimitSwitch().isPressed()||  turretMotor.getReverseLimitSwitch().isPressed())
           .andThen(new InstantCommand(() -> turretMotor.set(0), this));
     } else {
       return new InstantCommand();
@@ -285,7 +287,7 @@ public class Shooter extends SubsystemBase {
             () ->
                 turretMotor.getForwardLimitSwitch().isPressed()
                     || turretMotor.getReverseLimitSwitch().isPressed());
-    disableLimitSwitch.onTrue(Commands.runOnce(() -> disableLimitSwitchAutoZeroing()));
+    disableLimitSwitch.onTrue(Commands.runOnce(() -> disableLimitSwitchAutoZeroing()).ignoringDisable(true));
   }
 
   @Override
@@ -310,7 +312,15 @@ public class Shooter extends SubsystemBase {
 
     SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());
     SmartDashboard.putBoolean("Shooter/Turret/wasZeroed", wasZeroed);
-    SmartDashboard.putBoolean("Shooter/Turret/turret Updated with limitswitch?", turretUpdated);
+    SmartDashboard.putString("Shooter/Turret/fwd limit switch behavior",     turretMotor.configAccessor.limitSwitch.getForwardLimitSwitchTriggerBehavior().toString());
+    SmartDashboard.putString("Shooter/Turret/rev limit switch behavior",     turretMotor.configAccessor.limitSwitch.getReverseLimitSwitchTriggerBehavior().toString());
+    SmartDashboard.putBoolean("Shooter/Turret/fwd limit switch pressed",    turretMotor.getForwardLimitSwitch().isPressed());
+    SmartDashboard.putBoolean("Shooter/Turret/rev limit switch pressed",    turretMotor.getReverseLimitSwitch().isPressed());
+
+        SmartDashboard.putBoolean("turret updated",    turretUpdated);
+
+
+
   }
 
   @Override

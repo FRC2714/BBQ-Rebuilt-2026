@@ -146,7 +146,6 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    m_robotContainer.m_shooter.setTurretAngle(0);
     LimelightHelpers.SetIMUMode("limelight-front", 4); // 4 is internal imu + gyro
     LimelightHelpers.SetIMUMode("limelight-right", 4);
     LimelightHelpers.SetIMUMode("limelight-left", 4);

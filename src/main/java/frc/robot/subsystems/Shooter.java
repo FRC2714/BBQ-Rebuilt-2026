@@ -241,12 +241,48 @@ public class Shooter extends SubsystemBase {
     return turretRelativeEncoder.getPosition();
   }
 
+  private double normalizeTurretTarget(double angleDegrees) {
+    double min = ShooterConstants.kTurretMinRange;
+    double max = ShooterConstants.kTurretMaxRange;
+
+    // Fold into one revolution first so we can generate equivalent candidates.
+    double base = angleDegrees % 360.0;
+    if (base > 180.0) {
+      base -= 360.0;
+    } else if (base <= -180.0) {
+      base += 360.0;
+    }
+
+    double currentPosition = turretRelativeEncoder.getPosition();
+    double bestTarget = Double.NaN;
+    double bestError = Double.POSITIVE_INFINITY;
+
+    for (int k = -2; k <= 2; k++) {
+      double candidate = base + (k * 360.0);
+      if (candidate < min || candidate > max) {
+        continue;
+      }
+
+      double error = Math.abs(candidate - currentPosition);
+      if (error < bestError) {
+        bestError = error;
+        bestTarget = candidate;
+      }
+    }
+
+    if (!Double.isNaN(bestTarget)) {
+      return bestTarget;
+    }
+
+    return Math.max(min, Math.min(max, base));
+  }
+
   public double getHoodPosition() {
     return hoodRelativeEncoder.getPosition();
   }
 
   public void updateShootCommand(ShooterCommand command) {
-    turretCurrentTarget = command.turretAngle.getDegrees();
+    turretCurrentTarget = normalizeTurretTarget(command.turretAngle.getDegrees());
     flywheelCurrentTarget = command.rpm;
     hoodCurrentTarget = command.hoodAngle;
   }
@@ -361,6 +397,7 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
+    turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
     turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     flywheelController.setSetpoint(

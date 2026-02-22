@@ -30,7 +30,7 @@ public class StateMachine extends SubsystemBase {
   private static State m_state = State.Idle;
 
   CommandXboxController m_driverController =
-    new CommandXboxController(OIConstants.kDriverControllerPort);
+      new CommandXboxController(OIConstants.kDriverControllerPort);
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -100,12 +100,14 @@ public class StateMachine extends SubsystemBase {
         new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
     resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
 
-    Trigger stopPreload = 
-      new Trigger(() -> m_state != State.Climbing && m_shooter.getFuelLimitSwitch()).and(m_driverController.x());
+    Trigger stopPreload =
+        new Trigger(() -> m_state != State.Climbing && m_shooter.getFuelLimitSwitch())
+            .and(m_driverController.x());
     stopPreload.onTrue(Commands.runOnce(() -> this.preloadCommand().cancel()));
 
-    Trigger startPreload = 
-      new Trigger(() -> m_state != State.Climbing && !m_shooter.getFuelLimitSwitch()).and(m_driverController.x());
+    Trigger startPreload =
+        new Trigger(() -> m_state != State.Climbing && !m_shooter.getFuelLimitSwitch())
+            .and(m_driverController.x());
     startPreload.onTrue(Commands.runOnce(() -> this.preloadCommand()));
   }
 

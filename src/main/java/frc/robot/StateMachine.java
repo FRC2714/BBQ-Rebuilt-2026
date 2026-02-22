@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -59,9 +60,7 @@ public class StateMachine extends SubsystemBase {
               Commands.runOnce(
                   () -> {
                     LinearVelocity exitVelocity =
-                        MetersPerSecond.of(
-                            Units.rotationsPerMinuteToRadiansPerSecond(m_shooter.getFlywheelSpeed())
-                                * Units.inchesToMeters(1.5));
+                        MetersPerSecond.of(m_shooter.getFlywheelSpeed() / 6787 * 20);
 
                     Simulation.getInstance()
                         .shootFuel(
@@ -112,9 +111,11 @@ public class StateMachine extends SubsystemBase {
                     () -> {
                       startShootingRotorPosition = m_dyeRotor.getRotorPosition();
                       setState(State.Shooting);
+                      m_drivetrain.setShootingStateTrue();
                     }))
         .finallyDo(
             () -> {
+              m_drivetrain.setShootingStateFalse();
               CommandScheduler.getInstance().schedule(stopShoot());
             });
   }
@@ -221,41 +222,19 @@ public class StateMachine extends SubsystemBase {
     m_state = state;
   }
 
-  // Generalization of updating the targets
-  private static final double kLatencyCompensation = 0.1;
-  private static final double kBaselineHorizontalVelocity = 6.0;
-
-  private void aimAt(Translation2d target, Translation2d robotPosition, Rotation2d robotHeading) {
-    Translation2d robotVelocity = m_drivetrain.getFieldRelativeVelocity();
-
-    Translation2d futurePosition = robotPosition.plus(robotVelocity.times(kLatencyCompensation));
-
-    Translation2d toGoal = target.minus(futurePosition);
-    Translation2d targetDirection = toGoal.div(toGoal.getNorm());
-    Translation2d targetVelocity = targetDirection.times(kBaselineHorizontalVelocity);
-    Translation2d shotVelocity = targetVelocity.minus(robotVelocity);
-
-    double distanceToTarget = toGoal.getNorm();
-
-    Translation2d virtualTarget =
-        futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToTarget));
-
-    Translation2d robotToTarget = virtualTarget.minus(robotPosition);
-    Rotation2d fieldAngle = robotToTarget.getAngle();
-    Rotation2d turretAngle = fieldAngle.minus(robotHeading);
-
-    m_shooter.updateTurretTarget(turretAngle.getDegrees());
-    m_shooter.updateHoodTarget(distanceToTarget);
-    m_shooter.updateFlywheelTarget(distanceToTarget);
-  }
 
   private void runTargeting() {
-
     Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
     Rotation2d robotHeading = m_drivetrain.getPose().getRotation();
 
     if (m_drivetrain.isInAllianceZone()) {
-      aimAt(Field.getAllianceHub().toTranslation2d(), robotPosition, robotHeading);
+
+      m_shooter.calculate(
+          robotPosition,
+          robotHeading,
+          m_drivetrain.getFieldRelativeVelocity(),
+          Field.getAllianceHub().toTranslation2d(),
+          ShooterConstants.kLatencyCompensation);
       return;
     }
 
@@ -263,12 +242,17 @@ public class StateMachine extends SubsystemBase {
     double airstrikeY = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/y", 0));
 
     if (airstrikeX == 0 && airstrikeY == 0) {
-      m_shooter.updateTurretTarget(0.0);
       return;
     }
 
     Translation2d airstrikeTarget = new Translation2d(airstrikeX, airstrikeY);
-    aimAt(airstrikeTarget, robotPosition, robotHeading);
+
+    m_shooter.calculate(
+        robotPosition,
+        robotHeading,
+        m_drivetrain.getFieldRelativeVelocity(),
+        airstrikeTarget,
+        ShooterConstants.kLatencyCompensation);
   }
 
   @Override

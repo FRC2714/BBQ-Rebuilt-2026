@@ -11,9 +11,12 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
+import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -33,7 +36,6 @@ import frc.robot.Constants.ShooterConstants.HoodSetpoints;
 import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 import frc.robot.Robot;
 import frc.robot.Simulation;
-import frc.robot.utils.InterpolatingTreeMap;
 
 public class Shooter extends SubsystemBase {
   private SparkFlex turretMotor =
@@ -73,8 +75,109 @@ public class Shooter extends SubsystemBase {
   public boolean wasZeroed = false;
   private boolean isShooting = false;
 
-  private InterpolatingTreeMap hoodAngleMap;
-  private InterpolatingTreeMap flywheelSpeedMap;
+  public record ShooterParams(double rpm, double hoodAngle, double timeOfFlight) {
+    public static ShooterParams interpolate(ShooterParams a, ShooterParams b, double t) {
+      double rpm = a.rpm + (b.rpm - a.rpm) * t;
+      double hoodAngle = a.hoodAngle + (b.hoodAngle - a.hoodAngle) * t;
+      double timeOfFlight = a.timeOfFlight + (b.timeOfFlight - a.timeOfFlight) * t;
+      return new ShooterParams(rpm, hoodAngle, timeOfFlight);
+    }
+  }
+
+  public class ShooterCommand {
+    public final Rotation2d turretAngle;
+    public final double rpm;
+    public final double hoodAngle;
+
+    public ShooterCommand(Rotation2d turretAngle, double rpm, double hoodAngle) {
+      this.turretAngle = turretAngle;
+      this.rpm = rpm;
+      this.hoodAngle = hoodAngle;
+    }
+  }
+
+  private static final InterpolatingTreeMap<Double, ShooterParams> shooterMap =
+      new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShooterParams::interpolate);
+
+  static {
+    shooterMap.put(2.0, new ShooterParams(2400.0, 72.276537, 0.94));
+    shooterMap.put(3.0, new ShooterParams(2600.0, 68.0, 1.0));
+    shooterMap.put(4.0, new ShooterParams(2850.0, 66.0, 1.19));
+    shooterMap.put(5.0, new ShooterParams(3050.0, 64.0, 1.26));
+    shooterMap.put(6.0, new ShooterParams(3200.0, 62.0, 1.4));
+    shooterMap.put(7.0, new ShooterParams(3375.0, 60.0, 1.4));
+    shooterMap.put(8.0, new ShooterParams(3500.0, 54.276537, 1.33));
+  }
+
+  /**
+   * Courtesy of https://blog.eeshwark.com/robotblog/shooting-on-the-fly-pt2 and
+   * https://frc-docs--3242.org.readthedocs.build/en/3242/docs/software/advanced-controls/fire-control/dynamic-shooting.html
+   *
+   * @param robotPosition
+   * @param robotHeading
+   * @param robotVelocity
+   * @param goalPosition
+   * @param latencyCompensation
+   */
+  public void calculate(
+      Translation2d robotPosition,
+      Rotation2d robotHeading,
+      Translation2d robotVelocity,
+      Translation2d goalPosition,
+      double latencyCompensation) {
+
+    // 1. Project future position using latency compensation
+    Translation2d futurePos = robotPosition.plus(robotVelocity.times(latencyCompensation));
+
+    // Relative position and velocity of the target from the robot's perspective.
+    // The target (goal) is stationary, so its velocity relative to the robot is
+    // simply the negation of the robot's velocity.
+    Translation2d relativePosition = goalPosition.minus(futurePos);
+    Translation2d relativeVelocity = robotVelocity.times(-1);
+
+    // 2-4. Iteratively refine the shot using time-of-flight.
+    // We begin with the raw distance to the target, then on each iteration we
+    // predict where the target will be when the gamepiece arrives and re-look-up
+    // the TOF for that adjusted position. We stop when TOF has converged.
+    double timeOfFlight = 0.0;
+    Translation2d adjustedRelativePosition = relativePosition;
+
+    final int MAX_ITERATIONS = 10;
+    final double CONVERGENCE_THRESHOLD = 0.001; // seconds
+
+    for (int i = 0; i < MAX_ITERATIONS; i++) {
+      double distance = adjustedRelativePosition.getNorm();
+      ShooterParams params = shooterMap.get(distance);
+      double newTimeOfFlight = params.timeOfFlight;
+
+      // Check convergence before updating so we exit with the stable TOF value
+      if (Math.abs(newTimeOfFlight - timeOfFlight) < CONVERGENCE_THRESHOLD) {
+        timeOfFlight = newTimeOfFlight;
+        break;
+      }
+
+      timeOfFlight = newTimeOfFlight;
+
+      // Predict where the target will be (relative to the robot) when the
+      // gamepiece arrives: shift the relative position by relative velocity * TOF
+      adjustedRelativePosition = relativePosition.plus(relativeVelocity.times(timeOfFlight));
+    }
+
+    // 5. Once converged, look up control variables for the adjusted position
+    double adjustedDistance = adjustedRelativePosition.getNorm();
+    ShooterParams adjustedParams = shooterMap.get(adjustedDistance);
+
+    // Aim toward the predicted future position of the target rather than its
+    // current position, accounting for relative motion over the time of flight
+    Rotation2d turretAngle = adjustedRelativePosition.getAngle();
+    double requiredRpm = adjustedParams.rpm;
+    double requiredHoodAngle = adjustedParams.hoodAngle;
+
+    // 6. Set outputs
+    this.flywheelCurrentTarget = requiredRpm;
+    this.hoodCurrentTarget = requiredHoodAngle;
+    this.turretCurrentTarget = turretAngle.relativeTo(robotHeading).getDegrees();
+  }
 
   private Debouncer flywheelDebouncer =
       new Debouncer(ShooterConstants.kFlywheelDebounceTimeSeconds, DebounceType.kFalling);
@@ -117,30 +220,6 @@ public class Shooter extends SubsystemBase {
         Configs.Shooter.flywheelConfigFollower,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-
-    hoodAngleMap = new InterpolatingTreeMap();
-    flywheelSpeedMap = new InterpolatingTreeMap();
-
-    populateHoodAngleMap();
-    populateFlywheelSpeedMap();
-  }
-
-  // CHANGE LATER
-  public void populateHoodAngleMap() {
-    hoodAngleMap.put(1.0, ShooterConstants.kHoodMaxAngle);
-    hoodAngleMap.put(8.0, ShooterConstants.kHoodMinAngle);
-  }
-
-  // CHANGE LATER
-  public void populateFlywheelSpeedMap() {
-    flywheelSpeedMap.put(1.0, 1500.0);
-    flywheelSpeedMap.put(2.0, 2200.0);
-    flywheelSpeedMap.put(3.0, 2700.0);
-    flywheelSpeedMap.put(4.0, 3200.0);
-    flywheelSpeedMap.put(5.0, 3600.0);
-    flywheelSpeedMap.put(6.0, 4000.0);
-    flywheelSpeedMap.put(7.0, 4400.0);
-    flywheelSpeedMap.put(8.0, 4800.0);
   }
 
   public boolean getFuelLimitSwitch() {
@@ -158,22 +237,10 @@ public class Shooter extends SubsystemBase {
     return hoodRelativeEncoder.getPosition();
   }
 
-  public void updateTurretTarget(double updateValue) {
-    turretCurrentTarget =
-        MathUtil.clamp(
-            updateValue,
-            Constants.ShooterConstants.kTurretMinRange,
-            Constants.ShooterConstants.kTurretMaxRange);
-  }
-
-  public void updateHoodTarget(double distanceToHub) {
-    Double interpolated = hoodAngleMap.getInterpolated(distanceToHub);
-    hoodCurrentTarget = interpolated != null ? interpolated : HoodSetpoints.kStow;
-  }
-
-  public void updateFlywheelTarget(double distanceToHub) {
-    Double interpolated = flywheelSpeedMap.getInterpolated(distanceToHub);
-    flywheelCurrentTarget = interpolated != null ? interpolated : FlywheelSetpoints.kStow;
+  public void updateShootCommand(ShooterCommand command) {
+    turretCurrentTarget = command.turretAngle.getDegrees();
+    flywheelCurrentTarget = command.rpm;
+    hoodCurrentTarget = command.hoodAngle;
   }
 
   public double getFlywheelSpeed() {

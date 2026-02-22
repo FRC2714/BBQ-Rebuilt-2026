@@ -175,6 +175,7 @@ public class StateMachine extends SubsystemBase {
                     () -> {
                       startShootingRotorPosition = m_dyeRotor.getRotorPosition();
                       setState(State.Shooting);
+                      m_drivetrain.setShootingStateTrue();
                     }));
   }
 
@@ -187,6 +188,7 @@ public class StateMachine extends SubsystemBase {
         .beforeStarting(
             () -> {
               m_state = State.Idle;
+              m_drivetrain.setShootingStateFalse();
             });
   }
 
@@ -221,7 +223,6 @@ public class StateMachine extends SubsystemBase {
   public void setState(State state) {
     m_state = state;
   }
-
 
   private void runTargeting() {
     Translation2d robotPosition = m_drivetrain.getPose().getTranslation();

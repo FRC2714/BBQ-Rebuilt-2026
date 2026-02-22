@@ -188,7 +188,7 @@ public class Shooter extends SubsystemBase {
     return flywheelRelativeEncoder.getVelocity();
   }
 
-  public SparkFlex getTurretMotor(){
+  public SparkFlex getTurretMotor() {
     return this.turretMotor;
   }
 
@@ -279,8 +279,8 @@ public class Shooter extends SubsystemBase {
     turretRelativeEncoder.setPosition(angle);
   }
 
-  public void configureShooterBindings(){
-        Trigger disableLimitSwitch =
+  public void configureShooterBindings() {
+    Trigger disableLimitSwitch =
         new Trigger(
             () ->
                 turretMotor.getForwardLimitSwitch().isPressed()
@@ -294,7 +294,6 @@ public class Shooter extends SubsystemBase {
     hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     flywheelController.setSetpoint(
         isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-
 
     SmartDashboard.putNumber("Shooter/Flywheel/Expected Speed", flywheelCurrentTarget);
     SmartDashboard.putNumber(
@@ -342,6 +341,5 @@ public class Shooter extends SubsystemBase {
         Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1) * 10),
         RobotController.getBatteryVoltage(),
         0.02);
-
   }
 }

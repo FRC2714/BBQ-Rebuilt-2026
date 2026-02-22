@@ -25,9 +25,11 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
@@ -186,6 +188,10 @@ public class Shooter extends SubsystemBase {
     return flywheelRelativeEncoder.getVelocity();
   }
 
+  public SparkFlex getTurretMotor(){
+    return this.turretMotor;
+  }
+
   public void setHoodAngle(double angle) {
     hoodCurrentTarget = angle;
   }
@@ -273,6 +279,15 @@ public class Shooter extends SubsystemBase {
     turretRelativeEncoder.setPosition(angle);
   }
 
+  public void configureShooterBindings(){
+        Trigger disableLimitSwitch =
+        new Trigger(
+            () ->
+                turretMotor.getForwardLimitSwitch().isPressed()
+                    || turretMotor.getReverseLimitSwitch().isPressed());
+    disableLimitSwitch.onTrue(Commands.runOnce(() -> disableLimitSwitchAutoZeroing()));
+  }
+
   @Override
   public void periodic() {
     turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
@@ -280,10 +295,6 @@ public class Shooter extends SubsystemBase {
     flywheelController.setSetpoint(
         isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
 
-    if (turretMotor.getForwardLimitSwitch().isPressed()
-        || turretMotor.getReverseLimitSwitch().isPressed()) {
-      disableLimitSwitchAutoZeroing();
-    }
 
     SmartDashboard.putNumber("Shooter/Flywheel/Expected Speed", flywheelCurrentTarget);
     SmartDashboard.putNumber(
@@ -332,6 +343,5 @@ public class Shooter extends SubsystemBase {
         RobotController.getBatteryVoltage(),
         0.02);
 
-    zeroTurret();
   }
 }

@@ -94,6 +94,8 @@ public class StateMachine extends SubsystemBase {
     Trigger resumeShooter =
         new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
     resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
+
+    m_shooter.configureShooterBindings();
   }
 
   public Command preloadCommand() {

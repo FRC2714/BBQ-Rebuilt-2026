@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -21,18 +20,15 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -43,26 +39,17 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Field;
 import frc.robot.FieldConstants;
-import frc.robot.FieldConstants.AprilTagLayoutType;
 import frc.robot.Robot;
+import frc.robot.Simulation;
 import frc.robot.utils.LimelightHelpers;
-import frc.robot.utils.LimelightHelpers.RawFiducial;
-import java.util.ArrayList;
-import java.util.List;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 
 public class DriveSubsystem extends SubsystemBase {
-  // Create MAXSwerveModules
+
   private final MAXSwerveModule m_frontLeft =
       new MAXSwerveModule(
           DriveConstants.kFrontLeftDrivingCanId,
@@ -87,7 +74,6 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightTurningCanId,
           DriveConstants.kBackRightChassisAngularOffset);
 
-  // The gyro sensor
   private final Canandgyro m_gyro = new Canandgyro(0);
 
   private final Field2d m_field2d = new Field2d();
@@ -95,24 +81,28 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_driverHeadingOffsetDeg = 0.0; // Used for relative heading for the driver
 
   private static final double[] BLUE_ZONE = {
-    0.0, 0.0, FieldConstants.LinesVertical.allianceZone, FieldConstants.fieldWidth
+    0.0, 0.0, FieldConstants.LinesVertical.allianceZone, FieldConstants.fieldWidth,
   };
   private static final double[] RED_ZONE = {
     FieldConstants.LinesVertical.oppAllianceZone,
     0.0,
     FieldConstants.fieldLength,
-    FieldConstants.fieldWidth
+    FieldConstants.fieldWidth,
   };
 
-  private static final double ROBOT_BUFFER =
-      Units.inchesToMeters((DriveConstants.kTrackWidth + 6.0) / 2.0);
+  private static final double ROBOT_BUFFER_X =
+      (DriveConstants.kWheelBase / 2.0) + DriveConstants.kBumperThickness;
+
+  private static final double ROBOT_BUFFER_Y =
+      (DriveConstants.kTrackWidth / 2.0) + DriveConstants.kBumperThickness;
 
   private boolean isInZone(double[] zone) {
     Translation2d pos = getPose().getTranslation();
-    return pos.getX() + ROBOT_BUFFER >= zone[0]
-        && pos.getY() + ROBOT_BUFFER >= zone[1]
-        && pos.getX() - ROBOT_BUFFER <= zone[2]
-        && pos.getY() - ROBOT_BUFFER <= zone[3];
+    // Robot is in zone if ANY part overlaps (standard rectangle overlap check)
+    return (pos.getX() + ROBOT_BUFFER_X > zone[0]
+        && pos.getX() - ROBOT_BUFFER_X < zone[2]
+        && pos.getY() + ROBOT_BUFFER_Y > zone[1]
+        && pos.getY() - ROBOT_BUFFER_Y < zone[3]);
   }
 
   public boolean isInAllianceZone() {
@@ -120,43 +110,11 @@ public class DriveSubsystem extends SubsystemBase {
     return isInZone(isRed ? RED_ZONE : BLUE_ZONE);
   }
 
-  public double getTurretTargetAngle() {
-    if (isInAllianceZone()) {
-      return getAngleToHub();
-    }
-    return 0.0; // placeholder
-  }
-
   double xyStdDev;
 
+  private boolean shooting = false;
+
   // Publisher for robot pose for use with AdvantageScope
-  StructPublisher<Pose2d> publisher =
-      NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
-
-  StructPublisher<Pose2d> publisherLLright =
-      NetworkTableInstance.getDefault().getStructTopic("poseLLright", Pose2d.struct).publish();
-
-  StructPublisher<Pose2d> publisherLLleft =
-      NetworkTableInstance.getDefault().getStructTopic("poseLLleft", Pose2d.struct).publish();
-
-  StructPublisher<Pose2d> publisherLLfront =
-      NetworkTableInstance.getDefault().getStructTopic("poseLLfront", Pose2d.struct).publish();
-
-  StructArrayPublisher<Pose3d> tagPosesFrontArrayPublisher =
-      NetworkTableInstance.getDefault()
-          .getStructArrayTopic("tagPosesFront", Pose3d.struct)
-          .publish();
-
-  StructArrayPublisher<Pose3d> tagPosesLeftArrayPublisher =
-      NetworkTableInstance.getDefault()
-          .getStructArrayTopic("tagPosesLeft", Pose3d.struct)
-          .publish();
-
-  StructArrayPublisher<Pose3d> tagPosesRightArrayPublisher =
-      NetworkTableInstance.getDefault()
-          .getStructArrayTopic("tagPosesRight", Pose3d.struct)
-          .publish();
-
   StructArrayPublisher<SwerveModuleState> publisherModuleStates =
       NetworkTableInstance.getDefault()
           .getStructArrayTopic("Swerve Module States", SwerveModuleState.struct)
@@ -165,18 +123,6 @@ public class DriveSubsystem extends SubsystemBase {
       NetworkTableInstance.getDefault()
           .getStructArrayTopic("Expected Swerve Module States", SwerveModuleState.struct)
           .publish();
-
-  final DriveTrainSimulationConfig driveTrainSimulationConfig =
-      DriveTrainSimulationConfig.Default()
-          .withGyro(COTS.ofPigeon2())
-          .withSwerveModule(
-              COTS.ofMAXSwerve(
-                  DCMotor.getNeoVortex(1), DCMotor.getNeo550(1), COTS.WHEELS.COLSONS.cof, 1))
-          .withTrackLengthTrackWidth(
-              Inches.of(DriveConstants.kWheelBase), Inches.of(DriveConstants.kTrackWidth))
-          .withBumperSize(
-              Inches.of(DriveConstants.kWheelBase + 6.0),
-              Inches.of(DriveConstants.kTrackWidth + 6.0));
 
   SelfControlledSwerveDriveSimulation swerveDriveSimulation;
 
@@ -189,11 +135,14 @@ public class DriveSubsystem extends SubsystemBase {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
             m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
+            m_rearRight.getPosition(),
           },
           new Pose2d(3, 3, new Rotation2d()),
           LimelightConstants.m_stateStdDevs,
           LimelightConstants.m_visionStdDevs);
+
+  private static final double kLatencyCompensation = 0.1;
+  private static final double kBaselineHorizontalVelocity = 6.0;
 
   private double m_driveSysIdVoltage = 0.0;
   private double m_rotationSysIdVoltage = 0.0;
@@ -203,20 +152,13 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
     SmartDashboard.putData("Field", m_field2d);
 
     if (Robot.isSimulation()) {
       swerveDriveSimulation =
           new SelfControlledSwerveDriveSimulation(
-              new SwerveDriveSimulation(
-                  driveTrainSimulationConfig, new Pose2d(3, 3, new Rotation2d())));
-
-      SimulatedArena.overrideInstance(new Arena2026Rebuilt(false));
-
-      SimulatedArena.getInstance()
-          .addDriveTrainSimulation(swerveDriveSimulation.getDriveTrainSimulation());
+              Simulation.getInstance().getSwerveDriveSimulation());
     }
 
     RobotConfig config;
@@ -262,7 +204,7 @@ public class DriveSubsystem extends SubsystemBase {
         new SysIdRoutine(
             new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(2.5)),
             new SysIdRoutine.Mechanism(
-                (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)),
+                voltage -> this.driveVoltageForwardTest(voltage.in(Volts)),
                 null, // URCL handles logging
                 this,
                 "drive"));
@@ -271,7 +213,7 @@ public class DriveSubsystem extends SubsystemBase {
         new SysIdRoutine(
             new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
             new SysIdRoutine.Mechanism(
-                (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)),
+                voltage -> this.driveVoltageRotateTest(voltage.in(Volts)),
                 null, // URCL handles logging
                 this,
                 "rotation"));
@@ -281,7 +223,7 @@ public class DriveSubsystem extends SubsystemBase {
     return new SysIdRoutine(
         new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
         new SysIdRoutine.Mechanism(
-            (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)),
+            voltage -> this.driveVoltageForwardTest(voltage.in(Volts)),
             null, // URCL handles logging
             this,
             "drive"));
@@ -291,7 +233,7 @@ public class DriveSubsystem extends SubsystemBase {
     return new SysIdRoutine(
         new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
         new SysIdRoutine.Mechanism(
-            (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)),
+            voltage -> this.driveVoltageRotateTest(voltage.in(Volts)),
             null, // URCL handles logging
             this,
             "rotation"));
@@ -345,7 +287,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
+          m_rearRight.getPosition(),
         });
 
     LimelightHelpers.SetRobotOrientation("limelight-right", getHeading(), 0, 0, 0, 0, 0);
@@ -385,18 +327,6 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
-    SmartDashboard.putNumber("heading", getHeading());
-    SmartDashboard.putNumber("OdometryX", m_poseEstimator.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("std dev xy", xyStdDev);
-    SmartDashboard.putNumber("omegaRps", omegaRps);
-
-    publisher.set(getPose());
-    tagPosesFrontArrayPublisher.set(getCameraTargetPoses3d("limelight-front"));
-    tagPosesLeftArrayPublisher.set(getCameraTargetPoses3d("limelight-left"));
-    tagPosesRightArrayPublisher.set(getCameraTargetPoses3d("limelight-right"));
-    publisherLLfront.set(frontLLMeasurement != null ? frontLLMeasurement.pose : new Pose2d());
-    publisherLLleft.set(leftLLMeasurement != null ? leftLLMeasurement.pose : new Pose2d());
-    publisherLLright.set(rightLLMeasurement != null ? rightLLMeasurement.pose : new Pose2d());
 
     if (Robot.isReal()) {
       publisherModuleStates.set(
@@ -404,7 +334,7 @@ public class DriveSubsystem extends SubsystemBase {
             m_frontLeft.getState(),
             m_frontRight.getState(),
             m_rearLeft.getState(),
-            m_rearRight.getState()
+            m_rearRight.getState(),
           });
     } else {
       publisherModuleStates.set(swerveDriveSimulation.getMeasuredStates());
@@ -418,11 +348,6 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
-  /**
-   * Returns the currently-estimated pose of the robot.
-   *
-   * @return The pose.
-   */
   public Pose2d getPose() {
     if (swerveDriveSimulation != null) {
       return swerveDriveSimulation.getActualPoseInSimulationWorld();
@@ -431,11 +356,6 @@ public class DriveSubsystem extends SubsystemBase {
     return m_poseEstimator.getEstimatedPosition();
   }
 
-  /**
-   * Resets the odometry to the specified pose.
-   *
-   * @param pose The pose to which to set the odometry.
-   */
   public void resetOdometry(Pose2d pose) {
     if (swerveDriveSimulation != null) {
       swerveDriveSimulation.resetOdometry(pose);
@@ -447,26 +367,23 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
+          m_rearRight.getPosition(),
         },
         pose);
   }
 
-  /**
-   * Method to drive the robot using joystick info.
-   *
-   * @param xSpeed Speed of the robot in the x direction (forward).
-   * @param ySpeed Speed of the robot in the y direction (sideways).
-   * @param rot Angular rate of the robot.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
-   */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    // Convert the commanded speeds into the correct units for the drivetrain
     double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
     double driverRelativeHeading = getHeading() - m_driverHeadingOffsetDeg;
+
+    if (shooting) {
+      xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2;
+      ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2;
+      rotDelivered = (rot * DriveConstants.kMaxAngularSpeed) / 2;
+    }
 
     var swerveModuleStates =
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
@@ -542,6 +459,14 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
   }
 
+  public void setShootingStateTrue() {
+    shooting = true;
+  }
+
+  public void setShootingStateFalse() {
+    shooting = false;
+  }
+
   public void driveRobotRelative(ChassisSpeeds speeds) {
     drive(speeds, false);
   }
@@ -568,7 +493,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   public SwerveModuleState[] getModuleStates() {
     return new SwerveModuleState[] {
-      m_frontLeft.getState(), m_frontRight.getState(), m_rearLeft.getState(), m_rearRight.getState()
+      m_frontLeft.getState(),
+      m_frontRight.getState(),
+      m_rearLeft.getState(),
+      m_rearRight.getState(),
     };
   }
 
@@ -592,7 +520,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
+          m_rearRight.getPosition(),
         },
         pose);
 
@@ -648,40 +576,46 @@ public class DriveSubsystem extends SubsystemBase {
           .in(DegreesPerSecond);
     }
 
-    return m_gyro.getAngularVelocityYaw() * 360 * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
-  }
-
-  public double getAngleToHub() {
-    Pose2d pose = getPose().plus(Constants.ShooterConstants.turretOffset);
-
-    // Hub position in field coordinates (meters)
-    Translation2d hub = Field.getAllianceHub().toTranslation2d();
-
-    // Vector from robot to hub
-    Translation2d robotToHub = hub.minus(pose.getTranslation());
-
-    // Field-relative angle to hub
-    Rotation2d angleToHub = robotToHub.getAngle();
-
-    // Turret angle relative to robot forward
-    Rotation2d turretAngle = angleToHub.minus(pose.getRotation());
-
-    // Return degrees (wrapped to [-180, 180])
-    return turretAngle.getDegrees();
-  }
-
-  public Pose3d[] getCameraTargetPoses3d(String limelightName) {
-    RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(limelightName);
-    List<Pose3d> poses = new ArrayList<>();
-
-    for (RawFiducial fiducial : fiducials) {
-      AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(fiducial.id).ifPresent(poses::add);
-    }
-
-    return poses.toArray(new Pose3d[0]);
+    return (m_gyro.getAngularVelocityYaw() * 360 * (DriveConstants.kGyroReversed ? -1.0 : 1.0));
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
-    return DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
+    if (swerveDriveSimulation != null) {
+      return swerveDriveSimulation.getActualSpeedsRobotRelative();
+    }
+
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(
+        m_frontLeft.getState(),
+        m_frontRight.getState(),
+        m_rearLeft.getState(),
+        m_rearRight.getState());
+  }
+
+  public Translation2d getFieldRelativeVelocity() {
+    ChassisSpeeds robotSpeeds = getRobotRelativeSpeeds();
+    Rotation2d heading = Rotation2d.fromDegrees(getHeading());
+    return new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
+        .rotateBy(heading);
+  }
+
+  public Translation2d getVirtualTarget() {
+    Pose2d pose = getPose();
+    Translation2d robotVelocity = getFieldRelativeVelocity();
+    Translation2d hub = Field.getAllianceHub().toTranslation2d();
+
+    Translation2d futurePosition =
+        pose.getTranslation().plus(robotVelocity.times(kLatencyCompensation));
+
+    Translation2d toGoal = hub.minus(futurePosition);
+    Translation2d targetDirection = toGoal.div(toGoal.getNorm());
+
+    Translation2d targetVelocity = targetDirection.times(kBaselineHorizontalVelocity);
+    Translation2d shotVelocity = targetVelocity.minus(robotVelocity);
+
+    double distanceToHub = toGoal.getNorm();
+    Translation2d virtualTarget =
+        futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToHub));
+
+    return virtualTarget;
   }
 }

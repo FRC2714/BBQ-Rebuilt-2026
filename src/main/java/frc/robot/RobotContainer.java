@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.StateMachine.State;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -51,6 +52,12 @@ public class RobotContainer {
     NamedCommands.registerCommand("SCORE_INITAL", m_stateMachine.startShootingAuto());
     NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShootAuto());
     NamedCommands.registerCommand("INTAKE", m_stateMachine.intakeSequence());
+    NamedCommands.registerCommand(
+        "CLIMB",
+        new InstantCommand(
+            () ->
+                m_stateMachine.setState(
+                    State.Climbing))); // NO CURRENT CLIMB METHOD BUT REQUIRED FOR PATHPLANNER
     NamedCommands.registerCommand(
         "EXTAKE", m_stateMachine.extakeSequenceAuto(AutoConstants.kExtakeTimeout));
     NamedCommands.registerCommand(

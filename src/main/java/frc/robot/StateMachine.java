@@ -60,7 +60,7 @@ public class StateMachine extends SubsystemBase {
               Commands.runOnce(
                   () -> {
                     LinearVelocity exitVelocity =
-                        MetersPerSecond.of(m_shooter.getFlywheelSpeed() / 6787 * 20);
+                        MetersPerSecond.of(m_shooter.getFlywheelSpeed() / 6787 * 15.341);
 
                     Simulation.getInstance()
                         .shootFuel(

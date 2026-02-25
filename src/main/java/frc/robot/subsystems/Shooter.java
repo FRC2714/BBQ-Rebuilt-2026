@@ -106,13 +106,15 @@ public class Shooter extends SubsystemBase {
       new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShooterParams::interpolate);
 
   static {
-    shooterMap.put(2.0, new ShooterParams(2400.0, 72.276537, 0.94));
-    shooterMap.put(3.0, new ShooterParams(2600.0, 68.0, 1.0));
-    shooterMap.put(4.0, new ShooterParams(2850.0, 66.0, 1.19));
-    shooterMap.put(5.0, new ShooterParams(3050.0, 64.0, 1.26));
-    shooterMap.put(6.0, new ShooterParams(3200.0, 62.0, 1.4));
-    shooterMap.put(7.0, new ShooterParams(3375.0, 60.0, 1.4));
-    shooterMap.put(8.0, new ShooterParams(3500.0, 54.276537, 1.33));
+    shooterMap.put(1.2, new ShooterParams(2650.0, 72.276537, 0.94));
+    shooterMap.put(2.0, new ShooterParams(2714.0, 67.276537, 0.95));
+    shooterMap.put(3.0, new ShooterParams(3050.0, 64.276537, 1.1));
+    shooterMap.put(4.0, new ShooterParams(3450.0, 62.276537, 1.25));
+    shooterMap.put(5.0, new ShooterParams(3800.0, 60.276537, 1.34));
+    shooterMap.put(6.0, new ShooterParams(4275.0, 58.276537, 1.47));
+    shooterMap.put(7.0, new ShooterParams(4800.0, 54.276537, 1.48));
+    shooterMap.put(8.0, new ShooterParams(5750.0, 54.276537, 1.64));
+    shooterMap.put(8.5, new ShooterParams(6300.0, 54.276537, 1.64));
   }
 
   /**

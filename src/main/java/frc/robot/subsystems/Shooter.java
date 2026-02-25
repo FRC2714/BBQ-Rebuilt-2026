@@ -24,7 +24,12 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
@@ -106,6 +111,14 @@ public class Shooter extends SubsystemBase {
   LinearSystemSim<N2, N1, N2> hoodSim =
       new LinearSystemSim<>(LinearSystemId.createDCMotorSystem(hoodMotorSim, 0.001, 10));
 
+  // Flywheel Mech2d
+  Mechanism2d flyWheelMech = new Mechanism2d(1, 1);
+  MechanismRoot2d flyWheelRoot = flyWheelMech.getRoot("Flywheel Mech2d", 0.28, 0.5);
+
+  MechanismLigament2d flyWheelLigament =
+      flyWheelRoot.append(
+          new MechanismLigament2d("FlyWheel Ligament", 0.3, 180, 10, new Color8Bit(Color.kRed)));
+
   public Shooter() {
     turretMotor.configure(
         Configs.Shooter.turretConfig,
@@ -130,6 +143,7 @@ public class Shooter extends SubsystemBase {
 
     populateHoodAngleMap();
     populateFlywheelSpeedMap();
+    SmartDashboard.putData("Shooter/Mech2d", flyWheelMech);
   }
 
   // CHANGE LATER
@@ -287,14 +301,10 @@ public class Shooter extends SubsystemBase {
         new Pose3d(0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
 
     flyWheelPose3d =
-        new Pose3d(
-            0,
-            0,
-            0,
-            new Rotation3d(
-                0.0,
-                0.0,
-                Units.degreesToRadians(getTurretPosition())));
+        new Pose3d(0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
+
+    //Mech 2d Flywheel Angle Update
+    flyWheelLigament.setAngle(Units.rotationsToDegrees(flywheelRelativeEncoder.getPosition()));
   }
 
   @Override

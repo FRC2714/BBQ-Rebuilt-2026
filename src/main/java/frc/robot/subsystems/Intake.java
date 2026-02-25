@@ -113,7 +113,7 @@ public class Intake extends SubsystemBase {
 
   // Intake Simulation - Mech2d
   Mechanism2d intakeMech = new Mechanism2d(1, 1);
-  MechanismRoot2d intakeRoot = intakeMech.getRoot("Intake", 0.85, 0.1);
+  MechanismRoot2d intakeRoot = intakeMech.getRoot("Intake", 0.15, 0.1);
 
   MechanismLigament2d intakeBar =
       intakeRoot.append(

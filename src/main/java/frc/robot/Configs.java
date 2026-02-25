@@ -2,10 +2,12 @@ package frc.robot;
 
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
+import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.ShooterConstants;
 
 public final class Configs {
   public static final class MAXSwerveModule {
@@ -63,20 +65,67 @@ public final class Configs {
 
   public static final class Shooter {
     public static final SparkFlexConfig turretConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig hoodConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig flywheelConfigLeader = new SparkFlexConfig();
+    public static final SparkFlexConfig flywheelConfigFollower = new SparkFlexConfig();
 
     static {
       turretConfig
+          .smartCurrentLimit(20)
+          .idleMode(IdleMode.kBrake)
+          .inverted(false)
+          .voltageCompensation(12);
+      turretConfig
+          .externalEncoder
+          .positionConversionFactor(360)
+          .inverted(false)
+          .countsPerRevolution(8192);
+      turretConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
+          .pid(0.08, 0, 0)
+          .outputRange(-1, 1);
+      turretConfig
+          .limitSwitch
+          .forwardLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotorAndSetPosition)
+          .forwardLimitSwitchPosition(ShooterConstants.kFwdLimitSwitchOffset)
+          .limitSwitchPositionSensor(FeedbackSensor.kAlternateOrExternalEncoder);
+      turretConfig
+          .limitSwitch
+          .reverseLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotorAndSetPosition)
+          .reverseLimitSwitchPosition(ShooterConstants.kRevLimitSwitchOffset)
+          .limitSwitchPositionSensor(FeedbackSensor.kAlternateOrExternalEncoder);
+
+      hoodConfig
           .smartCurrentLimit(40)
           .idleMode(IdleMode.kBrake)
           .inverted(false)
           .voltageCompensation(12);
-      turretConfig.absoluteEncoder.positionConversionFactor(360).inverted(false).zeroCentered(true);
-      turretConfig
+      hoodConfig.externalEncoder.positionConversionFactor(360).inverted(false);
+      hoodConfig
           .closedLoop
-          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          .p(0.01)
+          .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
+          .p(0.1)
           .d(0)
-          .outputRange(-0.5, 0.5);
+          .outputRange(-1, 1);
+
+      flywheelConfigLeader
+          .smartCurrentLimit(60)
+          .idleMode(IdleMode.kCoast)
+          .inverted(true)
+          .voltageCompensation(12);
+
+      flywheelConfigLeader
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .p(0.001)
+          .outputRange(-1, 1)
+          .feedForward
+          .kV(0.00178);
+
+      flywheelConfigFollower
+          .idleMode(IdleMode.kCoast)
+          .follow(ShooterConstants.kFlywheelLeaderMotorId, true);
     }
   }
 

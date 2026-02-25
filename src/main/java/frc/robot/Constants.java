@@ -31,6 +31,8 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 4.8;
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
+    public static final double kBumperThickness = Units.inchesToMeters(3.5); // Needs to change
+
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(26.5);
     // Distance between centers of right and left wheels on robot
@@ -121,20 +123,48 @@ public final class Constants {
 
   public static final class ShooterConstants {
     public static final int kTurretCanId = 30;
-    public static final int kTurrentMaxRange = 175;
+    public static final int kTurretMaxRange = 175;
+    public static final int kFwdLimitSwitchOffset = 90;
+    public static final int kRevLimitSwitchOffset = -90;
     public static final int kTurretMinRange = -175;
     public static final Transform2d turretOffset =
         new Transform2d(
             Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));
+    public static final double kTurretGearRatio = 52.5;
+    public static final double kTurretMOI = 0.0722989441;
+
+    // Generalization of updating the targets
+    public static final double kLatencyCompensation = 0.1;
+
+    public static final int kHoodCanId = 31; // TBD
+    public static final double kHoodMaxAngle = 72.276537;
+    public static final double kHoodMinAngle = 54.276537;
+
+    public static final int kFlywheelLeaderMotorId = 32;
+    public static final int kFlywheelFollowerMotorId = 33;
+
+    public static final double kFlywheelDebounceTimeSeconds = 0.1;
+    public static final double kTurretDebounceTimeSeconds = 0.1;
+    public static final double kHoodDebounceTimeSeconds = 0.1;
 
     public static final class TurretSetpoints {
       public static final double kStow = 15.2;
+    }
+
+    public static final class HoodSetpoints {
+      public static final double kStow = 15.2;
+      public static final double kZeroOffsetDegrees = 0.0;
+    }
+
+    public static final class FlywheelSetpoints {
+      public static final double kStow = 0.0;
+      public static final double kStartSpeed = 1.0;
     }
   }
 
   public static final class DyeRotorConstants {
     public static final int kDyeRotorMotorCanID = 60;
-    public static final double kDyeRotorPower = 260;
+    public static final double kDyeRotorPower = 1.0;
   }
 
   public static final class ClimbConstants {
@@ -147,4 +177,23 @@ public final class Constants {
 
   // For field constants
   public static boolean disableHAL = false;
+
+  public static final class IntakeConstants {
+
+    public static final class RollerConstants {
+      public static final int kIntakeRollerCanId = 10; // needs tuning
+      public static final double kIntakeRollerPower = 0.5; // needs tuning
+      public static final double kExtakeRollerPower = -0.5; // needs tuning
+      public static final double kRollerStop = 0.0; // needs tuning
+    }
+
+    public static final class PivotConstants {
+      public static final int kIntakePivotCanId = 9; // needs tuning
+      public static final double kPivotkG = 0; // needs tuning
+      public static final double kPivotStow = 90; // needs tuning
+      public static final double kPivotExtend = 0; // needs tuning
+
+      public static final int kPivotThreshold = 1; // needs tuning
+    }
+  }
 }

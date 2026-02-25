@@ -44,17 +44,19 @@ public class Robot extends TimedRobot {
 
     LimelightHelpers.Flush();
 
-    DataLogManager.start();
-    var log = DataLogManager.getLog();
-    log.addSchema(Pose2d.proto);
-    log.addSchema(ChassisSpeeds.proto);
-    log.addSchema(Pose2d.struct);
-    log.addSchema(Pose3d.struct);
+    if (!Robot.isSimulation()) {
+      DataLogManager.start();
+      var log = DataLogManager.getLog();
+      log.addSchema(Pose2d.proto);
+      log.addSchema(ChassisSpeeds.proto);
+      log.addSchema(Pose2d.struct);
+      log.addSchema(Pose3d.struct);
 
-    URCL.start();
+      URCL.start();
 
-    StatusLogger.start();
-    DriverStation.startDataLog(DataLogManager.getLog());
+      StatusLogger.start();
+      DriverStation.startDataLog(DataLogManager.getLog());
+    }
   }
 
   /**
@@ -73,10 +75,6 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods. This must be called from the
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
-
-    m_robotContainer.m_turret.updateTurretTarget(
-        m_robotContainer.m_robotDrive.getTurretTargetAngle());
-
     CommandScheduler.getInstance().run();
   }
 
@@ -105,6 +103,10 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    if (Robot.isSimulation()) {
+      SimulatedArena.getInstance().resetFieldForAuto();
+    }
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     /*
@@ -174,6 +176,11 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
+
+  @Override
+  public void simulationInit() {
+    SimulatedArena.getInstance().placeGamePiecesOnField();
+  }
 
   @Override
   public void simulationPeriodic() {

@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -14,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -26,11 +26,9 @@ public class StateMachine extends SubsystemBase {
   private final Intake m_intake;
   private final DyeRotor m_dyeRotor;
   private final Publisher m_publisher;
+  private final XboxController m_driverHID;
 
   private static State m_state = State.Idle;
-
-  CommandXboxController m_driverController =
-      new CommandXboxController(OIConstants.kDriverControllerPort);
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -45,13 +43,14 @@ public class StateMachine extends SubsystemBase {
   }
 
   public StateMachine(
-      DriveSubsystem drivetrain, Shooter shooter, Intake intake, DyeRotor dyeRotor) {
+      DriveSubsystem drivetrain, Shooter shooter, Intake intake, DyeRotor dyeRotor, CommandXboxController driverController) {
     m_drivetrain = drivetrain;
     m_shooter = shooter;
     m_intake = intake;
     m_dyeRotor = dyeRotor;
 
     m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor);
+    m_driverHID = driverController.getHID();
 
     if (Robot.isSimulation()) {
       // Simulate fuel being shot out of robot
@@ -101,14 +100,17 @@ public class StateMachine extends SubsystemBase {
     resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
 
     Trigger stopPreload =
-        new Trigger(() -> m_state != State.Climbing && m_shooter.getFuelLimitSwitch())
-            .and(m_driverController.x());
-    stopPreload.onTrue(Commands.runOnce(() -> this.preloadCommand().cancel()));
-
+        new Trigger(() -> m_state != State.Shooting && m_dyeRotor.isRunning())
+            .and(() -> m_driverHID.getXButton());
+    stopPreload.onTrue(Commands.runOnce(() -> {
+        Command running = CommandScheduler.getInstance().requiring(m_dyeRotor);
+        if (running != null) running.cancel();
+    }));
+    
     Trigger startPreload =
-        new Trigger(() -> m_state != State.Climbing && !m_shooter.getFuelLimitSwitch())
-            .and(m_driverController.x());
-    startPreload.onTrue(Commands.runOnce(() -> this.preloadCommand()));
+        new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning())
+            .and(() -> m_driverHID.getXButton());
+    startPreload.onTrue(this.preloadCommand());
   }
 
   public Command preloadCommand() {
@@ -240,7 +242,7 @@ public class StateMachine extends SubsystemBase {
     SmartDashboard.putString(
         "State Machine/Current Comamand",
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
-    SmartDashboard.putString("State Machine/State", m_state.toString());
+    SmartDashboard.putString("State Machine/State", m_state.toString());    
 
     m_publisher.publish();
   }

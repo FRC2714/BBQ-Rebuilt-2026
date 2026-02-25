@@ -303,7 +303,7 @@ public class Shooter extends SubsystemBase {
     flyWheelPose3d =
         new Pose3d(0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
 
-    //Mech 2d Flywheel Angle Update
+    // Mech 2d Flywheel Angle Update
     flyWheelLigament.setAngle(Units.rotationsToDegrees(flywheelRelativeEncoder.getPosition()));
   }
 

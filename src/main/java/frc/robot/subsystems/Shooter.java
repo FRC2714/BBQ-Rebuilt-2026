@@ -117,7 +117,7 @@ public class Shooter extends SubsystemBase {
 
   MechanismLigament2d flyWheelLigament =
       flyWheelRoot.append(
-          new MechanismLigament2d("FlyWheel Ligament", 0.3, 180, 10, new Color8Bit(Color.kRed)));
+          new MechanismLigament2d("FlyWheel Ligament", 0.1, 180, 4, new Color8Bit(Color.kRed)));
 
   public Shooter() {
     turretMotor.configure(

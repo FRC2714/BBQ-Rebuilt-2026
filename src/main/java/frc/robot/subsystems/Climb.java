@@ -5,16 +5,16 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.PersistMode;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
-import frc.robot.Constants.ClimbConstants;
 
 public class Climb extends SubsystemBase {
   private final SparkFlex leftMotor =
@@ -22,7 +22,9 @@ public class Climb extends SubsystemBase {
   private final SparkFlex rightMotor =
       new SparkFlex(Constants.ClimbConstants.kRightMotorCanID, MotorType.kBrushless);
   private final SparkClosedLoopController leftController = leftMotor.getClosedLoopController();
-  private final RelativeEncoder leftEncoder = leftMotor.getEncoder();
+  private final SparkClosedLoopController rightController = rightMotor.getClosedLoopController();
+
+  private double setpoint = 0;
 
   /** Creates a new Climb. */
   public Climb() {
@@ -36,12 +38,34 @@ public class Climb extends SubsystemBase {
         PersistMode.kPersistParameters);
   }
 
-  private void extend() {
-    leftController.setSetpoint(ClimbConstants.kExtendSetpoint, ControlType.kPosition);
+  public Command extend() {
+    return this.run(
+        () -> {
+          leftMotor.set(Constants.ClimbConstants.kExtendSpeed);
+          rightMotor.set(Constants.ClimbConstants.kExtendSpeed);
+          moveToExtension();
+        });
   }
 
-  private void retract() {
-    leftController.setSetpoint(ClimbConstants.kRetractSetpoint, ControlType.kPosition);
+  public Command retract() {
+    return this.run(
+        () -> {
+          leftMotor.set(Constants.ClimbConstants.kRetractSpeed);
+          rightMotor.set(Constants.ClimbConstants.kRetractSpeed);
+          moveToRetract();
+        });
+  }
+
+  private void moveToExtension() {
+    setpoint = Constants.ClimbConstants.kExtendSetpoint;
+    leftController.setSetpoint(setpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    rightController.setSetpoint(setpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+  }
+
+  private void moveToRetract() {
+    setpoint = Constants.ClimbConstants.kRetractSetpoint;
+    leftController.setSetpoint(setpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    rightController.setSetpoint(setpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
   @Override

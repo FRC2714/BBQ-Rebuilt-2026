@@ -173,6 +173,8 @@ public final class Constants {
     public static final double kRetractSetpoint = 0.0;
     public static final double kExtendSetpoint = 100.0;
     public static final double kPositionTolerance = 2.0;
+    public static final double kExtendSpeed = 0.5; // TBD
+    public static final double kRetractSpeed = -0.5; // TBD
   }
 
   // For field constants

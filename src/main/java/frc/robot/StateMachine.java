@@ -60,16 +60,16 @@ public class StateMachine extends SubsystemBase {
               Commands.runOnce(
                   () -> {
                     LinearVelocity exitVelocity =
-                        MetersPerSecond.of(m_shooter.getFlywheelSpeed() / 6787 * 15.341);
+                        MetersPerSecond.of(m_shooter.getRawFlywheelTarget() / 6787 * 16.2);
 
                     Simulation.getInstance()
                         .shootFuel(
                             m_drivetrain
                                 .getPose()
                                 .getRotation()
-                                .plus(Rotation2d.fromDegrees(m_shooter.getTurretPosition())),
+                                .plus(Rotation2d.fromDegrees(m_shooter.getRawTurretTarget())),
                             exitVelocity,
-                            Degrees.of(m_shooter.getHoodAngle()));
+                            Degrees.of(m_shooter.getRawHoodTarget()));
                     startShootingRotorPosition = m_dyeRotor.getRotorPosition();
                   }));
 

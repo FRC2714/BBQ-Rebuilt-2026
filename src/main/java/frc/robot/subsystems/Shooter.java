@@ -77,6 +77,12 @@ public class Shooter extends SubsystemBase {
   private double hoodCurrentTarget = HoodSetpoints.kStow;
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
 
+  // Raw (non-lead-compensated) values for simulation — these point at the actual hub
+  // rather than the predicted future position, so MapleLib doesn't double-compensate.
+  private double rawTurretTarget = 0.0;
+  private double rawFlywheelTarget = 0.0;
+  private double rawHoodTarget = 0.0;
+
   public boolean wasZeroed = false;
   public boolean turretUpdated = false;
 
@@ -143,6 +149,12 @@ public class Shooter extends SubsystemBase {
     // simply the negation of the robot's velocity.
     Translation2d relativePosition = goalPosition.minus(futurePos);
     Translation2d relativeVelocity = robotVelocity.times(-1);
+
+    // Store raw (non-lead-compensated) values for simulation
+    ShooterParams rawParams = shooterMap.get(relativePosition.getNorm());
+    this.rawFlywheelTarget = rawParams.rpm;
+    this.rawHoodTarget = rawParams.hoodAngle;
+    this.rawTurretTarget = relativePosition.getAngle().relativeTo(robotHeading).getDegrees();
 
     // 2-4. Iteratively refine the shot using time-of-flight.
     // We begin with the raw distance to the target, then on each iteration we
@@ -272,6 +284,18 @@ public class Shooter extends SubsystemBase {
 
   public double getHoodAngle() {
     return hoodCurrentTarget;
+  }
+
+  public double getRawTurretTarget() {
+    return rawTurretTarget;
+  }
+
+  public double getRawFlywheelTarget() {
+    return rawFlywheelTarget;
+  }
+
+  public double getRawHoodTarget() {
+    return rawHoodTarget;
   }
 
   public void setIsShooting(boolean shooting) {

@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -96,7 +97,7 @@ public class Simulation {
             new RebuiltFuelOnFly(
                     swerveDriveSimulation.getSimulatedDriveTrainPose().getTranslation(),
                     new Translation2d(), // TODO: create constant
-                    swerveDriveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+                    new ChassisSpeeds(),
                     turretAngle,
                     Meters.of(0.4), // TODO: create constant
                     initialVelocity,

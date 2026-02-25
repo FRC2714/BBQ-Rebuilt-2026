@@ -31,6 +31,8 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 4.8;
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
+    public static final double kBumperThickness = Units.inchesToMeters(3.5); // Needs to change
+
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(26.5);
     // Distance between centers of right and left wheels on robot
@@ -129,10 +131,14 @@ public final class Constants {
   public static final class ShooterConstants {
     public static final int kTurretCanId = 30;
     public static final int kTurretMaxRange = 175;
+    public static final int kFwdLimitSwitchOffset = 90;
+    public static final int kRevLimitSwitchOffset = -90;
     public static final int kTurretMinRange = -175;
     public static final Transform2d turretOffset =
         new Transform2d(
             Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));
+    public static final double kTurretGearRatio = 52.5;
+    public static final double kTurretMOI = 0.0722989441;
 
     // Generalization of updating the targets
     public static final double kLatencyCompensation = 0.1;

@@ -90,15 +90,19 @@ public class DriveSubsystem extends SubsystemBase {
     FieldConstants.fieldWidth,
   };
 
-  private static final double ROBOT_BUFFER =
-      Units.inchesToMeters((DriveConstants.kTrackWidth + 6.0) / 2.0);
+  private static final double ROBOT_BUFFER_X =
+      (DriveConstants.kWheelBase / 2.0) + DriveConstants.kBumperThickness;
+
+  private static final double ROBOT_BUFFER_Y =
+      (DriveConstants.kTrackWidth / 2.0) + DriveConstants.kBumperThickness;
 
   private boolean isInZone(double[] zone) {
     Translation2d pos = getPose().getTranslation();
-    return (pos.getX() + ROBOT_BUFFER >= zone[0]
-        && pos.getY() + ROBOT_BUFFER >= zone[1]
-        && pos.getX() - ROBOT_BUFFER <= zone[2]
-        && pos.getY() - ROBOT_BUFFER <= zone[3]);
+    // Robot is in zone if ANY part overlaps (standard rectangle overlap check)
+    return (pos.getX() + ROBOT_BUFFER_X > zone[0]
+        && pos.getX() - ROBOT_BUFFER_X < zone[2]
+        && pos.getY() + ROBOT_BUFFER_Y > zone[1]
+        && pos.getY() - ROBOT_BUFFER_Y < zone[3]);
   }
 
   public boolean isInAllianceZone() {
@@ -376,9 +380,9 @@ public class DriveSubsystem extends SubsystemBase {
     double driverRelativeHeading = getHeading() - m_driverHeadingOffsetDeg;
 
     if (shooting) {
-      xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond / 2;
-      ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond / 2;
-      rotDelivered = rot * DriveConstants.kMaxAngularSpeed / 2;
+      xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2;
+      ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2;
+      rotDelivered = (rot * DriveConstants.kMaxAngularSpeed) / 2;
     }
 
     var swerveModuleStates =

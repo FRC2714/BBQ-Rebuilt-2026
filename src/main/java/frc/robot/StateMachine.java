@@ -155,12 +155,18 @@ public class StateMachine extends SubsystemBase {
     return m_intake.stow().until(() -> m_intake.atSetpoint()).andThen(m_climb.deploy());
   }
 
-  public Command climb(){
-    return deployClimber().until((() -> m_climb.atSetpoint())).andThen(m_climb.climb()).beforeStarting(() -> setState(State.Climbing));
+  public Command climb() {
+    return deployClimber()
+        .until((() -> m_climb.atSetpoint()))
+        .andThen(m_climb.climb())
+        .beforeStarting(() -> setState(State.Climbing));
   }
 
-  public Command unclimb(){
-    return m_climb.unclimb().onlyIf(() -> m_state == State.Climbing).beforeStarting(() -> setState(State.Idle));
+  public Command unclimb() {
+    return m_climb
+        .unclimb()
+        .onlyIf(() -> m_state == State.Climbing)
+        .beforeStarting(() -> setState(State.Idle));
   }
 
   public State getState() {

@@ -170,9 +170,9 @@ public final class Constants {
   public static final class ClimbConstants {
     public static final int kLeftMotorCanID = 45;
     public static final int kRightMotorCanID = 41;
-    public static final double kRetractSetpoint = 0.0; //TBD
-    public static final double kExtendSetpoint = 100.0; //TBD
-    public static final double kClimbSetpoint = 2.0; //TBD
+    public static final double kRetractSetpoint = 0.0; // TBD
+    public static final double kExtendSetpoint = 100.0; // TBD
+    public static final double kClimbSetpoint = 2.0; // TBD
     public static final double kPositionTolerance = 2.0;
     public static final double kExtendSpeed = 0.5; // TBD
     public static final double kRetractSpeed = -0.5; // TBD

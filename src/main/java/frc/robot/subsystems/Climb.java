@@ -45,19 +45,21 @@ public class Climb extends SubsystemBase {
           leftMotor.set(Constants.ClimbConstants.kExtendSpeed);
           rightMotor.set(Constants.ClimbConstants.kExtendSpeed);
           moveToDeploy();
-        }, () -> {
+        },
+        () -> {
           leftMotor.set(0);
           rightMotor.set(0);
         });
   }
 
-  public Command climb(){
+  public Command climb() {
     return this.runEnd(
-      () -> {
-           leftMotor.set(Constants.ClimbConstants.kExtendSpeed);
+        () -> {
+          leftMotor.set(Constants.ClimbConstants.kExtendSpeed);
           rightMotor.set(Constants.ClimbConstants.kExtendSpeed);
           moveToClimb();
-        }, () -> {
+        },
+        () -> {
           leftMotor.set(0);
           rightMotor.set(0);
         });
@@ -69,7 +71,8 @@ public class Climb extends SubsystemBase {
           leftMotor.set(Constants.ClimbConstants.kRetractSpeed);
           rightMotor.set(Constants.ClimbConstants.kRetractSpeed);
           moveToRetract();
-        }, () -> {
+        },
+        () -> {
           leftMotor.set(0);
           rightMotor.set(0);
         });

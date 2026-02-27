@@ -185,7 +185,7 @@ public class Shooter extends SubsystemBase {
     this.flywheelCurrentTarget = requiredRpm;
     this.hoodCurrentTarget = requiredHoodAngle;
     this.turretCurrentTarget =
-        turretAngle.relativeTo(robotHeading).plus(Rotation2d.fromDegrees(180.0)).getDegrees();
+        turretAngle.relativeTo(robotHeading).getDegrees();
   }
 
   private Debouncer flywheelDebouncer =

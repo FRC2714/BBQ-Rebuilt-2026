@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -32,9 +33,10 @@ public class RobotContainer {
   public final Shooter m_shooter = new Shooter();
   public final DyeRotor m_dyeRotor = new DyeRotor();
   public final Intake m_intake = new Intake();
+  private final Climb m_climb = new Climb();
 
   final StateMachine m_stateMachine =
-      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor);
+      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb);
 
   private SendableChooser<Command> autoChooser;
 
@@ -97,8 +99,11 @@ public class RobotContainer {
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
 
-    m_driverController.y().onTrue(m_stateMachine.climb());
-    m_driverController.rightStick().onTrue(m_stateMachine.unclimb());
+    if (Robot.isSimulation()) {
+      m_driverController.y().toggleOnTrue(m_stateMachine.shoot());
+      m_driverController.leftBumper().whileTrue(m_stateMachine.intakeSequence());
+    }
+    ;
 
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
     // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());

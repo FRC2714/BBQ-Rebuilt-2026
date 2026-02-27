@@ -137,7 +137,8 @@ public class StateMachine extends SubsystemBase {
             () -> {
               m_drivetrain.setShootingStateFalse();
               CommandScheduler.getInstance().schedule(stopShoot());
-            });
+            })
+        .onlyIf(() -> m_state == State.Idle);
   }
 
   public Command stopShoot() {
@@ -159,14 +160,15 @@ public class StateMachine extends SubsystemBase {
     return deployClimber()
         .until((() -> m_climb.atSetpoint()))
         .andThen(m_climb.climb())
-        .beforeStarting(() -> setState(State.Climbing));
+        .beforeStarting(() -> setState(State.Climbing))
+        .onlyIf(() -> m_state == State.Idle);
   }
 
   public Command unclimb() {
     return m_climb
         .unclimb()
-        .onlyIf(() -> m_state == State.Climbing)
-        .beforeStarting(() -> setState(State.Idle));
+        .beforeStarting(() -> setState(State.Idle))
+        .onlyIf(() -> m_state == State.Climbing);
   }
 
   public State getState() {

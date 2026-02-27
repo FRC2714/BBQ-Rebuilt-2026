@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.Climb;
@@ -41,8 +41,8 @@ public class RobotContainer {
   private SendableChooser<Command> autoChooser;
 
   // The driver's controller
-  CommandXboxController m_driverController =
-      new CommandXboxController(OIConstants.kDriverControllerPort);
+  CommandPS4Controller m_driverController =
+      new CommandPS4Controller(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -78,33 +78,32 @@ public class RobotContainer {
     m_stateMachine.configureBindings();
 
     m_driverController
-        .leftStick()
+        .L3()
         .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
 
     m_driverController
-        .back()
+        .share()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(), m_robotDrive));
     m_driverController
-        .start()
+        .options()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
     m_driverController.povRight().onTrue(m_shooter.zeroTurretSequence());
 
-    m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
+    m_driverController.cross().toggleOnTrue(m_stateMachine.shoot());
 
-    m_driverController.x().onTrue(m_stateMachine.preloadCommand());
+    m_driverController.square().onTrue(m_stateMachine.preloadCommand());
 
     // intake keybinds
-    m_driverController.rightBumper().whileTrue(m_stateMachine.intakeSequence());
+    m_driverController.R1().whileTrue(m_stateMachine.intakeSequence());
 
-    m_driverController.b().onTrue(m_stateMachine.stowSequence());
+    m_driverController.circle().onTrue(m_stateMachine.stowSequence());
+    
+    m_driverController.triangle().onTrue(m_stateMachine.climb());
+    m_driverController.R3().onTrue(m_stateMachine.unclimb());
 
     if (Robot.isSimulation()) {
-      m_driverController.y().toggleOnTrue(m_stateMachine.shoot());
-      m_driverController.leftBumper().whileTrue(m_stateMachine.intakeSequence());
-      m_driverController.rightBumper().whileTrue(m_stateMachine.stowSequence());
-      m_driverController.a().onTrue(m_stateMachine.climb());
-      m_driverController.x().onTrue(m_stateMachine.unclimb()); 
+      
     }
     ;
 

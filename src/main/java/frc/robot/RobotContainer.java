@@ -103,6 +103,8 @@ public class RobotContainer {
       m_driverController.y().toggleOnTrue(m_stateMachine.shoot());
       m_driverController.leftBumper().whileTrue(m_stateMachine.intakeSequence());
       m_driverController.rightBumper().whileTrue(m_stateMachine.stowSequence());
+      m_driverController.a().onTrue(m_stateMachine.climb());
+      m_driverController.x().onTrue(m_stateMachine.unclimb()); 
     }
     ;
 

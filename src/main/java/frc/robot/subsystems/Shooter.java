@@ -184,8 +184,7 @@ public class Shooter extends SubsystemBase {
     // 6. Set outputs
     this.flywheelCurrentTarget = requiredRpm;
     this.hoodCurrentTarget = requiredHoodAngle;
-    this.turretCurrentTarget =
-        turretAngle.relativeTo(robotHeading).getDegrees();
+    this.turretCurrentTarget = turretAngle.relativeTo(robotHeading).getDegrees();
   }
 
   private Debouncer flywheelDebouncer =
@@ -249,10 +248,8 @@ public class Shooter extends SubsystemBase {
   }
 
   private double normalizeTurretTarget(double angleDegrees) {
-    double min =
-        ShooterConstants.kTurretMinRange - ShooterConstants.kTurretMountingOffsetDegrees;
-    double max =
-        ShooterConstants.kTurretMaxRange - ShooterConstants.kTurretMountingOffsetDegrees;
+    double min = ShooterConstants.kTurretMinRange - ShooterConstants.kTurretMountingOffsetDegrees;
+    double max = ShooterConstants.kTurretMaxRange - ShooterConstants.kTurretMountingOffsetDegrees;
 
     // Fold into one revolution first so we can generate equivalent candidates.
     double base = angleDegrees % 360.0;

@@ -243,10 +243,6 @@ public class Shooter extends SubsystemBase {
     return turretRelativeEncoder.getPosition() - ShooterConstants.kTurretMountingOffsetDegrees;
   }
 
-  private double logicalToTurretEncoderDegrees(double logicalAngleDegrees) {
-    return logicalAngleDegrees + ShooterConstants.kTurretMountingOffsetDegrees;
-  }
-
   private double normalizeTurretTarget(double angleDegrees) {
     double min = ShooterConstants.kTurretMinRange - ShooterConstants.kTurretMountingOffsetDegrees;
     double max = ShooterConstants.kTurretMaxRange - ShooterConstants.kTurretMountingOffsetDegrees;
@@ -388,7 +384,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setTurretAngle(double angle) {
-    turretRelativeEncoder.setPosition(logicalToTurretEncoderDegrees(angle));
+    turretRelativeEncoder.setPosition(angle + ShooterConstants.kTurretMountingOffsetDegrees);
   }
 
   public void configureShooterBindings() {
@@ -405,7 +401,7 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
     turretController.setSetpoint(
-        logicalToTurretEncoderDegrees(turretCurrentTarget),
+        turretCurrentTarget + ShooterConstants.kTurretMountingOffsetDegrees,
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0);
     hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);

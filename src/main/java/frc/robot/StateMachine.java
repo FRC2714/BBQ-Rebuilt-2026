@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -26,7 +25,6 @@ public class StateMachine extends SubsystemBase {
   private final Intake m_intake;
   private final DyeRotor m_dyeRotor;
   private final Publisher m_publisher;
-  private final Climb m_climb;
 
   private static State m_state = State.Idle;
 
@@ -43,12 +41,11 @@ public class StateMachine extends SubsystemBase {
   }
 
   public StateMachine(
-      DriveSubsystem drivetrain, Shooter shooter, Intake intake, DyeRotor dyeRotor, Climb climb) {
+      DriveSubsystem drivetrain, Shooter shooter, Intake intake, DyeRotor dyeRotor) {
     m_drivetrain = drivetrain;
     m_shooter = shooter;
     m_intake = intake;
     m_dyeRotor = dyeRotor;
-    m_climb = climb;
 
     m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor);
 
@@ -137,8 +134,7 @@ public class StateMachine extends SubsystemBase {
             () -> {
               m_drivetrain.setShootingStateFalse();
               CommandScheduler.getInstance().schedule(stopShoot());
-            })
-        .onlyIf(() -> m_state == State.Idle);
+            });
   }
 
   public Command stopShoot() {
@@ -150,25 +146,6 @@ public class StateMachine extends SubsystemBase {
             () -> {
               m_state = State.Idle;
             });
-  }
-
-  public Command deployClimber() {
-    return m_intake.stow().until(() -> m_intake.atSetpoint()).andThen(m_climb.deploy());
-  }
-
-  public Command climb() {
-    return deployClimber()
-        .until((() -> m_climb.atSetpoint()))
-        .andThen(m_climb.climb())
-        .beforeStarting(() -> setState(State.Climbing))
-        .onlyIf(() -> m_state == State.Idle);
-  }
-
-  public Command unclimb() {
-    return m_climb
-        .unclimb()
-        .beforeStarting(() -> setState(State.Idle))
-        .onlyIf(() -> m_state == State.Climbing);
   }
 
   public State getState() {

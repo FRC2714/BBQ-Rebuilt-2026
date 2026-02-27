@@ -77,9 +77,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     m_stateMachine.configureBindings();
 
-    m_driverController
-        .L3()
-        .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+    m_driverController.L3().whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
 
     m_driverController
         .share()
@@ -98,13 +96,12 @@ public class RobotContainer {
     m_driverController.R1().whileTrue(m_stateMachine.intakeSequence());
 
     m_driverController.circle().onTrue(m_stateMachine.stowSequence());
-    
+
     m_driverController.triangle().onTrue(m_stateMachine.climb());
     m_driverController.R3().onTrue(m_stateMachine.unclimb());
 
-    if (Robot.isSimulation()) {
-      
-    }
+    if (Robot.isSimulation()) {}
+
     ;
 
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());

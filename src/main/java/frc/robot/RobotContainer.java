@@ -12,10 +12,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -33,16 +32,15 @@ public class RobotContainer {
   public final Shooter m_shooter = new Shooter();
   public final DyeRotor m_dyeRotor = new DyeRotor();
   public final Intake m_intake = new Intake();
-  private final Climb m_climb = new Climb();
 
   final StateMachine m_stateMachine =
-      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb);
+      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor);
 
   private SendableChooser<Command> autoChooser;
 
   // The driver's controller
-  CommandPS4Controller m_driverController =
-      new CommandPS4Controller(OIConstants.kDriverControllerPort);
+  CommandXboxController m_driverController =
+      new CommandXboxController(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -77,31 +75,32 @@ public class RobotContainer {
   private void configureButtonBindings() {
     m_stateMachine.configureBindings();
 
-    m_driverController.L3().whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+    m_driverController
+        .leftStick()
+        .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
 
     m_driverController
-        .share()
+        .back()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(), m_robotDrive));
     m_driverController
-        .options()
+        .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
     m_driverController.povRight().onTrue(m_shooter.zeroTurretSequence());
 
-    m_driverController.cross().toggleOnTrue(m_stateMachine.shoot());
+    m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
 
-    m_driverController.square().onTrue(m_stateMachine.preloadCommand());
+    m_driverController.x().onTrue(m_stateMachine.preloadCommand());
 
     // intake keybinds
-    m_driverController.R1().whileTrue(m_stateMachine.intakeSequence());
+    m_driverController.rightBumper().whileTrue(m_stateMachine.intakeSequence());
 
-    m_driverController.circle().onTrue(m_stateMachine.stowSequence());
+    m_driverController.b().onTrue(m_stateMachine.stowSequence());
 
-    m_driverController.triangle().onTrue(m_stateMachine.climb());
-    m_driverController.R3().onTrue(m_stateMachine.unclimb());
-
-    if (Robot.isSimulation()) {}
-
+    if (Robot.isSimulation()) {
+      m_driverController.y().toggleOnTrue(m_stateMachine.shoot());
+      m_driverController.leftBumper().whileTrue(m_stateMachine.intakeSequence());
+    }
     ;
 
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());

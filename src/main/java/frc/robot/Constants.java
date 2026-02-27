@@ -123,10 +123,11 @@ public final class Constants {
 
   public static final class ShooterConstants {
     public static final int kTurretCanId = 30;
-    public static final int kTurretMaxRange = 175;
-    public static final int kFwdLimitSwitchOffset = 90;
-    public static final int kRevLimitSwitchOffset = -90;
-    public static final int kTurretMinRange = -175;
+    public static final int kTurretMaxRange = 220;
+    public static final int kFwdLimitSwitchOffset = -90;
+    public static final int kRevLimitSwitchOffset = 90;
+    public static final int kTurretMinRange = -180;
+    public static final double kTurretMountingOffsetDegrees = 180.0;
     public static final Transform2d turretOffset =
         new Transform2d(
             Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));

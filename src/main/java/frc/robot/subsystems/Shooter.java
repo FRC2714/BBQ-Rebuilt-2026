@@ -51,8 +51,6 @@ import frc.robot.Constants.ShooterConstants.HoodSetpoints;
 import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 import frc.robot.Robot;
 import frc.robot.Simulation;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-
 
 /**
  * Controls the turret, hood, and flywheel. Handles aiming with lead compensation for shooting on
@@ -274,14 +272,9 @@ public class Shooter extends SubsystemBase {
         PersistMode.kPersistParameters);
     SmartDashboard.putData("Shooter/Mech2d", flyWheelMech);
 
-      if (Robot.isSimulation()) {
-    hoodSim.setState(
-        VecBuilder.fill(
-            Units.degreesToRadians(67.276537),
-            0.0
-        )
-    );
-}
+    if (Robot.isSimulation()) {
+      hoodSim.setState(VecBuilder.fill(Units.degreesToRadians(67.276537), 0.0));
+    }
   }
 
   /** Returns true if fuel is loaded (beam break in real, simulation flag in sim). */
@@ -435,16 +428,15 @@ public class Shooter extends SubsystemBase {
     final double kHomingPower = -0.18;
 
     return new InstantCommand(() -> zeroingHood = true)
+        .andThen(new RunCommand(() -> hoodMotor.set(kHomingPower), this).withTimeout(1.5))
         .andThen(
-            new RunCommand(() -> hoodMotor.set(kHomingPower), this)
-                .withTimeout(1.5)
-        )
-        .andThen(new InstantCommand(() -> {
-            hoodMotor.set(0.0);
-            hoodRelativeEncoder.setPosition(0.0);
-            zeroingHood = false;
-        }));
-}
+            new InstantCommand(
+                () -> {
+                  hoodMotor.set(0.0);
+                  hoodRelativeEncoder.setPosition(0.0);
+                  zeroingHood = false;
+                }));
+  }
 
   public Command zeroTurretSequence() {
     if (!wasZeroed) {
@@ -512,14 +504,13 @@ public class Shooter extends SubsystemBase {
         turretCurrentTarget + ShooterConstants.kTurretMountingOffsetDegrees,
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0);
-  
-        SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
-        if(!zeroingHood)
-   {
-        hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-    flywheelController.setSetpoint(
-        isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-   }
+
+    SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
+    if (!zeroingHood) {
+      hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+      flywheelController.setSetpoint(
+          isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    }
 
     SmartDashboard.putNumber("Shooter/Flywheel/Expected Speed", flywheelCurrentTarget);
     SmartDashboard.putNumber(
@@ -576,7 +567,6 @@ public class Shooter extends SubsystemBase {
 
     // Mech 2d Flywheel Angle Update
     flyWheelLigament.setAngle(Units.rotationsToDegrees(flywheelRelativeEncoder.getPosition()));
-    
   }
 
   @Override
@@ -604,24 +594,24 @@ public class Shooter extends SubsystemBase {
     hoodSim.setInput(hoodSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
     hoodSim.update(0.02);
 
-// Simulated mechanical limits
-double hoodPositionRad = hoodSim.getOutput(0);
-double minRad = Units.degreesToRadians(0);
-double maxRad = Units.degreesToRadians(90);
+    // Simulated mechanical limits
+    double hoodPositionRad = hoodSim.getOutput(0);
+    double minRad = Units.degreesToRadians(0);
+    double maxRad = Units.degreesToRadians(90);
 
-if (hoodPositionRad < minRad) {
-    hoodSim.setState(VecBuilder.fill(minRad, 0.0));
-}
-if (hoodPositionRad > maxRad) {
-    hoodSim.setState(VecBuilder.fill(maxRad, 0.0));
-}
+    if (hoodPositionRad < minRad) {
+      hoodSim.setState(VecBuilder.fill(minRad, 0.0));
+    }
+    if (hoodPositionRad > maxRad) {
+      hoodSim.setState(VecBuilder.fill(maxRad, 0.0));
+    }
 
-hoodSparkSim.iterate(
-    Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1)),
-    RobotController.getBatteryVoltage(),
-    0.02);
+    hoodSparkSim.iterate(
+        Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1)),
+        RobotController.getBatteryVoltage(),
+        0.02);
 
-double hoodPositionDegrees = Math.toDegrees(hoodSim.getOutput(0));
-hoodRelativeEncoder.setPosition(hoodPositionDegrees);
+    double hoodPositionDegrees = Math.toDegrees(hoodSim.getOutput(0));
+    hoodRelativeEncoder.setPosition(hoodPositionDegrees);
   }
 }

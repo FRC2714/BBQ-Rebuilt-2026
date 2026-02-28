@@ -430,18 +430,18 @@ public class Shooter extends SubsystemBase {
     return new InstantCommand(() -> zeroingHood = true)
         .andThen(
             new RunCommand(() -> hoodMotor.set(kHomingPower), this)
-                .until(() -> simHoodPosition <= 54.3) 
-        )
-        .andThen(new InstantCommand(() -> {
-            hoodMotor.set(0.0);
+                .until(() -> simHoodPosition <= 54.3))
+        .andThen(
+            new InstantCommand(
+                () -> {
+                  hoodMotor.set(0.0);
 
-            
-            hoodRelativeEncoder.setPosition(72.276537);
-            simHoodPosition = 72.276537;
+                  hoodRelativeEncoder.setPosition(72.276537);
+                  simHoodPosition = 72.276537;
 
-            zeroingHood = false;
-        }));
-}
+                  zeroingHood = false;
+                }));
+  }
 
   public Command zeroTurretSequence() {
     if (!wasZeroed) {
@@ -600,9 +600,9 @@ public class Shooter extends SubsystemBase {
     hoodSim.update(0.02);
 
     if (zeroingHood) {
-        simHoodPosition += hoodSparkSim.getAppliedOutput() * 2.0;
+      simHoodPosition += hoodSparkSim.getAppliedOutput() * 2.0;
     } else {
-        simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
+      simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
     }
 
     double physicalMin = 54.276537;
@@ -611,5 +611,5 @@ public class Shooter extends SubsystemBase {
     simHoodPosition = MathUtil.clamp(simHoodPosition, physicalMin, physicalMax);
 
     hoodRelativeEncoder.setPosition(simHoodPosition);
-}
+  }
 }

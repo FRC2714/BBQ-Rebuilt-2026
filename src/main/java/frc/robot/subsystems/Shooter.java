@@ -317,12 +317,11 @@ public class Shooter extends SubsystemBase {
   }
 
   
-   public Command zeroHoodSequence() {
-    final double kHomingPower = -0.18; // drive toward the hard stop; invert sign if your wiring is opposite
-    final double kStallCurrentThreshold = 4.0; // amps — tune for your mechanism
-    final double kTimeoutSeconds = 3.0; // safety timeout
+   public Command zeroHood() {
+    final double kHomingPower = -0.18; 
+    final double kStallCurrentThreshold = 4.0;   
+    final double kTimeoutSeconds = 3.0; 
 
-    // Run slowly until current rises above threshold (stall/hard-stop) or timeout.
     return new RunCommand(() -> hoodMotor.set(kHomingPower), this)
         .until(() -> hoodMotor.getOutputCurrent() > kStallCurrentThreshold)
         .withTimeout(kTimeoutSeconds)
@@ -330,9 +329,7 @@ public class Shooter extends SubsystemBase {
         .andThen(
             new InstantCommand(
                 () -> {
-                  // On stall or timeout, assume we are at stow and set the encoder.
-                  // Use your stow constant (HoodSetpoints.kStow) or 0.0 as appropriate.
-                  hoodRelativeEncoder.setPosition(HoodSetpoints.kStow);
+                  hoodRelativeEncoder.setPosition(0.0);
                 },
                 this));
   }

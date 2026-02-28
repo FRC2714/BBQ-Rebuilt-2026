@@ -236,10 +236,9 @@ public class StateMachine extends SubsystemBase {
     return Commands.runEnd(
         () -> {
           m_intake.intakeAutoGroup();
-        }
-        ,
+        },
         () -> {
-          m_intake.stow();
+          m_intake.stopAutoGroup();
         });
   }
 

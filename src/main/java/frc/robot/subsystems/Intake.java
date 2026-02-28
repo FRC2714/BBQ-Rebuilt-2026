@@ -140,13 +140,17 @@ public class Intake extends SubsystemBase {
         });
   }
 
-    public void intakeAutoGroup() {
+  public void intakeAutoGroup() {
 
-          setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
-          pivotExtend();
+    setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
+    pivotExtend();
 
-          if (Robot.isSimulation()) Simulation.getInstance().startIntake();
+    if (Robot.isSimulation()) Simulation.getInstance().startIntake();
+  }
 
+  public void stopAutoGroup() {
+
+    setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
   }
 
   /** Extends pivot and runs rollers outward (eject). Stops rollers on end. */

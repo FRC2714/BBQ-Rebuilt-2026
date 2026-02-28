@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -75,6 +76,12 @@ public class Shooter extends SubsystemBase {
   private double turretCurrentTarget = TurretSetpoints.kStow;
   private double hoodCurrentTarget = HoodSetpoints.kStow;
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
+
+  // Raw (non-lead-compensated) values for simulation — these point at the actual hub
+  // rather than the predicted future position, so MapleLib doesn't double-compensate.
+  private double rawTurretTarget = 0.0;
+  private double rawFlywheelTarget = 0.0;
+  private double rawHoodTarget = 0.0;
 
   public boolean wasZeroed = false;
   public boolean turretUpdated = false;
@@ -143,6 +150,12 @@ public class Shooter extends SubsystemBase {
     Translation2d relativePosition = goalPosition.minus(futurePos);
     Translation2d relativeVelocity = robotVelocity.times(-1);
 
+    // Store raw (non-lead-compensated) values for simulation
+    ShooterParams rawParams = shooterMap.get(relativePosition.getNorm());
+    this.rawFlywheelTarget = rawParams.rpm;
+    this.rawHoodTarget = rawParams.hoodAngle;
+    this.rawTurretTarget = relativePosition.getAngle().relativeTo(robotHeading).getDegrees();
+
     // 2-4. Iteratively refine the shot using time-of-flight.
     // We begin with the raw distance to the target, then on each iteration we
     // predict where the target will be when the gamepiece arrives and re-look-up
@@ -184,7 +197,11 @@ public class Shooter extends SubsystemBase {
     // 6. Set outputs
     this.flywheelCurrentTarget = requiredRpm;
     this.hoodCurrentTarget = requiredHoodAngle;
-    this.turretCurrentTarget = turretAngle.relativeTo(robotHeading).getDegrees();
+    this.turretCurrentTarget =
+        MathUtil.clamp(
+            turretAngle.relativeTo(robotHeading).getDegrees(),
+            Constants.ShooterConstants.kTurretMinRange,
+            Constants.ShooterConstants.kTurretMaxRange);
   }
 
   private Debouncer flywheelDebouncer =
@@ -303,6 +320,22 @@ public class Shooter extends SubsystemBase {
 
   public double getHoodAngle() {
     return hoodCurrentTarget;
+  }
+
+  public double getRawTurretTarget() {
+    return rawTurretTarget;
+  }
+
+  public double getRawFlywheelTarget() {
+    return rawFlywheelTarget;
+  }
+
+  public double getRawHoodTarget() {
+    return rawHoodTarget;
+  }
+
+  public void setIsShooting(boolean shooting) {
+    isShooting = shooting;
   }
 
   public Command startShooter() {

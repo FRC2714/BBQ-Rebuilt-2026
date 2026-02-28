@@ -36,8 +36,6 @@ public class StateMachine extends SubsystemBase {
   private final XboxController m_driverHID;
   private final Climb m_climb;
 
-  private boolean isPreloading = false;
-
   private static State m_state = State.Idle;
   private boolean phaseShiftActive = false;
 
@@ -118,19 +116,14 @@ public class StateMachine extends SubsystemBase {
     resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
 
     Trigger stopPreload =
-        new Trigger(() -> m_state != State.Shooting && m_dyeRotor.isRunning() && isPreloading)
+        new Trigger(() -> m_state != State.Shooting && m_dyeRotor.isRunning())
             .and(() -> m_driverHID.getXButtonReleased());
-    stopPreload.onTrue(
-        Commands.runOnce(
-            () -> {
-              m_dyeRotor.pause();
-              isPreloading = false;
-            }));
+    stopPreload.onTrue(m_dyeRotor.stop());
 
     Trigger startPreload =
-        new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning() && !isPreloading)
+        new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning())
             .and(() -> m_driverHID.getXButtonReleased());
-    startPreload.onTrue(this.preloadCommand());
+    startPreload.onTrue(m_dyeRotor.start());
 
     m_shooter.configureShooterBindings();
   }
@@ -189,7 +182,6 @@ public class StateMachine extends SubsystemBase {
         () -> {
           if (m_state == State.Shooting) return;
           CommandScheduler.getInstance().schedule(preload());
-          isPreloading = true;
         });
   }
 

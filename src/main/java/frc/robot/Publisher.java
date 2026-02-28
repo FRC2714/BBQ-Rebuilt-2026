@@ -77,6 +77,7 @@ public class Publisher {
     m_dyeRotor = dyeRotor;
   }
 
+  /** Publishes all NetworkTables data: poses, turret, Limelight measurements, and sim fuel. */
   public void publish() {
     Pose3d[] zeroRobotPose = new Pose3d[4];
     for (int i = 0; i < zeroRobotPose.length; i++) {

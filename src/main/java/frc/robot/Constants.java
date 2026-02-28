@@ -31,6 +31,8 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 4.8;
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
+    public static final double kBumperThickness = Units.inchesToMeters(3.5); // Needs to change
+
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(26.5);
     // Distance between centers of right and left wheels on robot
@@ -107,6 +109,13 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
         new TrapezoidProfile.Constraints(
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+
+    // Command timeouts in seconds (needs to be tested)
+    public static final double kShootInitialTimeout = 1.5;
+    public static final double kShootTimeout = 2.25;
+    public static final double kIntakeTimeout = 1.75;
+    public static final double kExtakeTimeout = 1.75;
+    public static final double kStowTimeout = 0.75;
   }
 
   public static final class NeoMotorConstants {
@@ -121,11 +130,19 @@ public final class Constants {
 
   public static final class ShooterConstants {
     public static final int kTurretCanId = 30;
-    public static final int kTurretMaxRange = 175;
-    public static final int kTurretMinRange = -175;
+    public static final int kTurretMaxRange = 220;
+    public static final int kFwdLimitSwitchOffset = -90;
+    public static final int kRevLimitSwitchOffset = 90;
+    public static final int kTurretMinRange = -180;
+    public static final double kTurretMountingOffsetDegrees = 180.0;
     public static final Transform2d turretOffset =
         new Transform2d(
             Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));
+    public static final double kTurretGearRatio = 52.5;
+    public static final double kTurretMOI = 0.0722989441;
+
+    // Generalization of updating the targets
+    public static final double kLatencyCompensation = 0.1;
 
     public static final int kHoodCanId = 31; // TBD
     public static final double kHoodMaxAngle = 72.276537;
@@ -156,6 +173,17 @@ public final class Constants {
   public static final class DyeRotorConstants {
     public static final int kDyeRotorMotorCanID = 60;
     public static final double kDyeRotorPower = 1.0;
+  }
+
+  public static final class ClimbConstants {
+    public static final int kLeftMotorCanID = 45;
+    public static final int kRightMotorCanID = 41;
+    public static final double kRetractSetpoint = 0.0; // TBD
+    public static final double kExtendSetpoint = 100.0; // TBD
+    public static final double kClimbSetpoint = 2.0; // TBD
+    public static final double kPositionTolerance = 2.0;
+    public static final double kExtendSpeed = 0.5; // TBD
+    public static final double kRetractSpeed = -0.5; // TBD
   }
 
   // For field constants

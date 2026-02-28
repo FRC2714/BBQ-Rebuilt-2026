@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.204696428571428,
-        "y": 0.618
+        "x": 4.275550824200666,
+        "y": 2.506
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.0025,
-        "y": 0.4393928571428569
+        "x": 6.255243018626057,
+        "y": 2.493480708645047
       },
       "isLocked": false,
-      "linkedName": "Trench Score Position"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.46165404040404,
-        "y": 1.8092803030303024
+        "x": 8.273435326470269,
+        "y": 2.506
       },
       "prevControl": {
-        "x": 6.391214285714285,
-        "y": 1.2654107142857138
+        "x": 7.117792784350526,
+        "y": 2.507872113576369
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,19 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "INTAKE",
+      "waypointRelativePos": 0.3279927909572259,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "INTAKE"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -42,7 +54,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 54.68878656036678
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "outpost to NZ",

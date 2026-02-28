@@ -3,7 +3,6 @@
   "robotLength": 0.609,
   "holonomicMode": true,
   "pathFolders": [
-    "depot nz trench",
     "depot to NZ",
     "grab depot",
     "outpost to NZ"

@@ -392,10 +392,9 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  
-   public Command zeroHood() {
-    final double kHomingPower = -0.18; 
-    final double kTimeoutSeconds = 1.5; 
+  public Command zeroHood() {
+    final double kHomingPower = -0.18;
+    final double kTimeoutSeconds = 1.5;
 
     return new RunCommand(() -> hoodMotor.set(kHomingPower), this)
         .until(() -> hoodRelativeEncoder.getVelocity() == 0.0)

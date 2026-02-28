@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -14,7 +15,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.StateMachine.State;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
@@ -46,6 +49,27 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    // NAMED COMMANDS FOR PATHPLANNER
+    NamedCommands.registerCommand("SCORE", m_stateMachine.startShootingAuto());
+    NamedCommands.registerCommand("SCORE_INITAL", m_stateMachine.startShootingAuto());
+    NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShootAuto());
+    NamedCommands.registerCommand("INTAKE", m_stateMachine.intakeSequence());
+    NamedCommands.registerCommand(
+        "CLIMB",
+        new InstantCommand(
+            () ->
+                m_stateMachine.setState(
+                    State.Climbing))); // NO CURRENT CLIMB METHOD BUT REQUIRED FOR PATHPLANNER
+    NamedCommands.registerCommand(
+        "EXTAKE", m_stateMachine.extakeSequenceAuto(AutoConstants.kExtakeTimeout));
+    NamedCommands.registerCommand(
+        "STOW_INTAKE", m_stateMachine.stowSequenceAuto(AutoConstants.kStowTimeout));
+    NamedCommands.registerCommand("PRELOAD", m_stateMachine.preloadCommand());
+    NamedCommands.registerCommand(
+        "WAIT_FOR_SCORE", m_stateMachine.waitForScore(AutoConstants.kShootTimeout));
+    NamedCommands.registerCommand(
+        "WAIT_FOR_SCORE_INITIAL", m_stateMachine.waitForScore(AutoConstants.kShootInitialTimeout));
+
     // Configure the button bindings
     configureButtonBindings();
 

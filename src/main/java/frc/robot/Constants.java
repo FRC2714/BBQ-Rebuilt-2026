@@ -109,6 +109,13 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
         new TrapezoidProfile.Constraints(
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+
+    // Command timeouts in seconds (needs to be tested)
+    public static final double kShootInitialTimeout = 1.5;
+    public static final double kShootTimeout = 2.25;
+    public static final double kIntakeTimeout = 1.75;
+    public static final double kExtakeTimeout = 1.75;
+    public static final double kStowTimeout = 0.75;
   }
 
   public static final class NeoMotorConstants {
@@ -123,10 +130,11 @@ public final class Constants {
 
   public static final class ShooterConstants {
     public static final int kTurretCanId = 30;
-    public static final int kTurretMaxRange = 175;
-    public static final int kFwdLimitSwitchOffset = 90;
-    public static final int kRevLimitSwitchOffset = -90;
-    public static final int kTurretMinRange = -175;
+    public static final int kTurretMaxRange = 220;
+    public static final int kFwdLimitSwitchOffset = -90;
+    public static final int kRevLimitSwitchOffset = 90;
+    public static final int kTurretMinRange = -180;
+    public static final double kTurretMountingOffsetDegrees = 180.0;
     public static final Transform2d turretOffset =
         new Transform2d(
             Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));

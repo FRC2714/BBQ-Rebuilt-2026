@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -42,6 +43,10 @@ import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 import frc.robot.Robot;
 import frc.robot.Simulation;
 
+/**
+ * Controls the turret, hood, and flywheel. Handles aiming with lead compensation for shooting on
+ * the move.
+ */
 public class Shooter extends SubsystemBase {
   private SparkFlex turretMotor =
       new SparkFlex(Constants.ShooterConstants.kTurretCanId, MotorType.kBrushless);
@@ -76,11 +81,18 @@ public class Shooter extends SubsystemBase {
   private double hoodCurrentTarget = HoodSetpoints.kStow;
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
 
+  // Raw (non-lead-compensated) values for simulation — these point at the actual hub
+  // rather than the predicted future position, so MapleLib doesn't double-compensate.
+  private double rawTurretTarget = 0.0;
+  private double rawFlywheelTarget = 0.0;
+  private double rawHoodTarget = 0.0;
+
   public boolean wasZeroed = false;
   public boolean turretUpdated = false;
 
   private boolean isShooting = false;
 
+  /** Interpolatable lookup values for a given distance to target. */
   public record ShooterParams(double rpm, double hoodAngle, double timeOfFlight) {
     public static ShooterParams interpolate(ShooterParams a, ShooterParams b, double t) {
       double rpm = a.rpm + (b.rpm - a.rpm) * t;
@@ -90,6 +102,7 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  /** Holds a complete set of shooter outputs: turret angle, flywheel RPM, and hood angle. */
   public class ShooterCommand {
     public final Rotation2d turretAngle;
     public final double rpm;
@@ -118,14 +131,8 @@ public class Shooter extends SubsystemBase {
   }
 
   /**
-   * Courtesy of https://blog.eeshwark.com/robotblog/shooting-on-the-fly-pt2 and
-   * https://frc-docs--3242.org.readthedocs.build/en/3242/docs/software/advanced-controls/fire-control/dynamic-shooting.html
-   *
-   * @param robotPosition
-   * @param robotHeading
-   * @param robotVelocity
-   * @param goalPosition
-   * @param latencyCompensation
+   * Calculates turret, hood, and flywheel targets with lead compensation for shooting on the move.
+   * Iteratively refines time-of-flight until convergence.
    */
   public void calculate(
       Translation2d robotPosition,
@@ -142,6 +149,12 @@ public class Shooter extends SubsystemBase {
     // simply the negation of the robot's velocity.
     Translation2d relativePosition = goalPosition.minus(futurePos);
     Translation2d relativeVelocity = robotVelocity.times(-1);
+
+    // Store raw (non-lead-compensated) values for simulation
+    ShooterParams rawParams = shooterMap.get(relativePosition.getNorm());
+    this.rawFlywheelTarget = rawParams.rpm;
+    this.rawHoodTarget = rawParams.hoodAngle;
+    this.rawTurretTarget = relativePosition.getAngle().relativeTo(robotHeading).getDegrees();
 
     // 2-4. Iteratively refine the shot using time-of-flight.
     // We begin with the raw distance to the target, then on each iteration we
@@ -184,7 +197,11 @@ public class Shooter extends SubsystemBase {
     // 6. Set outputs
     this.flywheelCurrentTarget = requiredRpm;
     this.hoodCurrentTarget = requiredHoodAngle;
-    this.turretCurrentTarget = turretAngle.relativeTo(robotHeading).getDegrees();
+    this.turretCurrentTarget =
+        MathUtil.clamp(
+            turretAngle.relativeTo(robotHeading).getDegrees(),
+            Constants.ShooterConstants.kTurretMinRange,
+            Constants.ShooterConstants.kTurretMaxRange);
   }
 
   private Debouncer flywheelDebouncer =
@@ -232,6 +249,7 @@ public class Shooter extends SubsystemBase {
         PersistMode.kPersistParameters);
   }
 
+  /** Returns true if fuel is loaded (beam break in real, simulation flag in sim). */
   public boolean getFuelLimitSwitch() {
     if (Robot.isSimulation()) {
       return Simulation.getInstance().isPreloaded();
@@ -239,16 +257,54 @@ public class Shooter extends SubsystemBase {
     return fuelBeamBreak.isPressed();
   }
 
+  /** Returns turret position in degrees, corrected for mounting offset. */
   public double getTurretPosition() {
-    return turretRelativeEncoder.getPosition();
+    return turretRelativeEncoder.getPosition() - ShooterConstants.kTurretMountingOffsetDegrees;
+  }
+
+  private double normalizeTurretTarget(double angleDegrees) {
+    double min = ShooterConstants.kTurretMinRange - ShooterConstants.kTurretMountingOffsetDegrees;
+    double max = ShooterConstants.kTurretMaxRange - ShooterConstants.kTurretMountingOffsetDegrees;
+
+    // Fold into one revolution first so we can generate equivalent candidates.
+    double base = angleDegrees % 360.0;
+    if (base > 180.0) {
+      base -= 360.0;
+    } else if (base <= -180.0) {
+      base += 360.0;
+    }
+
+    double currentPosition = getTurretPosition();
+    double bestTarget = Double.NaN;
+    double bestError = Double.POSITIVE_INFINITY;
+
+    for (int k = -2; k <= 2; k++) {
+      double candidate = base + (k * 360.0);
+      if (candidate < min || candidate > max) {
+        continue;
+      }
+
+      double error = Math.abs(candidate - currentPosition);
+      if (error < bestError) {
+        bestError = error;
+        bestTarget = candidate;
+      }
+    }
+
+    if (!Double.isNaN(bestTarget)) {
+      return bestTarget;
+    }
+
+    return Math.max(min, Math.min(max, base));
   }
 
   public double getHoodPosition() {
     return hoodRelativeEncoder.getPosition();
   }
 
+  /** Applies a ShooterCommand's targets to the turret, flywheel, and hood. */
   public void updateShootCommand(ShooterCommand command) {
-    turretCurrentTarget = command.turretAngle.getDegrees();
+    turretCurrentTarget = normalizeTurretTarget(command.turretAngle.getDegrees());
     flywheelCurrentTarget = command.rpm;
     hoodCurrentTarget = command.hoodAngle;
   }
@@ -269,6 +325,23 @@ public class Shooter extends SubsystemBase {
     return hoodCurrentTarget;
   }
 
+  public double getRawTurretTarget() {
+    return rawTurretTarget;
+  }
+
+  public double getRawFlywheelTarget() {
+    return rawFlywheelTarget;
+  }
+
+  public double getRawHoodTarget() {
+    return rawHoodTarget;
+  }
+
+  public void setIsShooting(boolean shooting) {
+    isShooting = shooting;
+  }
+
+  /** Enables the flywheel. Runs until cancelled. */
   public Command startShooter() {
     return this.run(
         () -> {
@@ -276,6 +349,7 @@ public class Shooter extends SubsystemBase {
         });
   }
 
+  /** Disables the flywheel. */
   public Command stopShooter() {
     return this.run(
         () -> {
@@ -283,6 +357,7 @@ public class Shooter extends SubsystemBase {
         });
   }
 
+  /** True when flywheel, turret, and hood are all at their setpoints. */
   public boolean readyToShoot() {
     return flywheelAtSetpoint() && turretAtSetpoint() && hoodAtSetpoint();
   }
@@ -294,7 +369,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean turretAtSetpoint() {
-    boolean atSetpoint = Math.abs(turretRelativeEncoder.getPosition() - turretCurrentTarget) < 5;
+    boolean atSetpoint = Math.abs(getTurretPosition() - turretCurrentTarget) < 5;
     return turretDebouncer.calculate(atSetpoint);
   }
 
@@ -303,6 +378,7 @@ public class Shooter extends SubsystemBase {
     return hoodDebouncer.calculate(atSetpoint);
   }
 
+  /** Zeros turret encoder when a limit switch is hit. Resets on release. */
   public void zeroTurret() {
     if (!wasZeroed && turretMotor.getForwardLimitSwitch().isPressed()) {
       wasZeroed = true;
@@ -352,6 +428,7 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  /** Disables limit-switch-triggered motor stop so turret can move freely after zeroing. */
   public void disableLimitSwitchAutoZeroing() {
     turretUpdated = true;
     SparkFlexConfig disableLimitSwitchZeroingConfig = new SparkFlexConfig();
@@ -366,9 +443,10 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setTurretAngle(double angle) {
-    turretRelativeEncoder.setPosition(angle);
+    turretRelativeEncoder.setPosition(angle + ShooterConstants.kTurretMountingOffsetDegrees);
   }
 
+  /** Sets up trigger to disable limit switch auto-zeroing once a switch is hit. */
   public void configureShooterBindings() {
     Trigger disableLimitSwitch =
         new Trigger(
@@ -381,7 +459,11 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
+    turretController.setSetpoint(
+        turretCurrentTarget + ShooterConstants.kTurretMountingOffsetDegrees,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0);
     hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     flywheelController.setSetpoint(
         isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
@@ -392,7 +474,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
 
     SmartDashboard.putNumber("Shooter/Turret/Setpoint", turretCurrentTarget);
-    SmartDashboard.putNumber("Shooter/Turret/Position", turretRelativeEncoder.getPosition());
+    SmartDashboard.putNumber("Shooter/Turret/Position", getTurretPosition());
     SmartDashboard.putBoolean("Shooter/Turret/At Setpoint", turretAtSetpoint());
 
     SmartDashboard.putNumber("Shooter/Hood/Setpoint", hoodCurrentTarget);

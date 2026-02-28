@@ -323,7 +323,7 @@ public class Shooter extends SubsystemBase {
     final double kTimeoutSeconds = 3.0; 
 
     return new RunCommand(() -> hoodMotor.set(kHomingPower), this)
-        .until(() -> hoodMotor.getOutputCurrent() > kStallCurrentThreshold)
+        .until(() -> hoodMotor.getPosition)
         .withTimeout(kTimeoutSeconds)
         .andThen(new InstantCommand(() -> hoodMotor.set(0), this))
         .andThen(

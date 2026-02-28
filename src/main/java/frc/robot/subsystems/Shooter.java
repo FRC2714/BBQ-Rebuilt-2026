@@ -319,13 +319,11 @@ public class Shooter extends SubsystemBase {
   
    public Command zeroHood() {
     final double kHomingPower = -0.18; 
-    final double kStallCurrentThreshold = 4.0;   
-    final double kTimeoutSeconds = 3.0; 
+    final double kTimeoutSeconds = 1.5; 
 
     return new RunCommand(() -> hoodMotor.set(kHomingPower), this)
-        .until(() -> hoodMotor.getPosition)
+        .until(() -> hoodRelativeEncoder.getVelocity() == 0.0)
         .withTimeout(kTimeoutSeconds)
-        .andThen(new InstantCommand(() -> hoodMotor.set(0), this))
         .andThen(
             new InstantCommand(
                 () -> {

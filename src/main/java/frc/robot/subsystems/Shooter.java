@@ -43,7 +43,10 @@ import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 import frc.robot.Robot;
 import frc.robot.Simulation;
 
-/** Controls the turret, hood, and flywheel. Handles aiming with lead compensation for shooting on the move. */
+/**
+ * Controls the turret, hood, and flywheel. Handles aiming with lead compensation for shooting on
+ * the move.
+ */
 public class Shooter extends SubsystemBase {
   private SparkFlex turretMotor =
       new SparkFlex(Constants.ShooterConstants.kTurretCanId, MotorType.kBrushless);

@@ -21,8 +21,8 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
 /**
- * Coordinates all robot subsystems through a state machine (Idle, Shooting, Climbing).
- * Commands are guarded by state checks to prevent conflicting actions.
+ * Coordinates all robot subsystems through a state machine (Idle, Shooting, Climbing). Commands are
+ * guarded by state checks to prevent conflicting actions.
  */
 public class StateMachine extends SubsystemBase {
   private final DriveSubsystem m_drivetrain;
@@ -92,7 +92,9 @@ public class StateMachine extends SubsystemBase {
     }
   }
 
-  /** Sets up triggers that pause/resume the dye rotor based on flywheel readiness during shooting. */
+  /**
+   * Sets up triggers that pause/resume the dye rotor based on flywheel readiness during shooting.
+   */
   public void configureBindings() {
     Trigger pauseShooter =
         new Trigger(() -> m_state == State.Shooting && !m_shooter.readyToShoot());
@@ -227,17 +229,23 @@ public class StateMachine extends SubsystemBase {
         });
   }
 
-  /** @param timeout max seconds to run intake */
+  /**
+   * @param timeout max seconds to run intake
+   */
   public Command intakeSequenceAuto(double timeout) {
     return m_intake.intake().withTimeout(timeout);
   }
 
-  /** @param timeout max seconds to run extake */
+  /**
+   * @param timeout max seconds to run extake
+   */
   public Command extakeSequenceAuto(double timeout) {
     return (m_intake.extake().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout));
   }
 
-  /** @param timeout max seconds to run stow */
+  /**
+   * @param timeout max seconds to run stow
+   */
   public Command stowSequenceAuto(double timeout) {
     return (m_intake.stow().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout));
   }

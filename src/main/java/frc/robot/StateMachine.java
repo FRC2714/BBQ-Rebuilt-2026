@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -38,6 +39,7 @@ public class StateMachine extends SubsystemBase {
   private boolean isPreloading = false;
 
   private static State m_state = State.Idle;
+  private boolean phaseShiftActive = false;
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -131,6 +133,15 @@ public class StateMachine extends SubsystemBase {
     startPreload.onTrue(this.preloadCommand());
 
     m_shooter.configureShooterBindings();
+  }
+
+  public boolean phaseShift() {
+    return phaseShiftActive;
+  }
+
+  private boolean isPhaseShiftTime(double matchTime) {
+    int wholeSeconds = (int) Math.round(matchTime);
+    return wholeSeconds == 133 || wholeSeconds == 108 || wholeSeconds == 83 || wholeSeconds == 58;
   }
 
   /** Spins up flywheel, preloads fuel, then fires. Only runs from Idle. */
@@ -336,11 +347,15 @@ public class StateMachine extends SubsystemBase {
   @Override
   public void periodic() {
     runTargeting();
+    phaseShiftActive = isPhaseShiftTime(DriverStation.getMatchTime());
 
     SmartDashboard.putString(
         "State Machine/Current Comamand",
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
     SmartDashboard.putString("State Machine/State", m_state.toString());
+
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+    SmartDashboard.putBoolean("State Machine/Phase Shift Active", phaseShiftActive);
 
     m_publisher.publish();
   }

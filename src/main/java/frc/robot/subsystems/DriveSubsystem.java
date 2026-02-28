@@ -48,7 +48,9 @@ import frc.robot.Simulation;
 import frc.robot.utils.LimelightHelpers;
 import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
 
+/** Swerve drivetrain with four MAXSwerve modules, Limelight vision fusion, and PathPlanner auto. */
 public class DriveSubsystem extends SubsystemBase {
+
   private final MAXSwerveModule m_frontLeft =
       new MAXSwerveModule(
           DriveConstants.kFrontLeftDrivingCanId,
@@ -80,26 +82,31 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_driverHeadingOffsetDeg = 0.0; // Used for relative heading for the driver
 
   private static final double[] BLUE_ZONE = {
-    0.0, 0.0, FieldConstants.LinesVertical.allianceZone, FieldConstants.fieldWidth
+    0.0, 0.0, FieldConstants.LinesVertical.allianceZone, FieldConstants.fieldWidth,
   };
   private static final double[] RED_ZONE = {
     FieldConstants.LinesVertical.oppAllianceZone,
     0.0,
     FieldConstants.fieldLength,
-    FieldConstants.fieldWidth
+    FieldConstants.fieldWidth,
   };
 
-  private static final double ROBOT_BUFFER =
-      Units.inchesToMeters((DriveConstants.kTrackWidth + 6.0) / 2.0);
+  private static final double ROBOT_BUFFER_X =
+      (DriveConstants.kWheelBase / 2.0) + DriveConstants.kBumperThickness;
+
+  private static final double ROBOT_BUFFER_Y =
+      (DriveConstants.kTrackWidth / 2.0) + DriveConstants.kBumperThickness;
 
   private boolean isInZone(double[] zone) {
     Translation2d pos = getPose().getTranslation();
-    return pos.getX() + ROBOT_BUFFER >= zone[0]
-        && pos.getY() + ROBOT_BUFFER >= zone[1]
-        && pos.getX() - ROBOT_BUFFER <= zone[2]
-        && pos.getY() - ROBOT_BUFFER <= zone[3];
+    // Robot is in zone if ANY part overlaps (standard rectangle overlap check)
+    return (pos.getX() + ROBOT_BUFFER_X > zone[0]
+        && pos.getX() - ROBOT_BUFFER_X < zone[2]
+        && pos.getY() + ROBOT_BUFFER_Y > zone[1]
+        && pos.getY() - ROBOT_BUFFER_Y < zone[3]);
   }
 
+  /** True if the robot is within its own alliance zone on the field. */
   public boolean isInAllianceZone() {
     boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
     return isInZone(isRed ? RED_ZONE : BLUE_ZONE);
@@ -130,7 +137,7 @@ public class DriveSubsystem extends SubsystemBase {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
             m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
+            m_rearRight.getPosition(),
           },
           new Pose2d(3, 3, new Rotation2d()),
           LimelightConstants.m_stateStdDevs,
@@ -145,7 +152,6 @@ public class DriveSubsystem extends SubsystemBase {
   private final SysIdRoutine rotationRoutine;
   private final SysIdRoutine driveRoutine;
 
-  /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
     SmartDashboard.putData("Field", m_field2d);
@@ -199,7 +205,7 @@ public class DriveSubsystem extends SubsystemBase {
         new SysIdRoutine(
             new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(2.5)),
             new SysIdRoutine.Mechanism(
-                (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)),
+                voltage -> this.driveVoltageForwardTest(voltage.in(Volts)),
                 null, // URCL handles logging
                 this,
                 "drive"));
@@ -208,7 +214,7 @@ public class DriveSubsystem extends SubsystemBase {
         new SysIdRoutine(
             new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
             new SysIdRoutine.Mechanism(
-                (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)),
+                voltage -> this.driveVoltageRotateTest(voltage.in(Volts)),
                 null, // URCL handles logging
                 this,
                 "rotation"));
@@ -218,7 +224,7 @@ public class DriveSubsystem extends SubsystemBase {
     return new SysIdRoutine(
         new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
         new SysIdRoutine.Mechanism(
-            (voltage) -> this.driveVoltageForwardTest(voltage.in(Volts)),
+            voltage -> this.driveVoltageForwardTest(voltage.in(Volts)),
             null, // URCL handles logging
             this,
             "drive"));
@@ -228,7 +234,7 @@ public class DriveSubsystem extends SubsystemBase {
     return new SysIdRoutine(
         new SysIdRoutine.Config(Volts.of(1).per(Second), Volts.of(7), Seconds.of(10)),
         new SysIdRoutine.Mechanism(
-            (voltage) -> this.driveVoltageRotateTest(voltage.in(Volts)),
+            voltage -> this.driveVoltageRotateTest(voltage.in(Volts)),
             null, // URCL handles logging
             this,
             "rotation"));
@@ -282,7 +288,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
+          m_rearRight.getPosition(),
         });
 
     LimelightHelpers.SetRobotOrientation("limelight-right", getHeading(), 0, 0, 0, 0, 0);
@@ -329,7 +335,7 @@ public class DriveSubsystem extends SubsystemBase {
             m_frontLeft.getState(),
             m_frontRight.getState(),
             m_rearLeft.getState(),
-            m_rearRight.getState()
+            m_rearRight.getState(),
           });
     } else {
       publisherModuleStates.set(swerveDriveSimulation.getMeasuredStates());
@@ -343,6 +349,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
+  /** Returns the estimated robot pose (sim uses actual pose, real uses pose estimator). */
   public Pose2d getPose() {
     if (swerveDriveSimulation != null) {
       return swerveDriveSimulation.getActualPoseInSimulationWorld();
@@ -351,6 +358,7 @@ public class DriveSubsystem extends SubsystemBase {
     return m_poseEstimator.getEstimatedPosition();
   }
 
+  /** Resets odometry to a specific pose. Used by PathPlanner at auto start. */
   public void resetOdometry(Pose2d pose) {
     if (swerveDriveSimulation != null) {
       swerveDriveSimulation.resetOdometry(pose);
@@ -362,11 +370,12 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
+          m_rearRight.getPosition(),
         },
         pose);
   }
 
+  /** Drives the robot with joystick inputs. Speeds are [-1, 1]. Halved while shooting. */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
@@ -375,9 +384,9 @@ public class DriveSubsystem extends SubsystemBase {
     double driverRelativeHeading = getHeading() - m_driverHeadingOffsetDeg;
 
     if (shooting) {
-      xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond / 2;
-      ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond / 2;
-      rotDelivered = rot * DriveConstants.kMaxAngularSpeed / 2;
+      xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2;
+      ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2;
+      rotDelivered = (rot * DriveConstants.kMaxAngularSpeed) / 2;
     }
 
     var swerveModuleStates =
@@ -410,6 +419,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
+  /** Drives the robot with ChassisSpeeds (m/s and rad/s). */
   public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
     // Convert the commanded speeds into the correct units for the drivetrain
     double xSpeedDelivered = speeds.vxMetersPerSecond;
@@ -454,14 +464,17 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
   }
 
+  /** Enables half-speed driving for shooting stability. */
   public void setShootingStateTrue() {
     shooting = true;
   }
 
+  /** Restores full-speed driving after shooting. */
   public void setShootingStateFalse() {
     shooting = false;
   }
 
+  /** Drives with robot-relative ChassisSpeeds. Used by PathPlanner. */
   public void driveRobotRelative(ChassisSpeeds speeds) {
     drive(speeds, false);
   }
@@ -488,7 +501,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   public SwerveModuleState[] getModuleStates() {
     return new SwerveModuleState[] {
-      m_frontLeft.getState(), m_frontRight.getState(), m_rearLeft.getState(), m_rearRight.getState()
+      m_frontLeft.getState(),
+      m_frontRight.getState(),
+      m_rearLeft.getState(),
+      m_rearRight.getState(),
     };
   }
 
@@ -512,7 +528,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
+          m_rearRight.getPosition(),
         },
         pose);
 
@@ -531,6 +547,7 @@ public class DriveSubsystem extends SubsystemBase {
         .alongWith(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-left", 4)));
   }
 
+  /** Sets the current heading as the driver's forward direction. */
   public void zeroDriverHeading() {
     m_driverHeadingOffsetDeg = getHeading();
   }
@@ -568,9 +585,10 @@ public class DriveSubsystem extends SubsystemBase {
           .in(DegreesPerSecond);
     }
 
-    return m_gyro.getAngularVelocityYaw() * 360 * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return (m_gyro.getAngularVelocityYaw() * 360 * (DriveConstants.kGyroReversed ? -1.0 : 1.0));
   }
 
+  /** Returns current robot-relative chassis speeds from module states. */
   public ChassisSpeeds getRobotRelativeSpeeds() {
     if (swerveDriveSimulation != null) {
       return swerveDriveSimulation.getActualSpeedsRobotRelative();
@@ -583,6 +601,7 @@ public class DriveSubsystem extends SubsystemBase {
         m_rearRight.getState());
   }
 
+  /** Returns the robot's velocity as a field-relative Translation2d (m/s). */
   public Translation2d getFieldRelativeVelocity() {
     ChassisSpeeds robotSpeeds = getRobotRelativeSpeeds();
     Rotation2d heading = Rotation2d.fromDegrees(getHeading());
@@ -590,6 +609,7 @@ public class DriveSubsystem extends SubsystemBase {
         .rotateBy(heading);
   }
 
+  /** Computes a lead-compensated aiming point for shooting on the move. */
   public Translation2d getVirtualTarget() {
     Pose2d pose = getPose();
     Translation2d robotVelocity = getFieldRelativeVelocity();

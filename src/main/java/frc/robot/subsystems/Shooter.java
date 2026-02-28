@@ -392,11 +392,10 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  
-   public Command zeroHood() {
-    final double kHomingPower = -0.18; 
-    final double kStallCurrentThreshold = 4.0;   
-    final double kTimeoutSeconds = 3.0; 
+  public Command zeroHood() {
+    final double kHomingPower = -0.18;
+    final double kStallCurrentThreshold = 4.0;
+    final double kTimeoutSeconds = 3.0;
 
     return new RunCommand(() -> hoodMotor.set(kHomingPower), this)
         .until(() -> hoodMotor.getOutputCurrent() > kStallCurrentThreshold)

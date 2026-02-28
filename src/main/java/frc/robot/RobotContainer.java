@@ -7,14 +7,17 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.StateMachine.State;
@@ -46,6 +49,8 @@ public class RobotContainer {
   // The driver's controller
   CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);
+
+  private final Trigger rumble = new Trigger(() -> m_stateMachine.phaseShift());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -128,13 +133,23 @@ public class RobotContainer {
       m_driverController.y().toggleOnTrue(m_stateMachine.shoot());
       m_driverController.leftBumper().whileTrue(m_stateMachine.intakeSequence());
     }
-    ;
 
     // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
     // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());
     // m_driverController.x().onTrue(m_robotDrive.translationalDynamic());
     // m_driverController.y().onTrue(m_robotDrive.rotationalDynamic());
 
+    rumble.onTrue(
+        new StartEndCommand(
+                () -> {
+                  m_driverController.setRumble(RumbleType.kLeftRumble, 1.0);
+                  m_driverController.setRumble(RumbleType.kRightRumble, 1.0);
+                },
+                () -> {
+                  m_driverController.setRumble(RumbleType.kLeftRumble, 0.0);
+                  m_driverController.setRumble(RumbleType.kRightRumble, 0.0);
+                })
+            .withTimeout(0.5));
   }
 
   /**

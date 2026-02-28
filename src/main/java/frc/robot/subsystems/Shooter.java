@@ -15,7 +15,10 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
@@ -27,7 +30,12 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -210,6 +218,11 @@ public class Shooter extends SubsystemBase {
       new Debouncer(ShooterConstants.kTurretDebounceTimeSeconds, DebounceType.kFalling);
   private Debouncer hoodDebouncer =
       new Debouncer(ShooterConstants.kHoodDebounceTimeSeconds, DebounceType.kFalling);
+
+  private Pose3d turretPose3d = new Pose3d();
+  private Pose3d hoodPose3d = new Pose3d();
+  private Pose3d flyWheelPose3d = new Pose3d();
+
   // Simulation
   DCMotor flywheelMotorSim = DCMotor.getNeoVortex(2);
   SparkFlexSim flywheelSparkSim = new SparkFlexSim(flywheelMotorLeader, flywheelMotorSim);
@@ -229,6 +242,14 @@ public class Shooter extends SubsystemBase {
   LinearSystemSim<N2, N1, N2> hoodSim =
       new LinearSystemSim<>(LinearSystemId.createDCMotorSystem(hoodMotorSim, 0.001, 10));
 
+  // Flywheel Mech2d
+  Mechanism2d flyWheelMech = new Mechanism2d(1, 1);
+  MechanismRoot2d flyWheelRoot = flyWheelMech.getRoot("Flywheel Mech2d", 0.28, 0.5);
+
+  MechanismLigament2d flyWheelLigament =
+      flyWheelRoot.append(
+          new MechanismLigament2d("FlyWheel Ligament", 0.1, 180, 4, new Color8Bit(Color.kRed)));
+
   public Shooter() {
     turretMotor.configure(
         Configs.Shooter.turretConfig,
@@ -247,6 +268,7 @@ public class Shooter extends SubsystemBase {
         Configs.Shooter.flywheelConfigFollower,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
+    SmartDashboard.putData("Shooter/Mech2d", flyWheelMech);
   }
 
   /** Returns true if fuel is loaded (beam break in real, simulation flag in sim). */
@@ -296,6 +318,10 @@ public class Shooter extends SubsystemBase {
     }
 
     return Math.max(min, Math.min(max, base));
+  }
+
+  public double getFlyWheelPosition() {
+    return flywheelRelativeEncoder.getPosition();
   }
 
   public double getHoodPosition() {
@@ -440,6 +466,18 @@ public class Shooter extends SubsystemBase {
         Commands.runOnce(() -> disableLimitSwitchAutoZeroing()).ignoringDisable(true));
   }
 
+  public Pose3d getTurretPose3d() {
+    return turretPose3d;
+  }
+
+  public Pose3d getHoodPose3d() {
+    return hoodPose3d;
+  }
+
+  public Pose3d getFlyWheelPose3d() {
+    return flyWheelPose3d;
+  }
+
   @Override
   public void periodic() {
     turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
@@ -478,6 +516,34 @@ public class Shooter extends SubsystemBase {
         "Shooter/Turret/rev limit switch pressed", turretMotor.getReverseLimitSwitch().isPressed());
 
     SmartDashboard.putBoolean("turret updated", turretUpdated);
+
+    turretPose3d =
+        new Pose3d(
+            0.058, 0, 0.55, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
+
+    double hoodAngleRange = ShooterConstants.kHoodMaxAngle - ShooterConstants.kHoodMinAngle;
+    hoodPose3d =
+        turretPose3d.transformBy(
+            new Transform3d(
+                0.1,
+                0,
+                0.06,
+                new Rotation3d(
+                    0.0,
+                    -Units.degreesToRadians(
+                        hoodAngleRange - (ShooterConstants.kHoodMaxAngle - getHoodPosition())),
+                    0.0)));
+
+    flyWheelPose3d =
+        turretPose3d.transformBy(
+            new Transform3d(
+                0.1,
+                0,
+                0.06,
+                new Rotation3d(0.0, Units.rotationsToRadians(getFlyWheelPosition()), 0.0)));
+
+    // Mech 2d Flywheel Angle Update
+    flyWheelLigament.setAngle(Units.rotationsToDegrees(flywheelRelativeEncoder.getPosition()));
   }
 
   @Override

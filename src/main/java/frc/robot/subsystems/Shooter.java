@@ -43,6 +43,7 @@ import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 import frc.robot.Robot;
 import frc.robot.Simulation;
 
+/** Controls the turret, hood, and flywheel. Handles aiming with lead compensation for shooting on the move. */
 public class Shooter extends SubsystemBase {
   private SparkFlex turretMotor =
       new SparkFlex(Constants.ShooterConstants.kTurretCanId, MotorType.kBrushless);
@@ -88,6 +89,7 @@ public class Shooter extends SubsystemBase {
 
   private boolean isShooting = false;
 
+  /** Interpolatable lookup values for a given distance to target. */
   public record ShooterParams(double rpm, double hoodAngle, double timeOfFlight) {
     public static ShooterParams interpolate(ShooterParams a, ShooterParams b, double t) {
       double rpm = a.rpm + (b.rpm - a.rpm) * t;
@@ -97,6 +99,7 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  /** Holds a complete set of shooter outputs: turret angle, flywheel RPM, and hood angle. */
   public class ShooterCommand {
     public final Rotation2d turretAngle;
     public final double rpm;
@@ -125,14 +128,8 @@ public class Shooter extends SubsystemBase {
   }
 
   /**
-   * Courtesy of https://blog.eeshwark.com/robotblog/shooting-on-the-fly-pt2 and
-   * https://frc-docs--3242.org.readthedocs.build/en/3242/docs/software/advanced-controls/fire-control/dynamic-shooting.html
-   *
-   * @param robotPosition
-   * @param robotHeading
-   * @param robotVelocity
-   * @param goalPosition
-   * @param latencyCompensation
+   * Calculates turret, hood, and flywheel targets with lead compensation for shooting on the move.
+   * Iteratively refines time-of-flight until convergence.
    */
   public void calculate(
       Translation2d robotPosition,
@@ -249,6 +246,7 @@ public class Shooter extends SubsystemBase {
         PersistMode.kPersistParameters);
   }
 
+  /** Returns true if fuel is loaded (beam break in real, simulation flag in sim). */
   public boolean getFuelLimitSwitch() {
     if (Robot.isSimulation()) {
       return Simulation.getInstance().isPreloaded();
@@ -256,6 +254,7 @@ public class Shooter extends SubsystemBase {
     return fuelBeamBreak.isPressed();
   }
 
+  /** Returns turret position in degrees, corrected for mounting offset. */
   public double getTurretPosition() {
     return turretRelativeEncoder.getPosition() - ShooterConstants.kTurretMountingOffsetDegrees;
   }
@@ -300,6 +299,7 @@ public class Shooter extends SubsystemBase {
     return hoodRelativeEncoder.getPosition();
   }
 
+  /** Applies a ShooterCommand's targets to the turret, flywheel, and hood. */
   public void updateShootCommand(ShooterCommand command) {
     turretCurrentTarget = normalizeTurretTarget(command.turretAngle.getDegrees());
     flywheelCurrentTarget = command.rpm;
@@ -338,6 +338,7 @@ public class Shooter extends SubsystemBase {
     isShooting = shooting;
   }
 
+  /** Enables the flywheel. Runs until cancelled. */
   public Command startShooter() {
     return this.run(
         () -> {
@@ -345,6 +346,7 @@ public class Shooter extends SubsystemBase {
         });
   }
 
+  /** Disables the flywheel. */
   public Command stopShooter() {
     return this.run(
         () -> {
@@ -352,6 +354,7 @@ public class Shooter extends SubsystemBase {
         });
   }
 
+  /** True when flywheel, turret, and hood are all at their setpoints. */
   public boolean readyToShoot() {
     return flywheelAtSetpoint() && turretAtSetpoint() && hoodAtSetpoint();
   }
@@ -372,6 +375,7 @@ public class Shooter extends SubsystemBase {
     return hoodDebouncer.calculate(atSetpoint);
   }
 
+  /** Zeros turret encoder when a limit switch is hit. Resets on release. */
   public void zeroTurret() {
     if (!wasZeroed && turretMotor.getForwardLimitSwitch().isPressed()) {
       wasZeroed = true;
@@ -385,6 +389,7 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  /** Spins turret until it hits a limit switch, then stops. Only runs once. */
   public Command zeroTurretSequence() {
     if (!wasZeroed) {
       wasZeroed = true;
@@ -403,6 +408,7 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  /** Disables limit-switch-triggered motor stop so turret can move freely after zeroing. */
   public void disableLimitSwitchAutoZeroing() {
     turretUpdated = true;
     SparkFlexConfig disableLimitSwitchZeroingConfig = new SparkFlexConfig();
@@ -420,6 +426,7 @@ public class Shooter extends SubsystemBase {
     turretRelativeEncoder.setPosition(angle + ShooterConstants.kTurretMountingOffsetDegrees);
   }
 
+  /** Sets up trigger to disable limit switch auto-zeroing once a switch is hit. */
   public void configureShooterBindings() {
     Trigger disableLimitSwitch =
         new Trigger(

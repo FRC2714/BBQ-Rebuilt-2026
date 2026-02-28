@@ -426,6 +426,7 @@ public class Shooter extends SubsystemBase {
 
   public Command zeroHood() {
     final double kHomingPower = -0.18;
+    hoodRelativeEncoder.setPosition(40.0);
 
     return new InstantCommand(() -> zeroingHood = true)
         .andThen(new RunCommand(() -> hoodMotor.set(kHomingPower), this).withTimeout(1.5))
@@ -594,24 +595,16 @@ public class Shooter extends SubsystemBase {
     hoodSim.setInput(hoodSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
     hoodSim.update(0.02);
 
-    // Simulated mechanical limits
-    double hoodPositionRad = hoodSim.getOutput(0);
-    double minRad = Units.degreesToRadians(0);
-    double maxRad = Units.degreesToRadians(90);
+// Simulated mechanical limits
+hoodSim.setInput(hoodSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+hoodSim.update(0.02);
 
-    if (hoodPositionRad < minRad) {
-      hoodSim.setState(VecBuilder.fill(minRad, 0.0));
-    }
-    if (hoodPositionRad > maxRad) {
-      hoodSim.setState(VecBuilder.fill(maxRad, 0.0));
-    }
+double minHood = ShooterConstants.kHoodMinAngle; 
+double maxHood = ShooterConstants.kHoodMaxAngle; 
+simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
 
-    hoodSparkSim.iterate(
-        Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1)),
-        RobotController.getBatteryVoltage(),
-        0.02);
+simHoodPosition = MathUtil.clamp(simHoodPosition, minHood, maxHood);
 
-    double hoodPositionDegrees = Math.toDegrees(hoodSim.getOutput(0));
-    hoodRelativeEncoder.setPosition(hoodPositionDegrees);
+hoodRelativeEncoder.setPosition(simHoodPosition);
   }
 }

@@ -26,8 +26,6 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
-import edu.wpi.first.wpilibj.DriverStation;
-
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -52,9 +50,7 @@ public class RobotContainer {
   CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);
 
-
-
-  private final Trigger rumble = new Trigger(()-> m_stateMachine.phaseShift());
+  private final Trigger rumble = new Trigger(() -> m_stateMachine.phaseShift());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

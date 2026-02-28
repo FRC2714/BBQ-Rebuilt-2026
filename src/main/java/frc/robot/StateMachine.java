@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -21,7 +20,6 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
-import java.util.Optional;
 
 /**
  * Coordinates all robot subsystems through a state machine (Idle, Shooting, Climbing). Commands are
@@ -117,12 +115,8 @@ public class StateMachine extends SubsystemBase {
 
   private boolean isPhaseShiftTime(double matchTime) {
     int wholeSeconds = (int) Math.round(matchTime);
-    return wholeSeconds == 133
-        || wholeSeconds == 103
-        || wholeSeconds == 83
-        || wholeSeconds == 58;
+    return wholeSeconds == 133 || wholeSeconds == 108 || wholeSeconds == 83 || wholeSeconds == 58;
   }
-
 
   /** Spins up flywheel, preloads fuel, then fires. Only runs from Idle. */
   public Command shoot() {

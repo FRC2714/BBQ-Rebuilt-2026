@@ -24,6 +24,7 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 
+/** Singleton managing the IronMaple robot simulation (drivetrain, intake, and fuel projectiles). */
 public class Simulation {
   private static Simulation instance;
 
@@ -71,18 +72,22 @@ public class Simulation {
             "Fuel", swerveDriveSimulation, Inches.of(20), Inches.of(6), IntakeSide.FRONT, 36);
   }
 
+  /** Activates the simulated intake to collect fuel. */
   public void startIntake() {
     intakeSimulation.startIntake();
   }
 
+  /** Deactivates the simulated intake. */
   public void stopIntake() {
     intakeSimulation.stopIntake();
   }
 
+  /** Returns the number of fuel game pieces currently held. */
   public int getFuelCount() {
     return intakeSimulation.getGamePiecesAmount();
   }
 
+  /** Launches a fuel projectile from the robot at the given angle and velocity. */
   public void shootFuel(
       Rotation2d turretAngle, LinearVelocity initialVelocity, Angle shootingAngle) {
     if (getFuelCount() == 0) {
@@ -123,11 +128,13 @@ public class Simulation {
     return isPreloaded;
   }
 
+  /** Publishes simulated fuel poses and count to NetworkTables. */
   public void publish() {
     publisherSimFuelPoses.set(SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
     publisherSimFuelCount.set(intakeSimulation.getGamePiecesAmount());
   }
 
+  /** Returns the singleton instance, creating it if needed. */
   public static Simulation getInstance() {
     if (instance == null) {
       instance = new Simulation();

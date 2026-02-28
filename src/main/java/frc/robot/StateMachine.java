@@ -20,6 +20,10 @@ import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
+/**
+ * Coordinates all robot subsystems through a state machine (Idle, Shooting, Climbing). Commands are
+ * guarded by state checks to prevent conflicting actions.
+ */
 public class StateMachine extends SubsystemBase {
   private final DriveSubsystem m_drivetrain;
   private final Shooter m_shooter;
@@ -88,6 +92,9 @@ public class StateMachine extends SubsystemBase {
     }
   }
 
+  /**
+   * Sets up triggers that pause/resume the dye rotor based on flywheel readiness during shooting.
+   */
   public void configureBindings() {
     Trigger pauseShooter =
         new Trigger(() -> m_state == State.Shooting && !m_shooter.readyToShoot());
@@ -100,7 +107,7 @@ public class StateMachine extends SubsystemBase {
     m_shooter.configureShooterBindings();
   }
 
-  // Teleop commands
+  /** Spins up flywheel, preloads fuel, then fires. Only runs from Idle. */
   public Command shoot() {
     // Run preload (dye rotor until fuel loaded, then stop) in parallel with
     // startShooter (spin flywheel until at setpoint). If startShooter finishes
@@ -126,6 +133,7 @@ public class StateMachine extends SubsystemBase {
         .onlyIf(() -> m_state == State.Idle);
   }
 
+  /** Stops the flywheel and dye rotor, returns to Idle. */
   public Command stopShoot() {
     return m_shooter
         .stopShooter()
@@ -137,6 +145,7 @@ public class StateMachine extends SubsystemBase {
             });
   }
 
+  /** Schedules a preload if not currently shooting. Safe to call anytime. */
   public Command preloadCommand() {
     return Commands.runOnce(
         () -> {
@@ -146,10 +155,12 @@ public class StateMachine extends SubsystemBase {
         });
   }
 
+  /** Stows the intake then deploys the climbing mechanism. */
   public Command deployClimber() {
     return m_intake.stow().until(() -> m_intake.atSetpoint()).andThen(m_climb.deploy());
   }
 
+  /** Deploys climber and climbs. Only runs from Idle. */
   public Command climb() {
     return deployClimber()
         .until((() -> m_climb.atSetpoint()))
@@ -158,6 +169,7 @@ public class StateMachine extends SubsystemBase {
         .onlyIf(() -> m_state == State.Idle);
   }
 
+  /** Reverses the climb and returns to Idle. Only runs from Climbing. */
   public Command unclimb() {
     return m_climb
         .unclimb()
@@ -165,6 +177,7 @@ public class StateMachine extends SubsystemBase {
         .onlyIf(() -> m_state == State.Climbing);
   }
 
+  /** Runs the dye rotor until fuel is loaded, then stops. */
   public Command preload() {
     return m_dyeRotor
         .start()
@@ -173,25 +186,27 @@ public class StateMachine extends SubsystemBase {
         .withName("preload");
   }
 
-  // intake commands (teleop)
+  /** Runs the intake. Blocked while climbing. */
   public Command intakeSequence() {
     return (m_intake.intake().onlyIf(StateMachine::isNotClimbing));
   }
 
+  /** Reverses the intake. Blocked while climbing. */
   public Command extakeSequence() {
     return (m_intake.extake().onlyIf(StateMachine::isNotClimbing));
   }
 
+  /** Stows the intake. Blocked while climbing. */
   public Command stowSequence() {
     return (m_intake.stow().onlyIf(StateMachine::isNotClimbing));
   }
 
   // Auto commands
 
-  // Event marker commands must have ZERO subsystem requirements. The auto's
-  // SequentialCommandGroup claims Shooter + DyeRotor (from WAIT_FOR_SCORE), so any
-  // independently scheduled command requiring those subsystems cancels the entire auto.
-  // Instead, we set flags directly — Shooter.periodic() drives the flywheel via isShooting.
+  /**
+   * Starts shooting for auto. Has zero subsystem requirements so it won't cancel the auto's
+   * SequentialCommandGroup — sets flags directly instead.
+   */
   public Command startShootingAuto() {
     return Commands.runOnce(
         () -> {
@@ -203,6 +218,7 @@ public class StateMachine extends SubsystemBase {
         });
   }
 
+  /** Stops shooting for auto. Zero subsystem requirements, same as {@link #startShootingAuto()}. */
   public Command stopShootAuto() {
     return Commands.runOnce(
         () -> {
@@ -213,20 +229,32 @@ public class StateMachine extends SubsystemBase {
         });
   }
 
-  // intake commands (auto)
+  /**
+   * @param timeout max seconds to run intake
+   */
   public Command intakeSequenceAuto(double timeout) {
     return m_intake.intake().withTimeout(timeout);
   }
 
+  /**
+   * @param timeout max seconds to run extake
+   */
   public Command extakeSequenceAuto(double timeout) {
     return (m_intake.extake().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout));
   }
 
+  /**
+   * @param timeout max seconds to run stow
+   */
   public Command stowSequenceAuto(double timeout) {
     return (m_intake.stow().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout));
   }
 
-  // For sequential use after paths — controls shooting duration then stops
+  /**
+   * Runs shooter and dye rotor for a duration, then stops. Only runs if already in Shooting state.
+   *
+   * @param shootTimeout max seconds to shoot before stopping
+   */
   public Command waitForScore(double shootTimeout) {
     return m_shooter
         .startShooter()
@@ -236,11 +264,12 @@ public class StateMachine extends SubsystemBase {
         .onlyIf(() -> m_state == State.Shooting);
   }
 
-  // State helpers
+  /** Returns the current robot state. */
   public State getState() {
     return m_state;
   }
 
+  /** Sets the current robot state. */
   public void setState(State state) {
     m_state = state;
   }

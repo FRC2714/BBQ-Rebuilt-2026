@@ -35,8 +35,8 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.Robot;
 import frc.robot.Simulation;
 
+/** Controls the intake pivot and roller. Extends to collect fuel, stows to retract. */
 public class Intake extends SubsystemBase {
-  /** Creates a new Intake. */
 
   // creates new intake pivot motor
   private SparkFlex pivotMotor =
@@ -103,6 +103,7 @@ public class Intake extends SubsystemBase {
     rollerMotor.set(power);
   }
 
+  /** True when the pivot has reached its target position. Always true in sim. */
   public boolean atSetpoint() {
     if (Robot.isSimulation()) {
       return true;
@@ -123,7 +124,7 @@ public class Intake extends SubsystemBase {
       intakeBar.append(
           new MechanismLigament2d("Roller Motor", 0.1, 180, 3, new Color8Bit(Color.kWhite)));
 
-  // Intake Commands
+  /** Extends pivot and runs rollers inward. Stops rollers on end. */
   public Command intake() {
     return this.runEnd(
         () -> {
@@ -139,6 +140,7 @@ public class Intake extends SubsystemBase {
         });
   }
 
+  /** Extends pivot and runs rollers outward (eject). Stops rollers on end. */
   public Command extake() {
     return this.runEnd(
         () -> {
@@ -150,6 +152,7 @@ public class Intake extends SubsystemBase {
         });
   }
 
+  /** Retracts pivot and stops rollers. */
   public Command stow() {
     return this.run(
         () -> {

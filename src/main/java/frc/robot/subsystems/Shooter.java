@@ -525,19 +525,19 @@ public class Shooter extends SubsystemBase {
     hoodPose3d =
         turretPose3d.transformBy(
             new Transform3d(
-                -0.1,
+                0.1,
                 0,
                 0.06,
                 new Rotation3d(
                     0.0,
-                    Units.degreesToRadians(
+                    -Units.degreesToRadians(
                         hoodAngleRange - (ShooterConstants.kHoodMaxAngle - getHoodPosition())),
                     0.0)));
 
     flyWheelPose3d =
         turretPose3d.transformBy(
             new Transform3d(
-                -0.1,
+                0.1,
                 0,
                 0.06,
                 new Rotation3d(0.0, Units.rotationsToRadians(getFlyWheelPosition()), 0.0)));

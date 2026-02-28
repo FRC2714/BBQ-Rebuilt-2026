@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
@@ -140,17 +141,45 @@ public class Intake extends SubsystemBase {
         });
   }
 
-  public void intakeAutoGroup() {
+  /**
+   * Auto-safe intake. Uses Commands.runEnd (no subsystem requirement) to avoid composition
+   * conflicts.
+   */
+  public Command intakeAuto() {
+    return Commands.runEnd(
+        () -> {
+          setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
+          pivotExtend();
 
-    setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
-    pivotExtend();
+          if (Robot.isSimulation()) Simulation.getInstance().startIntake();
+        },
+        () -> {
+          setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
 
-    if (Robot.isSimulation()) Simulation.getInstance().startIntake();
+          if (Robot.isSimulation()) Simulation.getInstance().stopIntake();
+        });
   }
 
-  public void stopAutoGroup() {
+  /** Auto-safe extake. Same pattern as {@link #intakeAuto()}. */
+  public Command extakeAuto() {
+    return Commands.runEnd(
+        () -> {
+          setRollerPower(Constants.IntakeConstants.RollerConstants.kExtakeRollerPower);
+          pivotExtend();
+        },
+        () -> {
+          setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
+        });
+  }
 
-    setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
+  /** Auto-safe stow. Same pattern as {@link #intakeAuto()}. */
+  public Command stowAuto() {
+    return Commands.runEnd(
+        () -> {
+          setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
+          pivotStow();
+        },
+        () -> {});
   }
 
   /** Extends pivot and runs rollers outward (eject). Stops rollers on end. */

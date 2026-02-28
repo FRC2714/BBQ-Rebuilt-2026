@@ -35,7 +35,7 @@ public class StateMachine extends SubsystemBase {
 
   private static State m_state = State.Idle;
   private boolean phaseShiftActive = false;
-  public double secondsUntilPhaseShift = -1;
+  private boolean phaseShiftWarningActive = false;
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -110,20 +110,23 @@ public class StateMachine extends SubsystemBase {
     m_shooter.configureShooterBindings();
   }
 
-
-  public double secondsBeforeNextPhaseShift(double matchTime) {
-    double[] phaseShiftTimes = {130.0, 105.0, 80.0, 55.0};
-
-    for (double phaseShiftTime : phaseShiftTimes) {
-      if (matchTime >= phaseShiftTime) {
-        return matchTime - phaseShiftTime;
-      }
-    }
-
-    return -1.0;
+  public boolean phaseShift() {
+    return phaseShiftActive;
   }
 
+  public boolean phaseShiftWarning() {
+    return phaseShiftWarningActive;
+  }
 
+  private boolean isPhaseShiftTime(double matchTime) {
+    int wholeSeconds = (int) Math.round(matchTime);
+    return wholeSeconds == 130 || wholeSeconds == 105 || wholeSeconds == 80 || wholeSeconds == 55;
+  }
+
+  private boolean isPhaseShiftWarningTime(double matchTime) {
+    int wholeSeconds = (int) Math.round(matchTime);
+    return wholeSeconds == 138 || wholeSeconds == 113 || wholeSeconds == 88 || wholeSeconds == 63;
+  }
 
   /** Spins up flywheel, preloads fuel, then fires. Only runs from Idle. */
   public Command shoot() {
@@ -327,16 +330,15 @@ public class StateMachine extends SubsystemBase {
   @Override
   public void periodic() {
     runTargeting();
-    double matchTime = DriverStation.getMatchTime();
-    secondsUntilPhaseShift = secondsBeforeNextPhaseShift(matchTime);
+    phaseShiftActive = isPhaseShiftTime(DriverStation.getMatchTime());
+    phaseShiftWarningActive = isPhaseShiftWarningTime(DriverStation.getMatchTime());
 
     SmartDashboard.putString(
         "State Machine/Current Comamand",
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
     SmartDashboard.putString("State Machine/State", m_state.toString());
 
-    SmartDashboard.putNumber("Match Time", matchTime);
-    SmartDashboard.putNumber("State Machine/Seconds Before Next Phase Shift", secondsUntilPhaseShift);
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
     SmartDashboard.putBoolean("State Machine/Phase Shift Active", phaseShiftActive);
 
     m_publisher.publish();

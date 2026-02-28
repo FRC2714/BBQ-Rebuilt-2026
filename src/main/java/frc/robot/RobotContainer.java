@@ -50,9 +50,8 @@ public class RobotContainer {
   CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);
 
-  private final Trigger phaseRumble = new Trigger(() -> m_stateMachine.secondsUntilPhaseShift==8);
-  private final Trigger warningRumble = new Trigger(() ->m_stateMachine.secondsUntilPhaseShift==3);
-
+  private final Trigger rumble = new Trigger(() -> m_stateMachine.phaseShift());
+  private final Trigger warningRumble = new Trigger(() -> m_stateMachine.phaseShiftWarning());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -141,29 +140,29 @@ public class RobotContainer {
     // m_driverController.x().onTrue(m_robotDrive.translationalDynamic());
     // m_driverController.y().onTrue(m_robotDrive.rotationalDynamic());
 
-    phaseRumble.onTrue(
+    rumble.onTrue(
         new StartEndCommand(
                 () -> {
-                  m_driverController.setRumble(RumbleType.kLeftRumble, .7);
-                  m_driverController.setRumble(RumbleType.kRightRumble, .7);
-                },
-                () -> {
-                  m_driverController.setRumble(RumbleType.kLeftRumble, 0.0);
-                  m_driverController.setRumble(RumbleType.kRightRumble, 0.0);
-                })
-            .withTimeout(0.5));
-
-    warningRumble.onTrue(
-        new StartEndCommand(
-                () -> {
-                  m_driverController.setRumble(RumbleType.kLeftRumble, 1);
-                  m_driverController.setRumble(RumbleType.kRightRumble, 1);
+                  m_driverController.setRumble(RumbleType.kLeftRumble, 1.0);
+                  m_driverController.setRumble(RumbleType.kRightRumble, 1.0);
                 },
                 () -> {
                   m_driverController.setRumble(RumbleType.kLeftRumble, 0.0);
                   m_driverController.setRumble(RumbleType.kRightRumble, 0.0);
                 })
             .withTimeout(3));
+
+    warningRumble.onTrue(
+        new StartEndCommand(
+                () -> {
+                  m_driverController.setRumble(RumbleType.kLeftRumble, 0.5);
+                  m_driverController.setRumble(RumbleType.kRightRumble, 0.5);
+                },
+                () -> {
+                  m_driverController.setRumble(RumbleType.kLeftRumble, 0.0);
+                  m_driverController.setRumble(RumbleType.kRightRumble, 0.0);
+                })
+            .withTimeout(0.5));
   }
 
   /**

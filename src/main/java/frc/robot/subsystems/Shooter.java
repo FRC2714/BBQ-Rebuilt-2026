@@ -18,6 +18,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
@@ -517,13 +518,29 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putBoolean("turret updated", turretUpdated);
 
     turretPose3d =
-        new Pose3d(0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
+        new Pose3d(
+            0.058, 0, 0.55, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
 
+    double hoodAngleRange = ShooterConstants.kHoodMaxAngle - ShooterConstants.kHoodMinAngle;
     hoodPose3d =
-        new Pose3d(0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
+        turretPose3d.transformBy(
+            new Transform3d(
+                -0.1,
+                0,
+                0.06,
+                new Rotation3d(
+                    0.0,
+                    Units.degreesToRadians(
+                        hoodAngleRange - (ShooterConstants.kHoodMaxAngle - getHoodPosition())),
+                    0.0)));
 
     flyWheelPose3d =
-        new Pose3d(0, 0, 0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(getTurretPosition())));
+        turretPose3d.transformBy(
+            new Transform3d(
+                -0.1,
+                0,
+                0.06,
+                new Rotation3d(0.0, Units.rotationsToRadians(getFlyWheelPosition()), 0.0)));
 
     // Mech 2d Flywheel Angle Update
     flyWheelLigament.setAngle(Units.rotationsToDegrees(flywheelRelativeEncoder.getPosition()));

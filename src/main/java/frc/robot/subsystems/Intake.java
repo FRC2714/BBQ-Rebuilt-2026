@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
@@ -126,7 +127,7 @@ public class Intake extends SubsystemBase {
 
   /** Extends pivot and runs rollers inward. Stops rollers on end. */
   public Command intake() {
-    return this.runEnd(
+    return Commands.runEnd(
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
           pivotExtend();
@@ -142,7 +143,7 @@ public class Intake extends SubsystemBase {
 
   /** Extends pivot and runs rollers outward (eject). Stops rollers on end. */
   public Command extake() {
-    return this.runEnd(
+    return Commands.runEnd(
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kExtakeRollerPower);
           pivotExtend();

@@ -233,7 +233,14 @@ public class StateMachine extends SubsystemBase {
    * @param timeout max seconds to run intake
    */
   public Command intakeSequenceAuto(double timeout) {
-    return m_intake.intake().withTimeout(timeout);
+    return Commands.runEnd(
+        () -> {
+          m_intake.intakeAutoGroup();
+        }
+        ,
+        () -> {
+          m_intake.stow();
+        });
   }
 
   /**

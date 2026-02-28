@@ -35,6 +35,8 @@ public class StateMachine extends SubsystemBase {
   private final XboxController m_driverHID;
   private final Climb m_climb;
 
+  private boolean isPreloading = false;
+
   private static State m_state = State.Idle;
 
   private static boolean isNotClimbing() {
@@ -50,7 +52,12 @@ public class StateMachine extends SubsystemBase {
   }
 
   public StateMachine(
-      DriveSubsystem drivetrain, Shooter shooter, Intake intake, DyeRotor dyeRotor, Climb climb, CommandXboxController driverController) {
+      DriveSubsystem drivetrain,
+      Shooter shooter,
+      Intake intake,
+      DyeRotor dyeRotor,
+      Climb climb,
+      CommandXboxController driverController) {
     m_drivetrain = drivetrain;
     m_shooter = shooter;
     m_intake = intake;
@@ -108,17 +115,19 @@ public class StateMachine extends SubsystemBase {
         new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
     resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
 
-     Trigger stopPreload =
-        new Trigger(() -> m_state != State.Shooting && m_dyeRotor.isRunning())
-            .and(() -> m_driverHID.getXButton());
-    stopPreload.onTrue(Commands.runOnce(() -> {
-        Command running = CommandScheduler.getInstance().requiring(m_dyeRotor);
-        if (running != null) running.cancel();
-    }));
-    
+    Trigger stopPreload =
+        new Trigger(() -> m_state != State.Shooting && m_dyeRotor.isRunning() && isPreloading)
+            .and(() -> m_driverHID.getXButtonReleased());
+    stopPreload.onTrue(
+        Commands.runOnce(
+            () -> {
+              m_dyeRotor.pause();
+              isPreloading = false;
+            }));
+
     Trigger startPreload =
-        new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning())
-            .and(() -> m_driverHID.getXButton());
+        new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning() && !isPreloading)
+            .and(() -> m_driverHID.getXButtonReleased());
     startPreload.onTrue(this.preloadCommand());
 
     m_shooter.configureShooterBindings();
@@ -144,6 +153,7 @@ public class StateMachine extends SubsystemBase {
                     }))
         .finallyDo(
             () -> {
+              this.preloadCommand().cancel();
               m_drivetrain.setShootingStateFalse();
               CommandScheduler.getInstance().schedule(stopShoot());
             })
@@ -167,8 +177,8 @@ public class StateMachine extends SubsystemBase {
     return Commands.runOnce(
         () -> {
           if (m_state == State.Shooting) return;
-
           CommandScheduler.getInstance().schedule(preload());
+          isPreloading = true;
         });
   }
 
@@ -330,7 +340,7 @@ public class StateMachine extends SubsystemBase {
     SmartDashboard.putString(
         "State Machine/Current Comamand",
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
-    SmartDashboard.putString("State Machine/State", m_state.toString());    
+    SmartDashboard.putString("State Machine/State", m_state.toString());
 
     m_publisher.publish();
   }

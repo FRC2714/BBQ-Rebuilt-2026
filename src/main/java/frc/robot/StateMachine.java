@@ -36,6 +36,7 @@ public class StateMachine extends SubsystemBase {
   private final Climb m_climb;
 
   private static State m_state = State.Idle;
+  private boolean phaseShiftActive = false;
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -110,59 +111,18 @@ public class StateMachine extends SubsystemBase {
     m_shooter.configureShooterBindings();
   }
 
-  public boolean isHubActive() {
-    Optional<Alliance> alliance = DriverStation.getAlliance();
-    // If we have no alliance, we cannot be enabled, therefore no hub.
-    if (alliance.isEmpty()) {
-      return false;
-    }
-    // Hub is always enabled in autonomous.
-
-    // We're teleop enabled, compute.
-    double matchTime = DriverStation.getMatchTime();
-    String gameData = DriverStation.getGameSpecificMessage();
-    // If we have no game data, we cannot compute, assume hub is active, as its likely early in
-    // teleop.
-    if (gameData.isEmpty()) {
-      return true;
-    }
-    boolean redInactiveFirst = false;
-    switch (gameData.charAt(0)) {
-      case 'R' -> redInactiveFirst = true;
-      case 'B' -> redInactiveFirst = false;
-      default -> {
-        // If we have invalid game data, assume hub is active.
-        return true;
-      }
-    }
-
-    // Shift was is active for blue if red won auto, or red if blue won auto.
-    boolean shift1Active =
-        switch (alliance.get()) {
-          case Red -> !redInactiveFirst;
-          case Blue -> redInactiveFirst;
-        };
-
-    if (matchTime > 130 + 8) {
-      // Transition shift, hub is active.
-      return true;
-    } else if (matchTime > 105 + 8) {
-      // Shift 1
-      return shift1Active;
-    } else if (matchTime > 80 + 8) {
-      // Shift 2
-      return !shift1Active;
-    } else if (matchTime > 55 + 8) {
-      // Shift 3
-      return shift1Active;
-    } else if (matchTime > 30 + 8) {
-      // Shift 4
-      return !shift1Active;
-    } else {
-      // End game, hub always active.
-      return true;
-    }
+  public boolean phaseShift() {
+    return phaseShiftActive;
   }
+
+  private boolean isPhaseShiftTime(double matchTime) {
+    int wholeSeconds = (int) Math.round(matchTime);
+    return wholeSeconds == 133
+        || wholeSeconds == 103
+        || wholeSeconds == 83
+        || wholeSeconds == 58;
+  }
+
 
   /** Spins up flywheel, preloads fuel, then fires. Only runs from Idle. */
   public Command shoot() {
@@ -366,11 +326,15 @@ public class StateMachine extends SubsystemBase {
   @Override
   public void periodic() {
     runTargeting();
+    phaseShiftActive = isPhaseShiftTime(DriverStation.getMatchTime());
 
     SmartDashboard.putString(
         "State Machine/Current Comamand",
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
     SmartDashboard.putString("State Machine/State", m_state.toString());
+
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+    SmartDashboard.putBoolean("State Machine/Phase Shift Active", phaseShiftActive);
 
     m_publisher.publish();
   }

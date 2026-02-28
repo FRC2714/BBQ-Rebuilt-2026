@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -23,6 +24,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import java.util.Set;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -50,26 +52,45 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // NAMED COMMANDS FOR PATHPLANNER
-    NamedCommands.registerCommand("SCORE", m_stateMachine.startShootingAuto());
-    NamedCommands.registerCommand("SCORE_INITAL", m_stateMachine.startShootingAuto());
-    NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShootAuto());
+    // Wrapped in Commands.defer() so each auto path gets a fresh command instance,
+    // preventing "command detected parallel running" errors when the same named
+    // command is referenced in multiple event markers.
     NamedCommands.registerCommand(
-        "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));
+        "SCORE", Commands.defer(() -> m_stateMachine.startShootingAuto(), Set.of()));
+    NamedCommands.registerCommand(
+        "SCORE_INITAL", Commands.defer(() -> m_stateMachine.startShootingAuto(), Set.of()));
+    NamedCommands.registerCommand(
+        "STOP_SHOOTING", Commands.defer(() -> m_stateMachine.stopShootAuto(), Set.of()));
+    NamedCommands.registerCommand(
+        "INTAKE",
+        Commands.defer(
+            () -> m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout),
+            Set.of(m_intake)));
     NamedCommands.registerCommand(
         "CLIMB",
-        new InstantCommand(
-            () ->
-                m_stateMachine.setState(
-                    State.Climbing))); // NO CURRENT CLIMB METHOD BUT REQUIRED FOR PATHPLANNER
+        Commands.defer(
+            () -> new InstantCommand(() -> m_stateMachine.setState(State.Climbing)), Set.of()));
     NamedCommands.registerCommand(
-        "EXTAKE", m_stateMachine.extakeSequenceAuto(AutoConstants.kExtakeTimeout));
+        "EXTAKE",
+        Commands.defer(
+            () -> m_stateMachine.extakeSequenceAuto(AutoConstants.kExtakeTimeout),
+            Set.of(m_intake)));
     NamedCommands.registerCommand(
-        "STOW_INTAKE", m_stateMachine.stowSequenceAuto(AutoConstants.kStowTimeout));
-    NamedCommands.registerCommand("PRELOAD", m_stateMachine.preloadCommand());
+        "STOW_INTAKE",
+        Commands.defer(
+            () -> m_stateMachine.stowSequenceAuto(AutoConstants.kStowTimeout), Set.of(m_intake)));
     NamedCommands.registerCommand(
-        "WAIT_FOR_SCORE", m_stateMachine.waitForScore(AutoConstants.kShootTimeout));
+        "PRELOAD", Commands.defer(() -> m_stateMachine.preloadCommand(), Set.of()));
     NamedCommands.registerCommand(
-        "WAIT_FOR_SCORE_INITIAL", m_stateMachine.waitForScore(AutoConstants.kShootInitialTimeout));
+        "WAIT_FOR_SCORE",
+        Commands.defer(
+            () -> m_stateMachine.waitForScore(AutoConstants.kShootTimeout),
+            Set.of(m_shooter, m_dyeRotor)));
+    NamedCommands.registerCommand(
+        "WAIT_FOR_SCORE_INITIAL",
+        Commands.defer(
+            () -> m_stateMachine.waitForScore(AutoConstants.kShootInitialTimeout),
+            Set.of(m_shooter, m_dyeRotor)));
 
     // Configure the button bindings
     configureButtonBindings();

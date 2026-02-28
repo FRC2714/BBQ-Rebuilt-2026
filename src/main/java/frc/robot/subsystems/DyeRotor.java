@@ -141,9 +141,9 @@ public class DyeRotor extends SubsystemBase {
 
     pose =
         new Pose3d(
+            0.058,
             0,
-            0,
-            0.02,
+            0.2,
             new Rotation3d(0.0, 0.0, Units.rotationsToRadians(-encoder.getPosition() / GEARING)));
   }
 

@@ -290,21 +290,21 @@ public class StateMachine extends SubsystemBase {
    * @param timeout max seconds to run intake
    */
   public Command intakeSequenceAuto(double timeout) {
-    return m_intake.intake().withTimeout(timeout);
+    return m_intake.intake().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout);
   }
 
   /**
    * @param timeout max seconds to run extake
    */
   public Command extakeSequenceAuto(double timeout) {
-    return (m_intake.extake().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout));
+    return m_intake.extake().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout);
   }
 
   /**
    * @param timeout max seconds to run stow
    */
   public Command stowSequenceAuto(double timeout) {
-    return (m_intake.stow().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout));
+    return m_intake.stow().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout);
   }
 
   /**

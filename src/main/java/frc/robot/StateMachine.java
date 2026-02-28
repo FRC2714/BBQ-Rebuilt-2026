@@ -144,6 +144,8 @@ public class StateMachine extends SubsystemBase {
 
           CommandScheduler.getInstance().schedule(preload());
         });
+  }
+
   public Command deployClimber() {
     return m_intake.stow().until(() -> m_intake.atSetpoint()).andThen(m_climb.deploy());
   }
@@ -161,10 +163,6 @@ public class StateMachine extends SubsystemBase {
         .unclimb()
         .beforeStarting(() -> setState(State.Idle))
         .onlyIf(() -> m_state == State.Climbing);
-  }
-
-  public State getState() {
-    return m_state;
   }
 
   public Command preload() {

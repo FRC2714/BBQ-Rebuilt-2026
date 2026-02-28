@@ -6,7 +6,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -121,7 +120,7 @@ public class RobotContainer {
     // m_driverController.x().onTrue(m_stateMachine.preloadCommand());
 
     // intake keybinds
-       m_driverController.rightBumper().whileTrue(m_stateMachine.intakeSequence());
+    m_driverController.rightBumper().whileTrue(m_stateMachine.intakeSequence());
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
 

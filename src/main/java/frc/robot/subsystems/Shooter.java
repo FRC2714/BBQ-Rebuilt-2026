@@ -257,7 +257,43 @@ public class Shooter extends SubsystemBase {
   }
 
   public double getTurretPosition() {
-    return turretRelativeEncoder.getPosition();
+    return turretRelativeEncoder.getPosition() - ShooterConstants.kTurretMountingOffsetDegrees;
+  }
+
+  private double normalizeTurretTarget(double angleDegrees) {
+    double min = ShooterConstants.kTurretMinRange - ShooterConstants.kTurretMountingOffsetDegrees;
+    double max = ShooterConstants.kTurretMaxRange - ShooterConstants.kTurretMountingOffsetDegrees;
+
+    // Fold into one revolution first so we can generate equivalent candidates.
+    double base = angleDegrees % 360.0;
+    if (base > 180.0) {
+      base -= 360.0;
+    } else if (base <= -180.0) {
+      base += 360.0;
+    }
+
+    double currentPosition = getTurretPosition();
+    double bestTarget = Double.NaN;
+    double bestError = Double.POSITIVE_INFINITY;
+
+    for (int k = -2; k <= 2; k++) {
+      double candidate = base + (k * 360.0);
+      if (candidate < min || candidate > max) {
+        continue;
+      }
+
+      double error = Math.abs(candidate - currentPosition);
+      if (error < bestError) {
+        bestError = error;
+        bestTarget = candidate;
+      }
+    }
+
+    if (!Double.isNaN(bestTarget)) {
+      return bestTarget;
+    }
+
+    return Math.max(min, Math.min(max, base));
   }
 
   public double getHoodPosition() {
@@ -265,7 +301,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void updateShootCommand(ShooterCommand command) {
-    turretCurrentTarget = command.turretAngle.getDegrees();
+    turretCurrentTarget = normalizeTurretTarget(command.turretAngle.getDegrees());
     flywheelCurrentTarget = command.rpm;
     hoodCurrentTarget = command.hoodAngle;
   }
@@ -327,7 +363,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean turretAtSetpoint() {
-    boolean atSetpoint = Math.abs(turretRelativeEncoder.getPosition() - turretCurrentTarget) < 5;
+    boolean atSetpoint = Math.abs(getTurretPosition() - turretCurrentTarget) < 5;
     return turretDebouncer.calculate(atSetpoint);
   }
 
@@ -381,7 +417,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setTurretAngle(double angle) {
-    turretRelativeEncoder.setPosition(angle);
+    turretRelativeEncoder.setPosition(angle + ShooterConstants.kTurretMountingOffsetDegrees);
   }
 
   public void configureShooterBindings() {
@@ -396,7 +432,11 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    turretController.setSetpoint(turretCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
+    turretController.setSetpoint(
+        turretCurrentTarget + ShooterConstants.kTurretMountingOffsetDegrees,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0);
     hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     flywheelController.setSetpoint(
         isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
@@ -407,7 +447,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
 
     SmartDashboard.putNumber("Shooter/Turret/Setpoint", turretCurrentTarget);
-    SmartDashboard.putNumber("Shooter/Turret/Position", turretRelativeEncoder.getPosition());
+    SmartDashboard.putNumber("Shooter/Turret/Position", getTurretPosition());
     SmartDashboard.putBoolean("Shooter/Turret/At Setpoint", turretAtSetpoint());
 
     SmartDashboard.putNumber("Shooter/Hood/Setpoint", hoodCurrentTarget);

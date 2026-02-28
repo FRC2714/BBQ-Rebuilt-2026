@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.StateMachine.State;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -35,9 +36,10 @@ public class RobotContainer {
   public final Shooter m_shooter = new Shooter();
   public final DyeRotor m_dyeRotor = new DyeRotor();
   public final Intake m_intake = new Intake();
+  private final Climb m_climb = new Climb();
 
   final StateMachine m_stateMachine =
-      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor);
+      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb);
 
   private SendableChooser<Command> autoChooser;
 

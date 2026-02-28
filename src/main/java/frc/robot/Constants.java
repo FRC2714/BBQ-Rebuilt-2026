@@ -130,10 +130,11 @@ public final class Constants {
 
   public static final class ShooterConstants {
     public static final int kTurretCanId = 30;
-    public static final int kTurretMaxRange = 175;
-    public static final int kFwdLimitSwitchOffset = 90;
-    public static final int kRevLimitSwitchOffset = -90;
-    public static final int kTurretMinRange = -175;
+    public static final int kTurretMaxRange = 220;
+    public static final int kFwdLimitSwitchOffset = -90;
+    public static final int kRevLimitSwitchOffset = 90;
+    public static final int kTurretMinRange = -180;
+    public static final double kTurretMountingOffsetDegrees = 180.0;
     public static final Transform2d turretOffset =
         new Transform2d(
             Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));
@@ -172,6 +173,17 @@ public final class Constants {
   public static final class DyeRotorConstants {
     public static final int kDyeRotorMotorCanID = 60;
     public static final double kDyeRotorPower = 1.0;
+  }
+
+  public static final class ClimbConstants {
+    public static final int kLeftMotorCanID = 45;
+    public static final int kRightMotorCanID = 41;
+    public static final double kRetractSetpoint = 0.0; // TBD
+    public static final double kExtendSetpoint = 100.0; // TBD
+    public static final double kClimbSetpoint = 2.0; // TBD
+    public static final double kPositionTolerance = 2.0;
+    public static final double kExtendSpeed = 0.5; // TBD
+    public static final double kRetractSpeed = -0.5; // TBD
   }
 
   // For field constants

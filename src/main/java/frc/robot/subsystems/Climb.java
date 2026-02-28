@@ -18,6 +18,7 @@ import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.Robot;
 
+/** Controls the left and right climb motors. Supports deploy, climb, and retract positions. */
 public class Climb extends SubsystemBase {
   private final SparkFlex leftMotor =
       new SparkFlex(Constants.ClimbConstants.kLeftMotorCanID, MotorType.kBrushless);
@@ -28,7 +29,6 @@ public class Climb extends SubsystemBase {
 
   private double setpoint = 0;
 
-  /** Creates a new Climb. */
   public Climb() {
     leftMotor.configure(
         Configs.Climb.leftClimbConfig,
@@ -40,6 +40,7 @@ public class Climb extends SubsystemBase {
         PersistMode.kPersistParameters);
   }
 
+  /** Extends the climber arms to the deploy position. Stops motors on end. */
   public Command deploy() {
     return this.runEnd(
         () -> {
@@ -53,6 +54,7 @@ public class Climb extends SubsystemBase {
         });
   }
 
+  /** Pulls the robot up to the climb position. Stops motors on end. */
   public Command climb() {
     return this.runEnd(
         () -> {
@@ -66,6 +68,7 @@ public class Climb extends SubsystemBase {
         });
   }
 
+  /** Retracts the climber arms back down. Stops motors on end. */
   public Command unclimb() {
     return this.runEnd(
         () -> {
@@ -97,6 +100,7 @@ public class Climb extends SubsystemBase {
     rightController.setSetpoint(setpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
+  /** True when both motors are within tolerance of the target position. Always true in sim. */
   public boolean atSetpoint() {
     if (Robot.isSimulation()) {
       return true;

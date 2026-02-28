@@ -35,6 +35,7 @@ public class StateMachine extends SubsystemBase {
 
   private static State m_state = State.Idle;
   private boolean phaseShiftActive = false;
+  private boolean phaseShiftWarningActive = false;
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -113,9 +114,18 @@ public class StateMachine extends SubsystemBase {
     return phaseShiftActive;
   }
 
+  public boolean phaseShiftWarning() {
+    return phaseShiftWarningActive;
+  }
+
   private boolean isPhaseShiftTime(double matchTime) {
     int wholeSeconds = (int) Math.round(matchTime);
-    return wholeSeconds == 133 || wholeSeconds == 108 || wholeSeconds == 83 || wholeSeconds == 58;
+    return wholeSeconds == 130 || wholeSeconds == 105 || wholeSeconds == 80 || wholeSeconds == 55;
+  }
+
+  private boolean isPhaseShiftWarningTime(double matchTime) {
+    int wholeSeconds = (int) Math.round(matchTime);
+    return wholeSeconds == 138 || wholeSeconds == 113 || wholeSeconds == 88 || wholeSeconds == 63;
   }
 
   /** Spins up flywheel, preloads fuel, then fires. Only runs from Idle. */
@@ -321,6 +331,7 @@ public class StateMachine extends SubsystemBase {
   public void periodic() {
     runTargeting();
     phaseShiftActive = isPhaseShiftTime(DriverStation.getMatchTime());
+    phaseShiftWarningActive = isPhaseShiftWarningTime(DriverStation.getMatchTime());
 
     SmartDashboard.putString(
         "State Machine/Current Comamand",

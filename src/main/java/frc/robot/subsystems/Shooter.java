@@ -426,18 +426,22 @@ public class Shooter extends SubsystemBase {
 
   public Command zeroHood() {
     final double kHomingPower = -0.18;
-    hoodRelativeEncoder.setPosition(40.0);
 
     return new InstantCommand(() -> zeroingHood = true)
-        .andThen(new RunCommand(() -> hoodMotor.set(kHomingPower), this).withTimeout(1.5))
         .andThen(
-            new InstantCommand(
-                () -> {
-                  hoodMotor.set(0.0);
-                  hoodRelativeEncoder.setPosition(0.0);
-                  zeroingHood = false;
-                }));
-  }
+            new RunCommand(() -> hoodMotor.set(kHomingPower), this)
+                .until(() -> simHoodPosition <= 54.3) 
+        )
+        .andThen(new InstantCommand(() -> {
+            hoodMotor.set(0.0);
+
+            
+            hoodRelativeEncoder.setPosition(72.276537);
+            simHoodPosition = 72.276537;
+
+            zeroingHood = false;
+        }));
+}
 
   public Command zeroTurretSequence() {
     if (!wasZeroed) {
@@ -595,16 +599,17 @@ public class Shooter extends SubsystemBase {
     hoodSim.setInput(hoodSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
     hoodSim.update(0.02);
 
-// Simulated mechanical limits
-hoodSim.setInput(hoodSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
-hoodSim.update(0.02);
+    if (zeroingHood) {
+        simHoodPosition += hoodSparkSim.getAppliedOutput() * 2.0;
+    } else {
+        simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
+    }
 
-double minHood = ShooterConstants.kHoodMinAngle; 
-double maxHood = ShooterConstants.kHoodMaxAngle; 
-simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
+    double physicalMin = 54.276537;
+    double physicalMax = 72.276537;
 
-simHoodPosition = MathUtil.clamp(simHoodPosition, minHood, maxHood);
+    simHoodPosition = MathUtil.clamp(simHoodPosition, physicalMin, physicalMax);
 
-hoodRelativeEncoder.setPosition(simHoodPosition);
-  }
+    hoodRelativeEncoder.setPosition(simHoodPosition);
+}
 }

@@ -53,8 +53,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("SCORE", m_stateMachine.startShootingAuto());
     NamedCommands.registerCommand("SCORE_INITAL", m_stateMachine.startShootingAuto());
     NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShootAuto());
-    NamedCommands.registerCommand(
-        "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));
+    NamedCommands.registerCommand("INTAKE", m_stateMachine.intakeSequence());
     NamedCommands.registerCommand(
         "CLIMB",
         new InstantCommand(

@@ -64,7 +64,7 @@ public class Simulation {
                 Meters.of(DriveConstants.kWheelBase), Meters.of(DriveConstants.kTrackWidth));
 
     swerveDriveSimulation =
-        new SwerveDriveSimulation(driveTrainSimulationConfig, new Pose2d(3, 3, new Rotation2d()));
+        new SwerveDriveSimulation(driveTrainSimulationConfig, new Pose2d(0, 0, new Rotation2d()));
     SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
 
     intakeSimulation =

@@ -15,7 +15,6 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -111,7 +110,7 @@ public class Intake extends SubsystemBase {
   public Pose3d getIntakePose3d() {
     return intakePose3d;
   }
-  
+
   public double getIntakePivotPosition() {
     return pivotEncoder.getPosition();
   }
@@ -183,8 +182,13 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSetpoint);
     SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
 
-    //3d SIM
-    intakePose3d = new Pose3d(-0.1, 0, -0.48, new Rotation3d(0.0, Units.degreesToRadians(getIntakePivotPosition()), 0.0));
+    // 3d SIM
+    intakePose3d =
+        new Pose3d(
+            -0.1,
+            0,
+            -0.48,
+            new Rotation3d(0.0, Units.degreesToRadians(getIntakePivotPosition()), 0.0));
   }
 
   @Override
@@ -208,6 +212,6 @@ public class Intake extends SubsystemBase {
     rollerSim.update(0.02);
 
     rollerSparkSim.iterate(
-        rollerSim.getAngularVelocityRPM(), RobotController.getBatteryVoltage(), 0.02);    
+        rollerSim.getAngularVelocityRPM(), RobotController.getBatteryVoltage(), 0.02);
   }
 }

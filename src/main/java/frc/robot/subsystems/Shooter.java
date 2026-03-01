@@ -621,8 +621,8 @@ public class Shooter extends SubsystemBase {
     }
 
     // Physical limits
-    double physicalMin = 54.276537; // top
-    double physicalMax = 72.276537; // bottom hard stop
+    double physicalMin = Constants.ShooterConstants.kHoodMinPosition; // top
+    double physicalMax = Constants.ShooterConstants.kHoodMaxPosition; // bottom hard stop
 
     simHoodPosition = MathUtil.clamp(simHoodPosition, physicalMin, physicalMax);
 

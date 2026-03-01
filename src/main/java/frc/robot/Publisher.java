@@ -83,12 +83,19 @@ public class Publisher {
 
   /** Publishes all NetworkTables data: poses, turret, Limelight measurements, and sim fuel. */
   public void publish() {
-    Pose3d[] zeroRobotPose = new Pose3d[1];
+    Pose3d[] zeroRobotPose = new Pose3d[4];
     for (int i = 0; i < zeroRobotPose.length; i++) {
       zeroRobotPose[i] = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, 0.0, 0.0));
     }
     publisherZeroedComponentPoses.set(zeroRobotPose);
-    Pose3d[] finalRobotPose = new Pose3d[] {m_dyeRotor.getPose3d()};
+    Pose3d[] finalRobotPose =
+        new Pose3d[] {
+          m_dyeRotor.getPose3d(),
+          m_shooter.getTurretPose3d(),
+          m_shooter.getHoodPose3d(),
+          m_shooter.getFlyWheelPose3d(),
+          new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, 0.0, 0.0))
+        };
     publisherFinalComponentPoses.set(finalRobotPose);
 
     turretPose.set(

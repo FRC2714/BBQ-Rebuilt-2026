@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -33,6 +34,8 @@ public class StateMachine extends SubsystemBase {
   private final Climb m_climb;
 
   private static State m_state = State.Idle;
+  private boolean phaseShiftActive = false;
+  private boolean phaseShiftWarningActive = false;
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -105,6 +108,24 @@ public class StateMachine extends SubsystemBase {
     resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
 
     m_shooter.configureShooterBindings();
+  }
+
+  public boolean phaseShift() {
+    return phaseShiftActive;
+  }
+
+  public boolean phaseShiftWarning() {
+    return phaseShiftWarningActive;
+  }
+
+  private boolean isPhaseShiftTime(double matchTime) {
+    int wholeSeconds = (int) Math.round(matchTime);
+    return wholeSeconds == 130 || wholeSeconds == 105 || wholeSeconds == 80 || wholeSeconds == 55;
+  }
+
+  private boolean isPhaseShiftWarningTime(double matchTime) {
+    int wholeSeconds = (int) Math.round(matchTime);
+    return wholeSeconds == 138 || wholeSeconds == 113 || wholeSeconds == 88 || wholeSeconds == 63;
   }
 
   /** Spins up flywheel, preloads fuel, then fires. Only runs from Idle. */
@@ -309,11 +330,16 @@ public class StateMachine extends SubsystemBase {
   @Override
   public void periodic() {
     runTargeting();
+    phaseShiftActive = isPhaseShiftTime(DriverStation.getMatchTime());
+    phaseShiftWarningActive = isPhaseShiftWarningTime(DriverStation.getMatchTime());
 
     SmartDashboard.putString(
         "State Machine/Current Comamand",
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
     SmartDashboard.putString("State Machine/State", m_state.toString());
+
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+    SmartDashboard.putBoolean("State Machine/Phase Shift Active", phaseShiftActive);
 
     m_publisher.publish();
   }

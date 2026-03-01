@@ -135,7 +135,7 @@ public class StateMachine extends SubsystemBase {
 
     Trigger startPreload =
         new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning()).and(xNewPress);
-    startPreload.onTrue(m_dyeRotor.start());
+    startPreload.onTrue(this.preloadCommand());
 
     m_shooter.configureShooterBindings();
   }

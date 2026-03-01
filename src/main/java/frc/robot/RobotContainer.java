@@ -12,17 +12,14 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.StateMachine.State;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
@@ -64,8 +61,7 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));
     NamedCommands.registerCommand(
-        "CLIMB",
-       Commands.runEnd(()->m_stateMachine.climb(), ()->m_stateMachine.unclimb())); // NO CURRENT CLIMB METHOD BUT REQUIRED FOR PATHPLANNER
+        "CLIMB", m_stateMachine.climb()); // NO CURRENT CLIMB METHOD BUT REQUIRED FOR PATHPLANNER
     NamedCommands.registerCommand(
         "EXTAKE", m_stateMachine.extakeSequenceAuto(AutoConstants.kExtakeTimeout));
     NamedCommands.registerCommand(

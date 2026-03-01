@@ -190,11 +190,6 @@ public class StateMachine extends SubsystemBase {
         .onlyIf(() -> m_state == State.Idle);
   }
 
-    public Command climbAuto() {
-    return Commands.runEnd(()->climb(), ()->unclimb());
-  }
-
-
   /** Reverses the climb and returns to Idle. Only runs from Climbing. */
   public Command unclimb() {
     return m_climb

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -64,11 +65,7 @@ public class RobotContainer {
         "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));
     NamedCommands.registerCommand(
         "CLIMB",
-        Commands.runEnd(
-            () -> m_stateMachine.setState(State.Climbing),
-            () ->
-                m_stateMachine.setState(
-                    State.Idle))); // NO CURRENT CLIMB METHOD BUT REQUIRED FOR PATHPLANNER
+       m_stateMachine.climbAuto()); // NO CURRENT CLIMB METHOD BUT REQUIRED FOR PATHPLANNER
     NamedCommands.registerCommand(
         "EXTAKE", m_stateMachine.extakeSequenceAuto(AutoConstants.kExtakeTimeout));
     NamedCommands.registerCommand(

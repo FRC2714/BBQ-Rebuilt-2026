@@ -434,24 +434,18 @@ public class Shooter extends SubsystemBase {
     return new InstantCommand(() -> zeroingHood = true)
         .andThen(
             new RunCommand(() -> hoodMotor.set(kHoodMotorSpeed), this)
-<<<<<<< Updated upstream
                 .until(
                     () ->
                         getHoodPosition()
+                            >= Constants.ShooterConstants.kHoodMaxAngle - 1)) //  72.276537
         .andThen(
-                            >= Constants.ShooterConstants.kHoodMaxAngle - 1) //  72.276537
-                .andThen(
-                    new InstantCommand(
-                        () -> {
-                          hoodMotor.set(0.0);
-                          // simHoodPosition = Constants.ShooterConstants.kHoodMaxAngle; //
-                          // 72.276537
-                          // simHoodPosition = Constants.ShooterConstants.kHoodMaxAngle; //
-                          // 72.276537
-                          hoodRelativeEncoder.setPosition(
-                              Constants.ShooterConstants.kHoodMaxAngle); // 72.276537
-                          zeroingHood = false;
-                        })));
+            new InstantCommand(
+                () -> {
+                  hoodMotor.set(0.0);
+                  hoodRelativeEncoder.setPosition(
+                      Constants.ShooterConstants.kHoodMaxAngle); // 72.276537
+                  zeroingHood = false;
+                }));
   }
 
   public Command zeroTurretSequence() {

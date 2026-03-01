@@ -425,17 +425,17 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command zeroHood() {
-    final double kHomingPower = -0.18;
+    final double kHomingPower = -0.18; 
 
     return new InstantCommand(() -> zeroingHood = true)
         .andThen(
             new RunCommand(() -> hoodMotor.set(kHomingPower), this)
-                .until(() -> simHoodPosition <= 54.3) 
+                .until(() -> simHoodPosition >= 72.25) 
         )
         .andThen(new InstantCommand(() -> {
             hoodMotor.set(0.0);
 
-            
+           
             hoodRelativeEncoder.setPosition(72.276537);
             simHoodPosition = 72.276537;
 
@@ -600,16 +600,18 @@ public class Shooter extends SubsystemBase {
     hoodSim.update(0.02);
 
     if (zeroingHood) {
-        simHoodPosition += hoodSparkSim.getAppliedOutput() * 2.0;
-    } else {
-        simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
-    }
-
-    double physicalMin = 54.276537;
-    double physicalMax = 72.276537;
-
-    simHoodPosition = MathUtil.clamp(simHoodPosition, physicalMin, physicalMax);
-
-    hoodRelativeEncoder.setPosition(simHoodPosition);
+    // negative power moves hood DOWN → increases shooting angle
+    simHoodPosition += hoodSparkSim.getAppliedOutput() * -2.0;
+} else {
+    simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
 }
+
+// Physical limits
+double physicalMin = 54.276537;  // top
+double physicalMax = 72.276537;  // bottom hard stop
+
+simHoodPosition = MathUtil.clamp(simHoodPosition, physicalMin, physicalMax);
+
+hoodRelativeEncoder.setPosition(simHoodPosition);
+  }
 }

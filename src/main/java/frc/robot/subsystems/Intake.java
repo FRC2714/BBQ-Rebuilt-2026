@@ -94,12 +94,12 @@ public class Intake extends SubsystemBase {
   }
 
   private void pivotExtend() {
-    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotStow;
+    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotExtend;
     intakePivotController.setSetpoint(pivotSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
   private void pivotStow() {
-    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotExtend;
+    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotStow;
     intakePivotController.setSetpoint(pivotSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
@@ -188,7 +188,11 @@ public class Intake extends SubsystemBase {
             0.35,
             0,
             0.232,
-            new Rotation3d(0.0, Units.degreesToRadians(getIntakePivotPosition()), 0.0));
+            new Rotation3d(
+                0.0,
+                Units.degreesToRadians(
+                    IntakeConstants.PivotConstants.kPivotStow - getIntakePivotPosition()),
+                0.0));
   }
 
   @Override

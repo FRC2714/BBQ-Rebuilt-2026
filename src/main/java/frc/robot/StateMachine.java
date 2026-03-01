@@ -38,6 +38,7 @@ public class StateMachine extends SubsystemBase {
 
   private static State m_state = State.Idle;
   private boolean phaseShiftActive = false;
+  private boolean xWasPressed = false;
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -115,14 +116,24 @@ public class StateMachine extends SubsystemBase {
         new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
     resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
 
+    Trigger xNewPress =
+        new Trigger(
+            () -> {
+              boolean current = m_driverHID.getXButton();
+              if (current && !xWasPressed) {
+                xWasPressed = true;
+                return true;
+              }
+              if (!current) xWasPressed = false;
+              return false;
+            });
+
     Trigger stopPreload =
-        new Trigger(() -> m_state != State.Shooting && m_dyeRotor.isRunning())
-            .and(() -> m_driverHID.getXButtonReleased());
+        new Trigger(() -> m_state != State.Shooting && m_dyeRotor.isRunning()).and(xNewPress);
     stopPreload.onTrue(m_dyeRotor.stop());
 
     Trigger startPreload =
-        new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning())
-            .and(() -> m_driverHID.getXButtonReleased());
+        new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning()).and(xNewPress);
     startPreload.onTrue(m_dyeRotor.start());
 
     m_shooter.configureShooterBindings();
@@ -157,7 +168,6 @@ public class StateMachine extends SubsystemBase {
                     }))
         .finallyDo(
             () -> {
-              this.preloadCommand().cancel();
               m_drivetrain.setShootingStateFalse();
               CommandScheduler.getInstance().schedule(stopShoot());
             })

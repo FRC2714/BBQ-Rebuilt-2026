@@ -8,11 +8,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Climb;
@@ -31,11 +33,13 @@ public class StateMachine extends SubsystemBase {
   private final Intake m_intake;
   private final DyeRotor m_dyeRotor;
   private final Publisher m_publisher;
+  private final XboxController m_driverHID;
   private final Climb m_climb;
 
   private static State m_state = State.Idle;
   private boolean phaseShiftActive = false;
   private boolean phaseShiftWarningActive = false;
+  private boolean xWasPressed = false;
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -50,7 +54,12 @@ public class StateMachine extends SubsystemBase {
   }
 
   public StateMachine(
-      DriveSubsystem drivetrain, Shooter shooter, Intake intake, DyeRotor dyeRotor, Climb climb) {
+      DriveSubsystem drivetrain,
+      Shooter shooter,
+      Intake intake,
+      DyeRotor dyeRotor,
+      Climb climb,
+      CommandXboxController driverController) {
     m_drivetrain = drivetrain;
     m_shooter = shooter;
     m_intake = intake;
@@ -58,6 +67,7 @@ public class StateMachine extends SubsystemBase {
     m_climb = climb;
 
     m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor);
+    m_driverHID = driverController.getHID();
 
     if (Robot.isSimulation()) {
       // Simulate fuel being shot out of robot
@@ -106,6 +116,26 @@ public class StateMachine extends SubsystemBase {
     Trigger resumeShooter =
         new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
     resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
+
+    Trigger xNewPress =
+        new Trigger(
+            () -> {
+              boolean current = m_driverHID.getXButton();
+              if (current && !xWasPressed) {
+                xWasPressed = true;
+                return true;
+              }
+              if (!current) xWasPressed = false;
+              return false;
+            });
+
+    Trigger stopPreload =
+        new Trigger(() -> m_state != State.Shooting && m_dyeRotor.isRunning()).and(xNewPress);
+    stopPreload.onTrue(m_dyeRotor.stop());
+
+    Trigger startPreload =
+        new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning()).and(xNewPress);
+    startPreload.onTrue(this.preloadCommand());
 
     m_shooter.configureShooterBindings();
   }
@@ -171,7 +201,6 @@ public class StateMachine extends SubsystemBase {
     return Commands.runOnce(
         () -> {
           if (m_state == State.Shooting) return;
-
           CommandScheduler.getInstance().schedule(preload());
         });
   }

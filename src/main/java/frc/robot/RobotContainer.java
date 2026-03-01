@@ -40,14 +40,14 @@ public class RobotContainer {
   public final Intake m_intake = new Intake();
   private final Climb m_climb = new Climb();
 
-  final StateMachine m_stateMachine =
-      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb);
-
-  private SendableChooser<Command> autoChooser;
-
   // The driver's controller
   CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);
+
+  final StateMachine m_stateMachine =
+      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb, m_driverController);
+
+  private SendableChooser<Command> autoChooser;
 
   private final Trigger rumble = new Trigger(() -> m_stateMachine.phaseShift());
   private final Trigger warningRumble = new Trigger(() -> m_stateMachine.phaseShiftWarning());
@@ -117,7 +117,7 @@ public class RobotContainer {
 
     m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
 
-    m_driverController.x().onTrue(m_stateMachine.preloadCommand());
+    // m_driverController.x().onTrue(m_stateMachine.preloadCommand());
 
     // intake keybinds
     m_driverController.rightBumper().whileTrue(m_stateMachine.intakeSequence());

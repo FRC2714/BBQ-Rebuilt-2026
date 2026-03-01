@@ -410,6 +410,10 @@ public class Shooter extends SubsystemBase {
     return hoodDebouncer.calculate(atSetpoint);
   }
 
+  public boolean zeroingHood() {
+    return zeroingHood;
+  }
+
   /** Zeros turret encoder when a limit switch is hit. Resets on release. */
   public void zeroTurret() {
     if (!wasZeroed && turretMotor.getForwardLimitSwitch().isPressed()) {
@@ -430,20 +434,13 @@ public class Shooter extends SubsystemBase {
     return new InstantCommand(() -> zeroingHood = true)
         .andThen(
             new RunCommand(() -> hoodMotor.set(kHoodMotorSpeed), this)
-                .until(
-                    () ->
-                        getHoodPosition() >= Constants.ShooterConstants.kHoodMaxAngle) //  72.276537
-            )
+                  .until(() -> getHoodPosition() <= Constants.ShooterConstants.kHoodMaxAngle)) /**/ //  72.276537
         .andThen(
-            new InstantCommand(
-                () -> {
+            new InstantCommand(() -> {
                   hoodMotor.set(0.0);
-
-                  hoodRelativeEncoder.setPosition(
-                      Constants.ShooterConstants.kHoodMinAngle); // 54.276537
                   simHoodPosition = Constants.ShooterConstants.kHoodMaxAngle; // 72.276537
                   hoodRelativeEncoder.setPosition(
-                      Constants.ShooterConstants.kHoodMinAngle); // 72.276537
+                      Constants.ShooterConstants.kHoodMaxAngle); // 72.276537
                   zeroingHood = false;
                 }));
   }
@@ -590,7 +587,6 @@ public class Shooter extends SubsystemBase {
         flywheelSim.getAngularVelocityRPM(), RobotController.getBatteryVoltage(), 0.02);
 
     simFlywheelVelocity += (flywheelCurrentTarget - simFlywheelVelocity) * 0.2;
-    simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
 
     turretSim.setInput(turretSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
     turretSim.update(0.02);

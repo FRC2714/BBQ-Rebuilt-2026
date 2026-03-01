@@ -15,6 +15,8 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -54,6 +56,7 @@ public class Intake extends SubsystemBase {
   private RelativeEncoder rollerEncoder = rollerMotor.getEncoder();
 
   private double pivotSetpoint = 0;
+  private Pose3d intakePose3d = new Pose3d();
 
   // Simulation
   DCMotor pivotMotorSim = DCMotor.getNeoVortex(1);
@@ -91,17 +94,25 @@ public class Intake extends SubsystemBase {
   }
 
   private void pivotExtend() {
-    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotExtend;
+    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotStow;
     intakePivotController.setSetpoint(pivotSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
   private void pivotStow() {
-    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotStow;
+    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotExtend;
     intakePivotController.setSetpoint(pivotSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
   private void setRollerPower(double power) {
     rollerMotor.set(power);
+  }
+
+  public Pose3d getIntakePose3d() {
+    return intakePose3d;
+  }
+
+  public double getIntakePivotPosition() {
+    return pivotEncoder.getPosition();
   }
 
   /** True when the pivot has reached its target position. Always true in sim. */
@@ -170,6 +181,14 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Pivot/Position", pivotEncoder.getPosition());
     SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSetpoint);
     SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
+
+    // 3d SIM
+    intakePose3d =
+        new Pose3d(
+            0.35,
+            0,
+            0.232,
+            new Rotation3d(0.0, Units.degreesToRadians(getIntakePivotPosition()), 0.0));
   }
 
   @Override

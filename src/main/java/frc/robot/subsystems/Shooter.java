@@ -438,19 +438,20 @@ public class Shooter extends SubsystemBase {
                 .until(
                     () ->
                         getHoodPosition()
-                            <= Constants.ShooterConstants.kHoodMaxAngle)) /**/ //  72.276537
-=======
-                  .until(() -> getHoodPosition() >= Constants.ShooterConstants.kHoodMaxAngle - 1)) /**/ //  72.276537
->>>>>>> Stashed changes
         .andThen(
-            new InstantCommand(
-                () -> {
-                  hoodMotor.set(0.0);
-                  //simHoodPosition = Constants.ShooterConstants.kHoodMaxAngle; // 72.276537
-                  hoodRelativeEncoder.setPosition(
-                      Constants.ShooterConstants.kHoodMaxAngle); // 72.276537
-                  zeroingHood = false;
-                }));
+                            >= Constants.ShooterConstants.kHoodMaxAngle - 1) //  72.276537
+                .andThen(
+                    new InstantCommand(
+                        () -> {
+                          hoodMotor.set(0.0);
+                          // simHoodPosition = Constants.ShooterConstants.kHoodMaxAngle; //
+                          // 72.276537
+                          // simHoodPosition = Constants.ShooterConstants.kHoodMaxAngle; //
+                          // 72.276537
+                          hoodRelativeEncoder.setPosition(
+                              Constants.ShooterConstants.kHoodMaxAngle); // 72.276537
+                          zeroingHood = false;
+                        })));
   }
 
   public Command zeroTurretSequence() {
@@ -594,8 +595,6 @@ public class Shooter extends SubsystemBase {
     flywheelSparkSim.iterate(
         flywheelSim.getAngularVelocityRPM(), RobotController.getBatteryVoltage(), 0.02);
 
-    
-
     simFlywheelVelocity += (flywheelCurrentTarget - simFlywheelVelocity) * 0.2;
 
     turretSim.setInput(turretSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
@@ -609,11 +608,19 @@ public class Shooter extends SubsystemBase {
         0.02);
 
     hoodSim.setInput(hoodSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
-    hoodSparkSim.iterate(Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1)), RobotController.getBatteryVoltage(), 0.02);
+    hoodSparkSim.iterate(
+        Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1)),
+        RobotController.getBatteryVoltage(),
+        0.02);
+    hoodSparkSim.iterate(
+        Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1)),
+        RobotController.getBatteryVoltage(),
+        0.02);
     hoodSim.update(0.02);
 
     if (zeroingHood) {
       // negative power moves hood DOWN → increases shooting angle
+      simHoodPosition += hoodMotor.getAppliedOutput() * -2.0;
       simHoodPosition += hoodMotor.getAppliedOutput() * -2.0;
     } else {
       simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;

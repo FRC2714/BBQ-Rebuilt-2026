@@ -188,7 +188,7 @@ public class Intake extends SubsystemBase {
             -0.1,
             0,
             -0.48,
-            new Rotation3d(0.0, -Units.degreesToRadians(getIntakePivotPosition()), 0.0));
+            new Rotation3d(0.0, Units.degreesToRadians(getIntakePivotPosition()), 0.0));
   }
 
   @Override

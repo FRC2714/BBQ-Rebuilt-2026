@@ -123,10 +123,10 @@ public final class Constants {
   }
 
   public static final class LimelightConstants {
-    public static final String kFrontRightName = "limelight-front-right";
-    public static final String kFrontLeftName = "limelight-front-left";
-    public static final String kRearLeftName = "limelight-rear-left";
-    public static final String kRearRightName = "limelight-rear-right";
+    public static final String kFrontRightName = "limelight-frontR";
+    public static final String kFrontLeftName = "limelight-frontL";
+    public static final String kRearLeftName = "limelight-rearL";
+    public static final String kRearRightName = "limelight-rearR";
     public static final String[] kCameraNames = {
       kFrontRightName, kFrontLeftName, kRearLeftName, kRearRightName
     };

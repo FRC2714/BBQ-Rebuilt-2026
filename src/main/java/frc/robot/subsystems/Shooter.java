@@ -589,7 +589,7 @@ public class Shooter extends SubsystemBase {
         flywheelSim.getAngularVelocityRPM(), RobotController.getBatteryVoltage(), 0.02);
 
     simFlywheelVelocity += (flywheelCurrentTarget - simFlywheelVelocity) * 0.2;
-    
+
     turretSim.setInput(turretSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
     turretSim.update(0.02);
 
@@ -619,7 +619,11 @@ public class Shooter extends SubsystemBase {
       simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
     }
 
-    simHoodPosition = MathUtil.clamp(simHoodPosition, Constants.ShooterConstants.kHoodMinAngle, Constants.ShooterConstants.kHoodMaxAngle);
+    simHoodPosition =
+        MathUtil.clamp(
+            simHoodPosition,
+            Constants.ShooterConstants.kHoodMinAngle,
+            Constants.ShooterConstants.kHoodMaxAngle);
 
     hoodRelativeEncoder.setPosition(simHoodPosition);
   }

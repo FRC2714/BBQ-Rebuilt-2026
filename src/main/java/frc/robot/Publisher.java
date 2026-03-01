@@ -52,9 +52,7 @@ public class Publisher {
       NetworkTableInstance.getDefault().getDoubleArrayTopic("Robot Pose Array").publish();
 
   StructPublisher<Pose2d> publisherLLfrontRight =
-      NetworkTableInstance.getDefault()
-          .getStructTopic("poseLLfrontRight", Pose2d.struct)
-          .publish();
+      NetworkTableInstance.getDefault().getStructTopic("poseLLfrontRight", Pose2d.struct).publish();
 
   StructPublisher<Pose2d> publisherLLfrontLeft =
       NetworkTableInstance.getDefault().getStructTopic("poseLLfrontLeft", Pose2d.struct).publish();
@@ -136,14 +134,16 @@ public class Publisher {
         frontRightLLMeasurement != null ? frontRightLLMeasurement.pose : new Pose2d());
     publisherLLfrontLeft.set(
         frontLeftLLMeasurement != null ? frontLeftLLMeasurement.pose : new Pose2d());
-    publisherLLrearLeft.set(rearLeftLLMeasurement != null ? rearLeftLLMeasurement.pose : new Pose2d());
+    publisherLLrearLeft.set(
+        rearLeftLLMeasurement != null ? rearLeftLLMeasurement.pose : new Pose2d());
     publisherLLrearRight.set(
         rearRightLLMeasurement != null ? rearRightLLMeasurement.pose : new Pose2d());
     tagPosesFrontRightArrayPublisher.set(
         Vision.getCameraTargetPoses3d(LimelightConstants.kFrontRightName));
     tagPosesFrontLeftArrayPublisher.set(
         Vision.getCameraTargetPoses3d(LimelightConstants.kFrontLeftName));
-    tagPosesRearLeftArrayPublisher.set(Vision.getCameraTargetPoses3d(LimelightConstants.kRearLeftName));
+    tagPosesRearLeftArrayPublisher.set(
+        Vision.getCameraTargetPoses3d(LimelightConstants.kRearLeftName));
     tagPosesRearRightArrayPublisher.set(
         Vision.getCameraTargetPoses3d(LimelightConstants.kRearRightName));
 

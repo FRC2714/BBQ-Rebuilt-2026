@@ -184,5 +184,4 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {
     SimulatedArena.getInstance().simulationPeriodic();
   }
-
 }

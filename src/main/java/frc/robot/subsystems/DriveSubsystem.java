@@ -551,13 +551,17 @@ public class DriveSubsystem extends SubsystemBase {
     // Switch back to fused mode after seeding
     new WaitCommand(0.1)
         .andThen(
-            new InstantCommand(() -> LimelightHelpers.SetIMUMode(LimelightConstants.kFrontRightName, 4)))
+            new InstantCommand(
+                () -> LimelightHelpers.SetIMUMode(LimelightConstants.kFrontRightName, 4)))
         .alongWith(
-            new InstantCommand(() -> LimelightHelpers.SetIMUMode(LimelightConstants.kFrontLeftName, 4)))
+            new InstantCommand(
+                () -> LimelightHelpers.SetIMUMode(LimelightConstants.kFrontLeftName, 4)))
         .alongWith(
-            new InstantCommand(() -> LimelightHelpers.SetIMUMode(LimelightConstants.kRearLeftName, 4)))
+            new InstantCommand(
+                () -> LimelightHelpers.SetIMUMode(LimelightConstants.kRearLeftName, 4)))
         .alongWith(
-            new InstantCommand(() -> LimelightHelpers.SetIMUMode(LimelightConstants.kRearRightName, 4)))
+            new InstantCommand(
+                () -> LimelightHelpers.SetIMUMode(LimelightConstants.kRearRightName, 4)))
         .schedule();
   }
 

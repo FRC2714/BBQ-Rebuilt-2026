@@ -60,8 +60,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShootAuto());
     NamedCommands.registerCommand(
         "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));
-    NamedCommands.registerCommand(
-        "CLIMB", m_stateMachine.climb()); // NO CURRENT CLIMB METHOD BUT REQUIRED FOR PATHPLANNER
+    NamedCommands.registerCommand("CLIMB", m_stateMachine.climb());
     NamedCommands.registerCommand(
         "EXTAKE", m_stateMachine.extakeSequenceAuto(AutoConstants.kExtakeTimeout));
     NamedCommands.registerCommand(

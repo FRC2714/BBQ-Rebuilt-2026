@@ -87,17 +87,16 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    LimelightHelpers.SetRobotOrientation(
-        "limelight-left", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
-    LimelightHelpers.SetRobotOrientation(
-        "limelight-right", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+    double heading = m_robotContainer.m_robotDrive.getHeading();
+    LimelightHelpers.SetRobotOrientation("limelight-front-right", heading, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-front-left", heading, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-rear-left", heading, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-rear-right", heading, 0, 0, 0, 0, 0);
 
-    LimelightHelpers.SetRobotOrientation(
-        "limelight-front", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
-
-    LimelightHelpers.SetIMUMode("limelight-left", 1);
-    LimelightHelpers.SetIMUMode("limelight-right", 1);
-    LimelightHelpers.SetIMUMode("limelight-front", 1); // inactive
+    LimelightHelpers.SetIMUMode("limelight-front-right", 1);
+    LimelightHelpers.SetIMUMode("limelight-front-left", 1);
+    LimelightHelpers.SetIMUMode("limelight-rear-left", 1);
+    LimelightHelpers.SetIMUMode("limelight-rear-right", 1);
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -120,21 +119,20 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
-    LimelightHelpers.SetIMUMode("limelight-front", 4); // 4 is internal imu + gyro
-    LimelightHelpers.SetIMUMode("limelight-right", 4);
-    LimelightHelpers.SetIMUMode("limelight-left", 4);
+    LimelightHelpers.SetIMUMode("limelight-front-right", 4); // 4 is internal imu + gyro
+    LimelightHelpers.SetIMUMode("limelight-front-left", 4);
+    LimelightHelpers.SetIMUMode("limelight-rear-left", 4);
+    LimelightHelpers.SetIMUMode("limelight-rear-right", 4);
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    LimelightHelpers.SetRobotOrientation(
-        "limelight-left", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
-    LimelightHelpers.SetRobotOrientation(
-        "limelight-right", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
-
-    LimelightHelpers.SetRobotOrientation(
-        "limelight-front", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+    double heading = m_robotContainer.m_robotDrive.getHeading();
+    LimelightHelpers.SetRobotOrientation("limelight-front-right", heading, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-front-left", heading, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-rear-left", heading, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-rear-right", heading, 0, 0, 0, 0, 0);
   }
 
   @Override
@@ -146,25 +144,25 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    LimelightHelpers.SetIMUMode("limelight-front", 4); // 4 is internal imu + gyro
-    LimelightHelpers.SetIMUMode("limelight-right", 4);
-    LimelightHelpers.SetIMUMode("limelight-left", 4);
-    // LimelightHelpers.SetIMUAssistAlpha("limelight-front", .005);
-    // LimelightHelpers.SetIMUAssistAlpha("limelight-right", .005);
-    // LimelightHelpers.SetIMUAssistAlpha("limelight-left", .005);
+    LimelightHelpers.SetIMUMode("limelight-front-right", 4); // 4 is internal imu + gyro
+    LimelightHelpers.SetIMUMode("limelight-front-left", 4);
+    LimelightHelpers.SetIMUMode("limelight-rear-left", 4);
+    LimelightHelpers.SetIMUMode("limelight-rear-right", 4);
+    // LimelightHelpers.SetIMUAssistAlpha("limelight-front-right", .005);
+    // LimelightHelpers.SetIMUAssistAlpha("limelight-front-left", .005);
+    // LimelightHelpers.SetIMUAssistAlpha("limelight-rear-left", .005);
+    // LimelightHelpers.SetIMUAssistAlpha("limelight-rear-right", .005);
 
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    LimelightHelpers.SetRobotOrientation(
-        "limelight-left", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
-    LimelightHelpers.SetRobotOrientation(
-        "limelight-right", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
-
-    LimelightHelpers.SetRobotOrientation(
-        "limelight-front", m_robotContainer.m_robotDrive.getHeading(), 0, 0, 0, 0, 0);
+    double heading = m_robotContainer.m_robotDrive.getHeading();
+    LimelightHelpers.SetRobotOrientation("limelight-front-right", heading, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-front-left", heading, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-rear-left", heading, 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-rear-right", heading, 0, 0, 0, 0, 0);
   }
 
   @Override
@@ -186,4 +184,5 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {
     SimulatedArena.getInstance().simulationPeriodic();
   }
+
 }

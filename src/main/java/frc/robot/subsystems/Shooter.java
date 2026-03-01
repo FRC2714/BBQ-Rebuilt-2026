@@ -425,11 +425,11 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command zeroHood() {
-    final double kHomingPower = -0.18;
+    final double kHoodMotorSpeed = -0.18;
 
     return new InstantCommand(() -> zeroingHood = true)
         .andThen(
-            new RunCommand(() -> hoodMotor.set(kHomingPower), this)
+            new RunCommand(() -> hoodMotor.set(kHoodMotorSpeed), this)
                 .until(() -> simHoodPosition <= 54.3))
         .andThen(
             new InstantCommand(

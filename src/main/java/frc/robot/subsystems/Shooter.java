@@ -429,11 +429,10 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command zeroHood() {
-    final double kHoodMotorSpeed = -0.18;
 
     return new InstantCommand(() -> zeroingHood = true)
         .andThen(
-            new RunCommand(() -> hoodMotor.set(kHoodMotorSpeed), this)
+            new RunCommand(() -> hoodMotor.set(Constants.ShooterConstants.kHoodMotorSpeed), this)
                 .until(
                     () ->
                         getHoodPosition()
@@ -590,7 +589,7 @@ public class Shooter extends SubsystemBase {
         flywheelSim.getAngularVelocityRPM(), RobotController.getBatteryVoltage(), 0.02);
 
     simFlywheelVelocity += (flywheelCurrentTarget - simFlywheelVelocity) * 0.2;
-
+    
     turretSim.setInput(turretSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
     turretSim.update(0.02);
 
@@ -607,7 +606,7 @@ public class Shooter extends SubsystemBase {
         RobotController.getBatteryVoltage(),
         0.02);
     hoodSparkSim.iterate(
-        Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1)),
+        Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1) * 10),
         RobotController.getBatteryVoltage(),
         0.02);
     hoodSim.update(0.02);
@@ -620,11 +619,7 @@ public class Shooter extends SubsystemBase {
       simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
     }
 
-    // Physical limits
-    double physicalMin = 54.276537; // top
-    double physicalMax = 72.276537; // bottom hard stop
-
-    simHoodPosition = MathUtil.clamp(simHoodPosition, physicalMin, physicalMax);
+    simHoodPosition = MathUtil.clamp(simHoodPosition, Constants.ShooterConstants.kHoodMinAngle, Constants.ShooterConstants.kHoodMaxAngle);
 
     hoodRelativeEncoder.setPosition(simHoodPosition);
   }

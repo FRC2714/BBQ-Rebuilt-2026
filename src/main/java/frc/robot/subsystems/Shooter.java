@@ -434,9 +434,13 @@ public class Shooter extends SubsystemBase {
     return new InstantCommand(() -> zeroingHood = true)
         .andThen(
             new RunCommand(() -> hoodMotor.set(kHoodMotorSpeed), this)
-                  .until(() -> getHoodPosition() <= Constants.ShooterConstants.kHoodMaxAngle)) /**/ //  72.276537
+                .until(
+                    () ->
+                        getHoodPosition()
+                            <= Constants.ShooterConstants.kHoodMaxAngle)) /**/ //  72.276537
         .andThen(
-            new InstantCommand(() -> {
+            new InstantCommand(
+                () -> {
                   hoodMotor.set(0.0);
                   simHoodPosition = Constants.ShooterConstants.kHoodMaxAngle; // 72.276537
                   hoodRelativeEncoder.setPosition(

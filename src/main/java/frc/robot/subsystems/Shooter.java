@@ -425,21 +425,20 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command zeroHood() {
-    final double kHomingPower = -0.18; 
     final double kHoodMotorSpeed = -0.18;
 
     return new InstantCommand(() -> zeroingHood = true)
         .andThen(
-            new RunCommand(() -> hoodMotor.set(kHomingPower), this)
-                .until(() -> simHoodPosition >= 72.25) 
+            new RunCommand(() -> hoodMotor.set(kHoodMotorSpeed), this)
+                .until(() -> getHoodPosition() >= Constants.ShooterConstants.kHoodMaxAngle) //  72.276537
         )
         .andThen(new InstantCommand(() -> {
             hoodMotor.set(0.0);
 
            
-            hoodRelativeEncoder.setPosition(72.276537);
-            simHoodPosition = 72.276537;
-
+            hoodRelativeEncoder.setPosition(Constants.ShooterConstants.kHoodMinAngle); // 54.276537
+            simHoodPosition = Constants.ShooterConstants.kHoodMaxAngle; // 72.276537
+            hoodRelativeEncoder.setPosition(Constants.ShooterConstants.kHoodMinAngle); // 72.276537
                   zeroingHood = false;
                 }));
   }
@@ -545,6 +544,7 @@ public class Shooter extends SubsystemBase {
         "Shooter/Turret/rev limit switch pressed", turretMotor.getReverseLimitSwitch().isPressed());
 
     SmartDashboard.putBoolean("turret updated", turretUpdated);
+    getHoodPosition();
 
     turretPose3d =
         new Pose3d(

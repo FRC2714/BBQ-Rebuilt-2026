@@ -166,7 +166,7 @@ public class Intake extends SubsystemBase {
 
   /** Retracts pivot and stops rollers. */
   public Command stow() {
-    return this.run(
+    return this.runOnce(
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
           pivotStow();

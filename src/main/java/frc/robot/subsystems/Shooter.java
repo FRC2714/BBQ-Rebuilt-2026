@@ -426,6 +426,7 @@ public class Shooter extends SubsystemBase {
 
   public Command zeroHood() {
     final double kHomingPower = -0.18; 
+    final double kHoodMotorSpeed = -0.18;
 
     return new InstantCommand(() -> zeroingHood = true)
         .andThen(
@@ -439,9 +440,9 @@ public class Shooter extends SubsystemBase {
             hoodRelativeEncoder.setPosition(72.276537);
             simHoodPosition = 72.276537;
 
-            zeroingHood = false;
-        }));
-}
+                  zeroingHood = false;
+                }));
+  }
 
   public Command zeroTurretSequence() {
     if (!wasZeroed) {

@@ -430,15 +430,20 @@ public class Shooter extends SubsystemBase {
     return new InstantCommand(() -> zeroingHood = true)
         .andThen(
             new RunCommand(() -> hoodMotor.set(kHoodMotorSpeed), this)
-                .until(() -> getHoodPosition() >= Constants.ShooterConstants.kHoodMaxAngle) //  72.276537
-        )
-        .andThen(new InstantCommand(() -> {
-            hoodMotor.set(0.0);
+                .until(
+                    () ->
+                        getHoodPosition() >= Constants.ShooterConstants.kHoodMaxAngle) //  72.276537
+            )
+        .andThen(
+            new InstantCommand(
+                () -> {
+                  hoodMotor.set(0.0);
 
-           
-            hoodRelativeEncoder.setPosition(Constants.ShooterConstants.kHoodMinAngle); // 54.276537
-            simHoodPosition = Constants.ShooterConstants.kHoodMaxAngle; // 72.276537
-            hoodRelativeEncoder.setPosition(Constants.ShooterConstants.kHoodMinAngle); // 72.276537
+                  hoodRelativeEncoder.setPosition(
+                      Constants.ShooterConstants.kHoodMinAngle); // 54.276537
+                  simHoodPosition = Constants.ShooterConstants.kHoodMaxAngle; // 72.276537
+                  hoodRelativeEncoder.setPosition(
+                      Constants.ShooterConstants.kHoodMinAngle); // 72.276537
                   zeroingHood = false;
                 }));
   }
@@ -601,18 +606,18 @@ public class Shooter extends SubsystemBase {
     hoodSim.update(0.02);
 
     if (zeroingHood) {
-    // negative power moves hood DOWN → increases shooting angle
-    simHoodPosition += hoodSparkSim.getAppliedOutput() * -2.0;
-} else {
-    simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
-}
+      // negative power moves hood DOWN → increases shooting angle
+      simHoodPosition += hoodSparkSim.getAppliedOutput() * -2.0;
+    } else {
+      simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
+    }
 
-// Physical limits
-double physicalMin = 54.276537;  // top
-double physicalMax = 72.276537;  // bottom hard stop
+    // Physical limits
+    double physicalMin = 54.276537; // top
+    double physicalMax = 72.276537; // bottom hard stop
 
-simHoodPosition = MathUtil.clamp(simHoodPosition, physicalMin, physicalMax);
+    simHoodPosition = MathUtil.clamp(simHoodPosition, physicalMin, physicalMax);
 
-hoodRelativeEncoder.setPosition(simHoodPosition);
+    hoodRelativeEncoder.setPosition(simHoodPosition);
   }
 }

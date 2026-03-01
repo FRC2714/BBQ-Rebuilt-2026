@@ -106,7 +106,7 @@ public class Publisher {
 
     virtualTarget.set(new Pose2d(m_drivetrain.getVirtualTarget(), new Rotation2d()));
 
-    publisher.set(new Pose2d());
+    publisher.set(m_drivetrain.getPose());
     var frontLLMeasurement =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
     var leftLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");

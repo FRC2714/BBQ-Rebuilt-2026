@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
@@ -46,6 +47,9 @@ public class Publisher {
   StructPublisher<Pose2d> publisher =
       NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
 
+  DoubleArrayPublisher publisherPoseArray =
+      NetworkTableInstance.getDefault().getDoubleArrayTopic("Robot Pose Array").publish();
+
   StructPublisher<Pose2d> publisherLLright =
       NetworkTableInstance.getDefault().getStructTopic("poseLLright", Pose2d.struct).publish();
 
@@ -79,7 +83,7 @@ public class Publisher {
 
   /** Publishes all NetworkTables data: poses, turret, Limelight measurements, and sim fuel. */
   public void publish() {
-    Pose3d[] zeroRobotPose = new Pose3d[4];
+    Pose3d[] zeroRobotPose = new Pose3d[5];
     for (int i = 0; i < zeroRobotPose.length; i++) {
       zeroRobotPose[i] = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, 0.0, 0.0));
     }
@@ -90,7 +94,8 @@ public class Publisher {
           m_shooter.getTurretPose3d(),
           m_shooter.getHoodPose3d(),
           m_shooter.getFlyWheelPose3d(),
-          new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, 0.0, 0.0))
+          new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, 0.0, 0.0)),
+          m_intake.getIntakePose3d()
         };
     publisherFinalComponentPoses.set(finalRobotPose);
 
@@ -106,6 +111,9 @@ public class Publisher {
     virtualTarget.set(new Pose2d(m_drivetrain.getVirtualTarget(), new Rotation2d()));
 
     publisher.set(m_drivetrain.getPose());
+    Pose2d pose = m_drivetrain.getPose();
+    publisherPoseArray.set(
+        new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});
     var frontLLMeasurement =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
     var leftLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");

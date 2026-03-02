@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.StateMachine.State;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
@@ -41,16 +40,17 @@ public class RobotContainer {
   public final Intake m_intake = new Intake();
   private final Climb m_climb = new Climb();
 
-  final StateMachine m_stateMachine =
-      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb);
-
-  private SendableChooser<Command> autoChooser;
-
   // The driver's controller
   CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);
 
+  final StateMachine m_stateMachine =
+      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb, m_driverController);
+
+  private SendableChooser<Command> autoChooser;
+
   private final Trigger rumble = new Trigger(() -> m_stateMachine.phaseShift());
+  private final Trigger warningRumble = new Trigger(() -> m_stateMachine.phaseShiftWarning());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -60,12 +60,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShootAuto());
     NamedCommands.registerCommand(
         "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));
-    NamedCommands.registerCommand(
-        "CLIMB",
-        new InstantCommand(
-            () ->
-                m_stateMachine.setState(
-                    State.Climbing))); // NO CURRENT CLIMB METHOD BUT REQUIRED FOR PATHPLANNER
+    NamedCommands.registerCommand("CLIMB", m_stateMachine.climb());
     NamedCommands.registerCommand(
         "EXTAKE", m_stateMachine.extakeSequenceAuto(AutoConstants.kExtakeTimeout));
     NamedCommands.registerCommand(
@@ -124,7 +119,7 @@ public class RobotContainer {
 
     m_driverController.rightStick().onTrue(m_shooter.zeroHood());
 
-    m_driverController.x().onTrue(m_stateMachine.preloadCommand());
+    // m_driverController.x().onTrue(m_stateMachine.preloadCommand());
 
     // intake keybinds
     m_driverController.rightBumper().whileTrue(m_stateMachine.intakeSequence());
@@ -146,6 +141,18 @@ public class RobotContainer {
                 () -> {
                   m_driverController.setRumble(RumbleType.kLeftRumble, 1.0);
                   m_driverController.setRumble(RumbleType.kRightRumble, 1.0);
+                },
+                () -> {
+                  m_driverController.setRumble(RumbleType.kLeftRumble, 0.0);
+                  m_driverController.setRumble(RumbleType.kRightRumble, 0.0);
+                })
+            .withTimeout(3));
+
+    warningRumble.onTrue(
+        new StartEndCommand(
+                () -> {
+                  m_driverController.setRumble(RumbleType.kLeftRumble, 0.5);
+                  m_driverController.setRumble(RumbleType.kRightRumble, 0.5);
                 },
                 () -> {
                   m_driverController.setRumble(RumbleType.kLeftRumble, 0.0);

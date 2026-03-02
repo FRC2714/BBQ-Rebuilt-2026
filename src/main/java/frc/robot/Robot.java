@@ -146,6 +146,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    CommandScheduler.getInstance().schedule(m_robotContainer.m_stateMachine.unclimb());
+
     LimelightHelpers.SetIMUMode("limelight-front", 4); // 4 is internal imu + gyro
     LimelightHelpers.SetIMUMode("limelight-right", 4);
     LimelightHelpers.SetIMUMode("limelight-left", 4);

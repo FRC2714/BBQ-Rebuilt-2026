@@ -66,7 +66,7 @@ public class StateMachine extends SubsystemBase {
     m_dyeRotor = dyeRotor;
     m_climb = climb;
 
-    m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor);
+    m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor, m_climb);
     m_driverHID = driverController.getHID();
 
     if (Robot.isSimulation()) {

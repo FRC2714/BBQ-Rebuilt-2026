@@ -11,6 +11,9 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,6 +31,8 @@ public class Climb extends SubsystemBase {
   private final SparkClosedLoopController rightController = rightMotor.getClosedLoopController();
 
   private double setpoint = 0;
+
+  private Pose3d climbPose = new Pose3d();
 
   public Climb() {
     leftMotor.configure(
@@ -111,8 +116,14 @@ public class Climb extends SubsystemBase {
             <= Constants.ClimbConstants.kPositionTolerance;
   }
 
+  public Pose3d getClimbPose3d() {
+    return climbPose;
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putBoolean("Climb/At Setpoint?", atSetpoint());
+
+    climbPose = new Pose3d(-0.3225, 0.0, 0.58, new Rotation3d(0.0, Units.degreesToRadians(0), 0.0));
   }
 }

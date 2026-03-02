@@ -124,15 +124,9 @@ public class RobotContainer {
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
 
-    if (Robot.isSimulation()) {
-      m_driverController.y().toggleOnTrue(m_stateMachine.shoot());
-      m_driverController.leftBumper().whileTrue(m_stateMachine.intakeSequence());
-    }
-
-    // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
-    // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());
-    // m_driverController.x().onTrue(m_robotDrive.translationalDynamic());
-    // m_driverController.y().onTrue(m_robotDrive.rotationalDynamic());
+    m_driverController.povLeft().onTrue(m_stateMachine.deployClimber());
+    m_driverController.povUp().onTrue(m_stateMachine.climb());
+    m_driverController.povDown().onTrue(m_stateMachine.unclimb());
 
     rumble.onTrue(
         new StartEndCommand(

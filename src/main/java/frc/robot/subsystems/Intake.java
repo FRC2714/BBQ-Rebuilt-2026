@@ -115,11 +115,8 @@ public class Intake extends SubsystemBase {
     return pivotEncoder.getPosition();
   }
 
-  /** True when the pivot has reached its target position. Always true in sim. */
+  /** True when the pivot has reached its target position */
   public boolean atSetpoint() {
-    if (Robot.isSimulation()) {
-      return true;
-    }
     return Math.abs(intakePivotController.getSetpoint() - pivotEncoder.getPosition())
         <= IntakeConstants.PivotConstants.kPivotThreshold;
   }

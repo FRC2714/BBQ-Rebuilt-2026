@@ -3,8 +3,6 @@
   "robotLength": 0.609,
   "holonomicMode": true,
   "pathFolders": [
-    "depot to NZ",
-    "grab depot",
     "outpost to NZ"
   ],
   "autoFolders": [],

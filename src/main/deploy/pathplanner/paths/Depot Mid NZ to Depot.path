@@ -1,0 +1,113 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.7535444444444455,
+        "y": 4.80481111111111
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.217600000000001,
+        "y": 4.989955555555555
+      },
+      "isLocked": false,
+      "linkedName": "Depot Mid NZ"
+    },
+    {
+      "anchor": {
+        "x": 4.723022222222222,
+        "y": 5.827977777777778
+      },
+      "prevControl": {
+        "x": 6.09698888888889,
+        "y": 5.827977777777778
+      },
+      "nextControl": {
+        "x": 3.5342000000000007,
+        "y": 5.827977777777778
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.5913777777777778,
+        "y": 5.9351666666666665
+      },
+      "prevControl": {
+        "x": 2.3064,
+        "y": 5.886444444444444
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6887966804979228,
+      "rotationDegrees": -77.17063408300179
+    },
+    {
+      "waypointRelativePos": 1.2564315352696998,
+      "rotationDegrees": -76.35617694149478
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "STOW",
+      "waypointRelativePos": 0.31166253101737784,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "STOW_INTAKE"
+        }
+      }
+    },
+    {
+      "name": "SCORE",
+      "waypointRelativePos": 0.9429280397022329,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "SCORE"
+        }
+      }
+    },
+    {
+      "name": "INTAKE",
+      "waypointRelativePos": 1.4947890818858494,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "INTAKE"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 178.65999221910027
+  },
+  "reversed": false,
+  "folder": "Double NZ + Depot",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -62.378925016924505
+  },
+  "useDefaultConstraints": true
+}

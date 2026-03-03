@@ -3,7 +3,8 @@
   "robotLength": 0.914,
   "holonomicMode": true,
   "pathFolders": [
-    "Double NZ + Climb"
+    "Double NZ + Climb",
+    "Double NZ + Depot"
   ],
   "autoFolders": [],
   "defaultMaxVel": 4.2,

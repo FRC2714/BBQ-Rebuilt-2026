@@ -305,7 +305,7 @@ public class DriveSubsystem extends SubsystemBase {
     var rightLLMeasurement =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
 
-    if (Math.abs(omegaRps) < .7) {
+    if (Math.abs(omegaRps) < 1) {
       if (frontLLMeasurement != null && frontLLMeasurement.tagCount > 0) {
         xyStdDev = .7 * (1 + frontLLMeasurement.avgTagDist * .5);
         m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
@@ -340,6 +340,7 @@ public class DriveSubsystem extends SubsystemBase {
     } else {
       publisherModuleStates.set(swerveDriveSimulation.getMeasuredStates());
     }
+    SmartDashboard.putNumber("omegaRPS", omegaRps);
   }
 
   @Override

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.3880333333333335,
-        "y": 2.2809999999999993
+        "x": 3.524455555555555,
+        "y": 2.310233333333333
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.658488888888891,
-        "y": 2.251766666666665
+        "x": 5.794911111111112,
+        "y": 2.280999999999999
       },
       "isLocked": false,
       "linkedName": "Trench Score Position"
@@ -54,13 +54,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 24.12098311944258
   },
   "reversed": false,
   "folder": "Double NZ + Climb",
   "idealStartingState": {
     "velocity": 5.0,
-    "rotation": 50.76263288659837
+    "rotation": -0.5115558665869887
   },
   "useDefaultConstraints": true
 }

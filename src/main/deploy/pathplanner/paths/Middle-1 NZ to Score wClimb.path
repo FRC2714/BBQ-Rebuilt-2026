@@ -55,7 +55,7 @@
     },
     {
       "waypointRelativePos": 1.2265560165975162,
-      "rotationDegrees": 28.083971364833214
+      "rotationDegrees": 0.35048993259687794
     }
   ],
   "constraintZones": [
@@ -103,7 +103,7 @@
   "folder": "Double NZ + Climb",
   "idealStartingState": {
     "velocity": 5.0,
-    "rotation": 0.0
+    "rotation": 24.12098311944258
   },
   "useDefaultConstraints": true
 }

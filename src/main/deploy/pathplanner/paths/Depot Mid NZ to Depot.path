@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.880222222222223,
-        "y": 3.7621555555555553
+        "x": 7.7535444444444455,
+        "y": 4.80481111111111
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.983733333333336,
-        "y": 3.382122222222223
+        "x": 6.545233333333333,
+        "y": 5.408966666666666
       },
       "isLocked": false,
-      "linkedName": "Intake Middle NZ"
+      "linkedName": "Depot Mid NZ"
     },
     {
       "anchor": {
-        "x": 4.645066666666667,
-        "y": 2.2322777777777776
+        "x": 4.723022222222222,
+        "y": 5.827977777777778
       },
       "prevControl": {
-        "x": 6.125580113907558,
-        "y": 2.2847782546302917
+        "x": 6.09698888888889,
+        "y": 5.827977777777778
       },
       "nextControl": {
-        "x": 3.2710999999999997,
-        "y": 2.183555555555555
+        "x": 3.5342000000000007,
+        "y": 5.827977777777778
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.5755666666666666,
-        "y": 3.3333999999999993
+        "x": 0.5913777777777778,
+        "y": 5.9351666666666665
       },
       "prevControl": {
-        "x": 2.939788888888889,
-        "y": 2.339466666666666
+        "x": 2.3064,
+        "y": 5.886444444444444
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,22 +46,18 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.7153526970954311,
-      "rotationDegrees": 32.741320721786416
+      "waypointRelativePos": 0.6887966804979228,
+      "rotationDegrees": -77.17063408300179
     },
     {
-      "waypointRelativePos": 1.0,
-      "rotationDegrees": 29.006415902270025
-    },
-    {
-      "waypointRelativePos": 1.2265560165975162,
-      "rotationDegrees": 26.861591052287057
+      "waypointRelativePos": 1.2564315352696998,
+      "rotationDegrees": -76.35617694149478
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.7563275434243111,
+      "minWaypointRelativePos": 0.7126550868486359,
       "maxWaypointRelativePos": 2.0,
       "constraints": {
         "maxVelocity": 2.0,
@@ -76,8 +72,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "STOW_INTAKE",
-      "waypointRelativePos": 0.6729528535980207,
+      "name": "STOW",
+      "waypointRelativePos": 0.31166253101737784,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -88,12 +84,23 @@
     },
     {
       "name": "SCORE",
-      "waypointRelativePos": 0.7007444168734502,
+      "waypointRelativePos": 0.9429280397022329,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
           "name": "SCORE"
+        }
+      }
+    },
+    {
+      "name": "INTAKE",
+      "waypointRelativePos": 1.4947890818858494,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "INTAKE"
         }
       }
     }
@@ -108,13 +115,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 178.65999221910027
   },
   "reversed": false,
-  "folder": "Double NZ + Climb",
+  "folder": "Double NZ + Depot",
   "idealStartingState": {
-    "velocity": 5.0,
-    "rotation": 62.386972176915414
+    "velocity": 0,
+    "rotation": -62.378925016924505
   },
   "useDefaultConstraints": true
 }

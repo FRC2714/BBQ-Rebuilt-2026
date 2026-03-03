@@ -1,0 +1,66 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.831623567891368,
+        "y": 4.305189677835749
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.6329744511357065,
+        "y": 2.3656866014268667
+      },
+      "isLocked": false,
+      "linkedName": "Intake Middle NZ"
+    },
+    {
+      "anchor": {
+        "x": 1.6883922096535016,
+        "y": 3.5324909826208044
+      },
+      "prevControl": {
+        "x": 4.80691822419343,
+        "y": 2.3623619927300346
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "SCORE",
+      "waypointRelativePos": 0.42862577216569764,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "SCORE"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "outpost to NZ",
+  "idealStartingState": {
+    "velocity": 5.0,
+    "rotation": 19.048198504654927
+  },
+  "useDefaultConstraints": true
+}

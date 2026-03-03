@@ -2,8 +2,10 @@ package frc.robot;
 
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
+import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.ShooterConstants;
 
@@ -69,29 +71,43 @@ public final class Configs {
 
     static {
       turretConfig
-          .smartCurrentLimit(40)
+          .smartCurrentLimit(20)
           .idleMode(IdleMode.kBrake)
           .inverted(false)
           .voltageCompensation(12);
-      turretConfig.absoluteEncoder.positionConversionFactor(360).inverted(false).zeroCentered(true);
+      turretConfig
+          .externalEncoder
+          .positionConversionFactor(360)
+          .inverted(false)
+          .countsPerRevolution(8192);
       turretConfig
           .closedLoop
-          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          .p(0.1)
+          .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
+          .pid(0.08, 0, 0)
           .outputRange(-1, 1);
+      turretConfig
+          .limitSwitch
+          .forwardLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotorAndSetPosition)
+          .forwardLimitSwitchPosition(ShooterConstants.kFwdLimitSwitchOffset)
+          .limitSwitchPositionSensor(FeedbackSensor.kAlternateOrExternalEncoder);
+      turretConfig
+          .limitSwitch
+          .reverseLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotorAndSetPosition)
+          .reverseLimitSwitchPosition(ShooterConstants.kRevLimitSwitchOffset)
+          .limitSwitchPositionSensor(FeedbackSensor.kAlternateOrExternalEncoder);
 
       hoodConfig
           .smartCurrentLimit(40)
           .idleMode(IdleMode.kBrake)
           .inverted(false)
           .voltageCompensation(12);
-      hoodConfig.absoluteEncoder.positionConversionFactor(360).inverted(false).zeroCentered(true);
+      hoodConfig.externalEncoder.positionConversionFactor(360).inverted(false);
       hoodConfig
           .closedLoop
-          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          .p(0.01)
+          .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
+          .p(0.1)
           .d(0)
-          .outputRange(-0.1, 0.1);
+          .outputRange(-1, 1);
 
       flywheelConfigLeader
           .smartCurrentLimit(60)
@@ -160,6 +176,29 @@ public final class Configs {
           .idleMode(IdleMode.kBrake) // needs tuning
           .inverted(false) // needs tuning
           .voltageCompensation(12); // needs tuning
+    }
+  }
+
+  public static final class Climb {
+    public static final SparkFlexConfig leftClimbConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig rightClimbConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig climbConfig = leftClimbConfig;
+
+    static {
+      leftClimbConfig
+          .smartCurrentLimit(40) // needs tuning
+          .idleMode(IdleMode.kBrake) // needs tuning
+          .inverted(false) // needs tuning
+          .voltageCompensation(12); // needs tuning
+      leftClimbConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder) // needs tuning
+          .p(0.01) // needs tuning
+          .d(0) // needs tuning
+          .outputRange(-0.5, 0.5); // needs tuning
+
+      rightClimbConfig.apply(leftClimbConfig);
+      rightClimbConfig.follow(ClimbConstants.kLeftMotorCanID, true);
     }
   }
 }

@@ -15,6 +15,8 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -28,14 +30,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Robot;
+import frc.robot.Simulation;
 
+/** Controls the intake pivot and roller. Extends to collect fuel, stows to retract. */
 public class Intake extends SubsystemBase {
-  /** Creates a new Intake. */
 
   // creates new intake pivot motor
   private SparkFlex pivotMotor =
@@ -52,6 +56,7 @@ public class Intake extends SubsystemBase {
   private RelativeEncoder rollerEncoder = rollerMotor.getEncoder();
 
   private double pivotSetpoint = 0;
+  private Pose3d intakePose3d = new Pose3d();
 
   // Simulation
   DCMotor pivotMotorSim = DCMotor.getNeoVortex(1);
@@ -102,6 +107,15 @@ public class Intake extends SubsystemBase {
     rollerMotor.set(power);
   }
 
+  public Pose3d getIntakePose3d() {
+    return intakePose3d;
+  }
+
+  public double getIntakePivotPosition() {
+    return pivotEncoder.getPosition();
+  }
+
+  /** True when the pivot has reached its target position. Always true in sim. */
   public boolean atSetpoint() {
     if (Robot.isSimulation()) {
       return true;
@@ -122,20 +136,25 @@ public class Intake extends SubsystemBase {
       intakeBar.append(
           new MechanismLigament2d("Roller Motor", 0.1, 180, 3, new Color8Bit(Color.kWhite)));
 
-  // Intake Commands
+  /** Extends pivot and runs rollers inward. Stops rollers on end. */
   public Command intake() {
-    return this.runEnd(
+    return Commands.runEnd(
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
           pivotExtend();
+
+          if (Robot.isSimulation()) Simulation.getInstance().startIntake();
         },
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
+
+          if (Robot.isSimulation()) Simulation.getInstance().stopIntake();
         });
   }
 
+  /** Extends pivot and runs rollers outward (eject). Stops rollers on end. */
   public Command extake() {
-    return this.runEnd(
+    return Commands.runEnd(
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kExtakeRollerPower);
           pivotExtend();
@@ -145,8 +164,9 @@ public class Intake extends SubsystemBase {
         });
   }
 
+  /** Retracts pivot and stops rollers. */
   public Command stow() {
-    return this.run(
+    return this.runOnce(
         () -> {
           setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
           pivotStow();
@@ -161,6 +181,18 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Pivot/Position", pivotEncoder.getPosition());
     SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSetpoint);
     SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
+
+    // 3d SIM
+    intakePose3d =
+        new Pose3d(
+            0.35,
+            0,
+            0.232,
+            new Rotation3d(
+                0.0,
+                Units.degreesToRadians(
+                    IntakeConstants.PivotConstants.kPivotStow - getIntakePivotPosition()),
+                0.0));
   }
 
   @Override

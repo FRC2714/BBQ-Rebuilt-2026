@@ -103,6 +103,10 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    if (Robot.isSimulation()) {
+      SimulatedArena.getInstance().resetFieldForAuto();
+    }
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     /*
@@ -142,6 +146,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    CommandScheduler.getInstance().schedule(m_robotContainer.m_stateMachine.unclimb());
+
     LimelightHelpers.SetIMUMode("limelight-front", 4); // 4 is internal imu + gyro
     LimelightHelpers.SetIMUMode("limelight-right", 4);
     LimelightHelpers.SetIMUMode("limelight-left", 4);
@@ -172,6 +179,11 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
+
+  @Override
+  public void simulationInit() {
+    SimulatedArena.getInstance().placeGamePiecesOnField();
+  }
 
   @Override
   public void simulationPeriodic() {

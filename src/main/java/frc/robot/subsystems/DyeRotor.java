@@ -28,24 +28,26 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants;
 
+/** Indexes fuel through the robot using a spinning rotor. Supports pause/resume during shooting. */
 public class DyeRotor extends SubsystemBase {
 
   private SparkFlex dyeRotorMotor =
       new SparkFlex(Constants.DyeRotorConstants.kDyeRotorMotorCanID, MotorType.kBrushless);
   private RelativeEncoder encoder = dyeRotorMotor.getEncoder();
   private double dyeRotorCurrentTarget = 0;
+  private boolean paused = false;
+
   private Pose3d pose = new Pose3d();
 
   // Simulation
   DCMotor motor = DCMotor.getNeoVortex(1);
   private SparkFlexSim dyeRotorSim = new SparkFlexSim(dyeRotorMotor, motor);
   private static final double MOMENT_OF_INERTIA = 0.00032; // kg*m^2
-  private static final double GEARING = 25; // 1:1 if direct drive
+  private static final double GEARING = 56.25; // 1:1 if direct drive
   private FlywheelSim flywheelSim =
       new FlywheelSim(
           LinearSystemId.createFlywheelSystem(motor, MOMENT_OF_INERTIA, GEARING), motor);
 
-  /** Creates a new Dyerotor. */
   public DyeRotor() {
     dyeRotorMotor.configure(
         Configs.DyeRotor.dyeRotorConfig,
@@ -55,20 +57,53 @@ public class DyeRotor extends SubsystemBase {
     SmartDashboard.putData("Dye Rotor/Mech2d", mech2d);
   }
 
+  /** Runs the rotor (respects pause state). Clears pause on start. */
   public Command start() {
     return this.run(
-        () -> {
-          dyeRotorCurrentTarget = Constants.DyeRotorConstants.kDyeRotorPower;
-          dyeRotorMotor.set(Constants.DyeRotorConstants.kDyeRotorPower);
-        });
+            () -> {
+              dyeRotorCurrentTarget = paused ? 0 : Constants.DyeRotorConstants.kDyeRotorPower;
+              dyeRotorMotor.set(dyeRotorCurrentTarget);
+            })
+        .beforeStarting(
+            () -> {
+              paused = false;
+            });
   }
 
+  /** Stops the rotor immediately. */
   public Command stop() {
     return this.runOnce(
         () -> {
           dyeRotorCurrentTarget = 0;
           dyeRotorMotor.set(0);
         });
+  }
+
+  /** Starts the rotor directly (no command). Used by auto event markers. */
+  public void startDirect() {
+    paused = false;
+    dyeRotorCurrentTarget = Constants.DyeRotorConstants.kDyeRotorPower;
+    dyeRotorMotor.set(dyeRotorCurrentTarget);
+  }
+
+  /** Stops the rotor directly (no command). Used by auto event markers. */
+  public void stopDirect() {
+    dyeRotorCurrentTarget = 0;
+    dyeRotorMotor.set(0);
+  }
+
+  /** Pauses the rotor. The {@link #start()} command will output 0 until resumed. */
+  public void pause() {
+    paused = true;
+    dyeRotorCurrentTarget = 0;
+    dyeRotorMotor.set(0);
+  }
+
+  /** Resumes the rotor after a pause. */
+  public void resume() {
+    paused = false;
+    dyeRotorCurrentTarget = Constants.DyeRotorConstants.kDyeRotorPower;
+    dyeRotorMotor.set(dyeRotorCurrentTarget);
   }
 
   // Mech2d for DyeRotor
@@ -89,6 +124,16 @@ public class DyeRotor extends SubsystemBase {
     return pose;
   }
 
+  /** Returns rotor position in output rotations (after gearing). */
+  public double getRotorPosition() {
+    return encoder.getPosition() / GEARING;
+  }
+
+  /** True if the rotor has a non-zero target. */
+  public boolean isRunning() {
+    return dyeRotorCurrentTarget != 0;
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Dye Rotor/Setpoint", dyeRotorCurrentTarget);
@@ -96,9 +141,9 @@ public class DyeRotor extends SubsystemBase {
 
     pose =
         new Pose3d(
+            0.058,
             0,
-            0,
-            0.02,
+            0.2,
             new Rotation3d(0.0, 0.0, Units.rotationsToRadians(-encoder.getPosition() / GEARING)));
   }
 

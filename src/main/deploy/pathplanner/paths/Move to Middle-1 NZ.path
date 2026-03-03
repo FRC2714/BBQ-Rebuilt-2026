@@ -1,0 +1,66 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.3549181431965023,
+        "y": 2.5057999437120224
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.835528786207153,
+        "y": 2.678457298410805
+      },
+      "isLocked": false,
+      "linkedName": "Trench Score Position"
+    },
+    {
+      "anchor": {
+        "x": 8.831623567891368,
+        "y": 4.305189677835749
+      },
+      "prevControl": {
+        "x": 8.318886302697205,
+        "y": 4.438750175291279
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Intake Middle NZ"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "INTAKE",
+      "waypointRelativePos": 0.3259796791888298,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "INTAKE"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 19.048198504654927
+  },
+  "reversed": false,
+  "folder": "outpost to NZ",
+  "idealStartingState": {
+    "velocity": 5.0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

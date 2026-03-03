@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.275550824200666,
-        "y": 2.506
+        "x": 4.4112,
+        "y": 2.2809999999999993
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.255243018626057,
-        "y": 2.493480708645047
+        "x": 6.223666666666667,
+        "y": 2.2907444444444423
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.273435326470269,
-        "y": 2.506
+        "x": 7.714566666666666,
+        "y": 2.2809999999999993
       },
       "prevControl": {
-        "x": 7.117792784350526,
-        "y": 2.507872113576369
+        "x": 6.558924124546924,
+        "y": 2.2828721135763685
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 4.2,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -57,10 +57,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Double NZ + Climb Paths",
+  "folder": "outpost to NZ",
   "idealStartingState": {
     "velocity": 5.0,
-    "rotation": 0.0
+    "rotation": 2.7702157972002444
   },
   "useDefaultConstraints": true
 }

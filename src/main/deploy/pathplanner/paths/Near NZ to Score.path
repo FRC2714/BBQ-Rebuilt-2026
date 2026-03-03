@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.273435326470269,
-        "y": 2.5057999437120224
+        "x": 7.714566666666666,
+        "y": 2.2809999999999993
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.023436584559972,
-        "y": 2.5050068212315226
+        "x": 7.46456792475637,
+        "y": 2.2802068775194995
       },
       "isLocked": false,
       "linkedName": "Intake Near NZ"
     },
     {
       "anchor": {
-        "x": 3.3549181431965023,
-        "y": 2.5057999437120224
+        "x": 3.3880333333333335,
+        "y": 2.2809999999999993
       },
       "prevControl": {
-        "x": 5.457026095790901,
-        "y": 2.50631776651831
+        "x": 5.490141285927734,
+        "y": 2.2815178228062867
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,21 +31,9 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "SCORE",
-      "waypointRelativePos": 0.6819577644829736,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "SCORE"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 4.2,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -54,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 50.76263288659837
   },
   "reversed": false,
-  "folder": "Double NZ + Climb Paths",
+  "folder": "outpost to NZ",
   "idealStartingState": {
     "velocity": 5.0,
     "rotation": 0.0

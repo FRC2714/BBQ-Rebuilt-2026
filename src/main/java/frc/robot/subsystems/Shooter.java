@@ -273,7 +273,12 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putData("Shooter/Mech2d", flyWheelMech);
 
     if (Robot.isSimulation()) {
-      hoodSim.setState(VecBuilder.fill(Units.degreesToRadians(67.276537), 0.0));
+      hoodSim.setState(
+          VecBuilder.fill(
+              Units.degreesToRadians(
+                  Math.random() * (ShooterConstants.kHoodMaxAngle - ShooterConstants.kHoodMinAngle)
+                      + ShooterConstants.kHoodMinAngle),
+              0.0));
     }
   }
 
@@ -600,31 +605,15 @@ public class Shooter extends SubsystemBase {
         RobotController.getBatteryVoltage(),
         0.02);
 
+    SmartDashboard.putNumber(
+        "Shooter/Hood/Sim Position", Units.radiansToDegrees(hoodSim.getOutput(0)));
+
     hoodSim.setInput(hoodSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
-    hoodSparkSim.iterate(
-        Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1)),
-        RobotController.getBatteryVoltage(),
-        0.02);
+    hoodSim.update(0.02);
+
     hoodSparkSim.iterate(
         Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1) * 10),
         RobotController.getBatteryVoltage(),
         0.02);
-    hoodSim.update(0.02);
-
-    if (zeroingHood) {
-      // negative power moves hood DOWN → increases shooting angle
-      simHoodPosition += hoodMotor.getAppliedOutput() * -2.0;
-      simHoodPosition += hoodMotor.getAppliedOutput() * -2.0;
-    } else {
-      simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
-    }
-
-    simHoodPosition =
-        MathUtil.clamp(
-            simHoodPosition,
-            Constants.ShooterConstants.kHoodMinAngle,
-            Constants.ShooterConstants.kHoodMaxAngle);
-
-    hoodRelativeEncoder.setPosition(simHoodPosition);
   }
 }

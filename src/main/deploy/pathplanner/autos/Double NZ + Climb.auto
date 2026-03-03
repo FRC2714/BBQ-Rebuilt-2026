@@ -19,6 +19,12 @@
         {
           "type": "named",
           "data": {
+            "name": "SCORE"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "WAIT_FOR_SCORE"
           }
         },

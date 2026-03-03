@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.3549181431965023,
-        "y": 2.5057999437120224
+        "x": 3.524455555555555,
+        "y": 2.310233333333333
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.835528786207153,
-        "y": 2.678457298410805
+        "x": 5.4928333333333335,
+        "y": 2.2420222222222206
       },
       "isLocked": false,
       "linkedName": "Trench Score Position"
     },
     {
       "anchor": {
-        "x": 8.831623567891368,
-        "y": 4.305189677835749
+        "x": 7.880222222222223,
+        "y": 3.7621555555555553
       },
       "prevControl": {
-        "x": 8.318886302697205,
-        "y": 4.438750175291279
+        "x": 7.597633333333333,
+        "y": 2.1932999999999994
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,10 +42,16 @@
           "name": "INTAKE"
         }
       }
+    },
+    {
+      "name": "STOW",
+      "waypointRelativePos": 0.3841191066997539,
+      "endWaypointRelativePos": null,
+      "command": null
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 4.2,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -54,13 +60,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 19.048198504654927
+    "rotation": 62.386972176915414
   },
   "reversed": false,
-  "folder": "Double NZ + Climb Paths",
+  "folder": "Double NZ + Climb",
   "idealStartingState": {
     "velocity": 5.0,
-    "rotation": 0.0
+    "rotation": -0.5115558665869887
   },
   "useDefaultConstraints": true
 }

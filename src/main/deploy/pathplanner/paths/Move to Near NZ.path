@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "INTAKE",
-      "waypointRelativePos": 0.3279927909572259,
+      "waypointRelativePos": 0.22531017369727158,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -60,7 +60,7 @@
   "folder": "Double NZ + Climb",
   "idealStartingState": {
     "velocity": 5.0,
-    "rotation": 2.7702157972002444
+    "rotation": -2.082565279730861
   },
   "useDefaultConstraints": true
 }

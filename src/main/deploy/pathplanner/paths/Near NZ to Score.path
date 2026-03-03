@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.3880333333333335,
-        "y": 2.2809999999999993
+        "x": 3.524455555555555,
+        "y": 2.310233333333333
       },
       "prevControl": {
-        "x": 5.490141285927734,
-        "y": 2.2815178228062867
+        "x": 5.626563508149956,
+        "y": 2.3107511561396206
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,19 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "STOW_INTAKE",
+      "waypointRelativePos": 0.6064516129032244,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "STOW_INTAKE"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.2,
     "maxAcceleration": 3.0,
@@ -42,7 +54,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 50.76263288659837
+    "rotation": -0.5115558665869887
   },
   "reversed": false,
   "folder": "Double NZ + Climb",

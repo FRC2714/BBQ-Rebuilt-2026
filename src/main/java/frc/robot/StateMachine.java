@@ -66,7 +66,7 @@ public class StateMachine extends SubsystemBase {
     m_dyeRotor = dyeRotor;
     m_climb = climb;
 
-    m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor);
+    m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor, m_climb);
     m_driverHID = driverController.getHID();
 
     if (Robot.isSimulation()) {
@@ -207,7 +207,12 @@ public class StateMachine extends SubsystemBase {
 
   /** Stows the intake then deploys the climbing mechanism. */
   public Command deployClimber() {
-    return m_intake.stow().until(() -> m_intake.atSetpoint()).andThen(m_climb.deploy());
+    return m_intake
+        .stow()
+        .repeatedly() // TODO - this is hacky since stow is a runOnce
+        .until(() -> m_intake.atSetpoint())
+        .andThen(m_climb.deploy())
+        .beforeStarting(() -> setState(State.Climbing));
   }
 
   /** Deploys climber and climbs. Only runs from Idle. */
@@ -215,16 +220,16 @@ public class StateMachine extends SubsystemBase {
     return deployClimber()
         .until((() -> m_climb.atSetpoint()))
         .andThen(m_climb.climb())
-        .beforeStarting(() -> setState(State.Climbing))
-        .onlyIf(() -> m_state == State.Idle);
+        .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing);
   }
 
   /** Reverses the climb and returns to Idle. Only runs from Climbing. */
   public Command unclimb() {
     return m_climb
         .unclimb()
-        .beforeStarting(() -> setState(State.Idle))
-        .onlyIf(() -> m_state == State.Climbing);
+        .until(() -> m_climb.atSetpoint())
+        .onlyIf(() -> m_state == State.Climbing)
+        .andThen(() -> setState(State.Idle));
   }
 
   /** Runs the dye rotor until fuel is loaded, then stops. */

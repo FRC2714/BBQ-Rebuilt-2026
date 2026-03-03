@@ -404,6 +404,21 @@ public class Shooter extends SubsystemBase {
     return hoodDebouncer.calculate(atSetpoint);
   }
 
+  public void stowTurret() {
+    setTurretAngle(-90);
+  }
+
+  public boolean turretIsStowed() {
+    double turretPosition = turretRelativeEncoder.getPosition();
+    return Math.abs(turretPosition - Constants.ShooterConstants.TurretSetpoints.kStow)
+        <= Constants.ShooterConstants.kShooterPositionTolerance;
+  }
+
+  public Command stowTurretCommand() {
+    return Commands.runOnce(() -> stowTurret(), this)
+        .andThen(Commands.waitUntil(() -> turretIsStowed()));
+  }
+
   /** Zeros turret encoder when a limit switch is hit. Resets on release. */
   public void zeroTurret() {
     if (!wasZeroed && turretMotor.getForwardLimitSwitch().isPressed()) {

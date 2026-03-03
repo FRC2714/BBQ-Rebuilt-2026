@@ -217,10 +217,13 @@ public class StateMachine extends SubsystemBase {
 
   /** Deploys climber and climbs. Only runs from Idle. */
   public Command climb() {
-    return deployClimber()
-        .until((() -> m_climb.atSetpoint()))
-        .andThen(m_climb.climb())
-        .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing);
+    return Commands.sequence(
+        m_shooter.stowTurretCommand(),
+        m_intake.stow(),
+        deployClimber()
+            .until((() -> m_climb.atSetpoint()))
+            .andThen(m_climb.climb())
+            .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing));
   }
 
   /** Reverses the climb and returns to Idle. Only runs from Climbing. */

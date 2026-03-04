@@ -117,25 +117,25 @@ public class StateMachine extends SubsystemBase {
         new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
     resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
 
-    Trigger xNewPress =
-        new Trigger(
-            () -> {
-              boolean current = m_driverHID.getXButton();
-              if (current && !xWasPressed) {
-                xWasPressed = true;
-                return true;
-              }
-              if (!current) xWasPressed = false;
-              return false;
-            });
+    // Trigger xNewPress =
+    //     new Trigger(
+    //         () -> {
+    //           boolean current = m_driverHID.getXButton();
+    //           if (current && !xWasPressed) {
+    //             xWasPressed = true;
+    //             return true;
+    //           }
+    //           if (!current) xWasPressed = false;
+    //           return false;
+    //         });
 
-    Trigger stopPreload =
-        new Trigger(() -> m_state != State.Shooting && m_dyeRotor.isRunning()).and(xNewPress);
-    stopPreload.onTrue(m_dyeRotor.stop());
+    // Trigger stopPreload =
+    //     new Trigger(() -> m_state != State.Shooting && m_dyeRotor.isRunning()).and(xNewPress);
+    // stopPreload.onTrue(m_dyeRotor.stop());
 
-    Trigger startPreload =
-        new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning()).and(xNewPress);
-    startPreload.onTrue(this.preloadCommand());
+    // Trigger startPreload =
+    //     new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning()).and(xNewPress);
+    // startPreload.onTrue(this.preloadCommand());
 
     m_shooter.configureShooterBindings();
   }
@@ -164,8 +164,9 @@ public class StateMachine extends SubsystemBase {
     // startShooter (spin flywheel until at setpoint). If startShooter finishes
     // first, just run the
     // dye rotor immediately.
-    return preload()
-        .withDeadline(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()))
+    return m_shooter
+        .startShooter()
+        .until(() -> m_shooter.readyToShoot())
         .andThen(
             m_shooter
                 .startShooter()

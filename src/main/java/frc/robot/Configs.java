@@ -112,16 +112,18 @@ public final class Configs {
       flywheelConfigLeader
           .smartCurrentLimit(60)
           .idleMode(IdleMode.kCoast)
-          .inverted(true)
+          .inverted(false)
           .voltageCompensation(12);
+
+      flywheelConfigLeader.encoder.uvwMeasurementPeriod(10).uvwAverageDepth(2);
 
       flywheelConfigLeader
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(0.001)
+          .p(0.0001)
           .outputRange(-1, 1)
           .feedForward
-          .kV(0.00178);
+          .kV(0.00185);
 
       flywheelConfigFollower
           .idleMode(IdleMode.kCoast)

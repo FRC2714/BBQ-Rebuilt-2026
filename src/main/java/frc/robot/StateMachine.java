@@ -207,7 +207,7 @@ public class StateMachine extends SubsystemBase {
 
   /** Stows the intake then deploys the climbing mechanism. */
   public Command deployClimber() {
-    return Commands.parallel(
+    return Commands.sequence(
         m_shooter.stowTurretCommand(),
         m_intake
             .stow()

@@ -156,10 +156,10 @@ public final class Constants {
     public static final double kHoodDebounceTimeSeconds = 0.1;
 
     public static final double kShooterPositionTolerance =
-        0.3; // degrees in which the relative encoder and setpoitn values can be off
+        1; // degrees in which the relative encoder and setpoitn values can be off
 
     public static final class TurretSetpoints {
-      public static final double kStow = 15.2;
+      public static final double kStow = 0;
     }
 
     public static final class HoodSetpoints {

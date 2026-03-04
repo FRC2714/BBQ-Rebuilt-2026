@@ -407,7 +407,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void stowTurret() {
-    setTurretOverride(0);
+    setTurretOverride(TurretSetpoints.kStow);
   }
 
   public boolean turretIsStowed() {
@@ -417,8 +417,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command stowTurretCommand() {
-    return Commands.runOnce(() -> stowTurret(), this)
-        .andThen(Commands.waitUntil(() -> turretIsStowed()));
+    return Commands.runOnce(() -> stowTurret(), this).until(() -> turretAtSetpoint());
   }
 
   /** Zeros turret encoder when a limit switch is hit. Resets on release. */

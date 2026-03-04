@@ -141,16 +141,18 @@ public final class Configs {
 
     static {
       dyeRotorConfig
-          .smartCurrentLimit(40) // needs tuning
-          .idleMode(IdleMode.kBrake) // needs tuning
-          .inverted(false) // needs tuning
-          .voltageCompensation(12); // needs tuning
+          .smartCurrentLimit(80)
+          .idleMode(IdleMode.kCoast)
+          .inverted(true)
+          .voltageCompensation(12);
+      dyeRotorConfig.encoder.uvwMeasurementPeriod(10).uvwAverageDepth(2);
       dyeRotorConfig
           .closedLoop
-          .feedbackSensor(FeedbackSensor.kPrimaryEncoder) // needs tuning
-          .p(0.01) // needs tuning
-          .d(0) // needs tuning
-          .outputRange(-0.5, 0.5); // needs tuning
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .p(0.0001)
+          .outputRange(-0.5, 0.5)
+          .feedForward
+          .kV(0.00185);
     }
   }
 

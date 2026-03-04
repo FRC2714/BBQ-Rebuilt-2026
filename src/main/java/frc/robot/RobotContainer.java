@@ -115,12 +115,11 @@ public class RobotContainer {
 
     m_driverController.povRight().onTrue(m_shooter.zeroTurretSequence());
 
-    // m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
+    m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
 
-    m_driverController.a().onTrue(m_shooter.zeroHood());
-    m_driverController.a().onTrue(m_shooter.zeroHood());
+    m_driverController.a().onTrue(m_shooter.zeroHood()); //TODO: bind to right button
 
-    // m_driverController.x().onTrue(m_stateMachine.preloadCommand());
+    m_driverController.x().onTrue(m_stateMachine.preloadCommand());
 
     // intake keybinds
     m_driverController.rightBumper().whileTrue(m_stateMachine.intakeSequence());

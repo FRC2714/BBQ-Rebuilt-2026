@@ -147,7 +147,7 @@ public final class Constants {
     public static final int kHoodCanId = 31; // TBD
     public static final double kHoodMaxAngle = 72.276537;
     public static final double kHoodMinAngle = 54.276537;
-    public static final double kHoodMotorSpeed = -0.18;
+    public static final double kHoodMotorSpeed = 0.18; //Should this be flipped?
 
     public static final int kFlywheelLeaderMotorId = 32;
     public static final int kFlywheelFollowerMotorId = 33;

@@ -118,6 +118,7 @@ public class RobotContainer {
     // m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
 
     m_driverController.a().onTrue(m_shooter.zeroHood());
+    m_driverController.a().onTrue(m_shooter.zeroHood());
 
     // m_driverController.x().onTrue(m_stateMachine.preloadCommand());
 

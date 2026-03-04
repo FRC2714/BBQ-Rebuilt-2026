@@ -440,8 +440,7 @@ public class Shooter extends SubsystemBase {
             new RunCommand(() -> hoodMotor.set(Constants.ShooterConstants.kHoodMotorSpeed), this)
                 .until(
                     () ->
-                        getHoodPosition()
-                            >= Constants.ShooterConstants.kHoodMaxAngle - 1)) //  72.276537
+                        Math.abs(hoodRelativeEncoder.getVelocity()) < Constants.ShooterConstants.HoodSetpoints.khoodVelocityTolerance))
         .andThen(
             new InstantCommand(
                 () -> {
@@ -520,7 +519,7 @@ public class Shooter extends SubsystemBase {
         ClosedLoopSlot.kSlot0);
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
-    if (!zeroingHood) {
+    if (zeroingHood == false) {
       hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
       flywheelController.setSetpoint(
           isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);

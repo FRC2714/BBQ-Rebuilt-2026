@@ -434,13 +434,16 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command zeroHood() {
-
-    return new InstantCommand(() -> zeroingHood = true)
+    return new InstantCommand(
+            () -> {
+              zeroingHood = true;
+            })
         .andThen(
             new RunCommand(() -> hoodMotor.set(Constants.ShooterConstants.kHoodMotorSpeed), this)
                 .until(
                     () ->
-                        Math.abs(hoodRelativeEncoder.getVelocity()) < Constants.ShooterConstants.HoodSetpoints.khoodVelocityTolerance))
+                        Math.abs(hoodMotor.get())
+                            < Constants.ShooterConstants.HoodSetpoints.kHoodVelocityTolerance))
         .andThen(
             new InstantCommand(
                 () -> {
@@ -519,7 +522,7 @@ public class Shooter extends SubsystemBase {
         ClosedLoopSlot.kSlot0);
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
-    if (zeroingHood == false) {
+    if (!zeroingHood) {
       hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
       flywheelController.setSetpoint(
           isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
@@ -536,6 +539,9 @@ public class Shooter extends SubsystemBase {
 
     SmartDashboard.putNumber("Shooter/Hood/Setpoint", hoodCurrentTarget);
     SmartDashboard.putNumber("Shooter/Hood/Position", hoodRelativeEncoder.getPosition());
+    SmartDashboard.putString(
+        "Shooter/Hood/Current Command",
+        this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
     SmartDashboard.putBoolean("Shooter/Hood/At Setpoint", hoodAtSetpoint());
 
     SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());

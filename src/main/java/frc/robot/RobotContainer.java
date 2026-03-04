@@ -56,7 +56,6 @@ public class RobotContainer {
   public RobotContainer() {
     // NAMED COMMANDS FOR PATHPLANNER
     NamedCommands.registerCommand("SCORE", m_stateMachine.startShootingAuto());
-    NamedCommands.registerCommand("SCORE_INITAL", m_stateMachine.startShootingAuto());
     NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShootAuto());
     NamedCommands.registerCommand(
         "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));

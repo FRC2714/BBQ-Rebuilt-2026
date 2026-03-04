@@ -163,7 +163,7 @@ public final class Constants {
     public static final class HoodSetpoints {
       public static final double kStow = 15.2;
       public static final double kZeroOffsetDegrees = 0.0;
-      public static final double khoodVelocityTolerance = 0.05; 
+      public static final double khoodVelocityTolerance = 0.05;
     }
 
     public static final class FlywheelSetpoints {

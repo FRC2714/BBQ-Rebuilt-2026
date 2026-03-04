@@ -97,17 +97,22 @@ public final class Configs {
           .limitSwitchPositionSensor(FeedbackSensor.kAlternateOrExternalEncoder);
 
       hoodConfig
-          .smartCurrentLimit(40)
+          .smartCurrentLimit(20)
           .idleMode(IdleMode.kBrake)
-          .inverted(false)
+          .inverted(true)
           .voltageCompensation(12);
-      hoodConfig.externalEncoder.positionConversionFactor(360).inverted(false);
+      hoodConfig
+          .externalEncoder
+          .countsPerRevolution(8192)
+          .positionConversionFactor(16.363636)
+          .inverted(false);
       hoodConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
           .p(0.1)
-          .d(0)
-          .outputRange(-1, 1);
+          .outputRange(-0.33, 0.33) // TODO(jan): Tune
+          .feedForward
+          .kS(0.175);
 
       flywheelConfigLeader
           .smartCurrentLimit(60)

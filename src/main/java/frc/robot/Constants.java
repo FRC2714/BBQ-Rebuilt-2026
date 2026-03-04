@@ -144,7 +144,7 @@ public final class Constants {
     // Generalization of updating the targets
     public static final double kLatencyCompensation = 0.1;
 
-    public static final int kHoodCanId = 31; // TBD
+    public static final int kHoodCanId = 32;
     public static final double kHoodMaxAngle = 72.276537;
     public static final double kHoodMinAngle = 54.276537;
     public static final double kHoodMotorSpeed = 0.18; // Should this be flipped?

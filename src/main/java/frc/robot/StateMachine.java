@@ -207,7 +207,7 @@ public class StateMachine extends SubsystemBase {
 
   /** Stows the intake then deploys the climbing mechanism. */
   public Command deployClimber() {
-    return Commands.sequence(
+    return Commands.parallel(
         m_shooter.stowTurretCommand(),
         m_intake
             .stow()
@@ -231,6 +231,7 @@ public class StateMachine extends SubsystemBase {
         .unclimb()
         .until(() -> m_climb.atSetpoint())
         .onlyIf(() -> m_state == State.Climbing)
+        .beforeStarting(() -> m_shooter.clearTurretOverride())
         .andThen(() -> setState(State.Idle));
   }
 

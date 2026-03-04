@@ -86,6 +86,8 @@ public class Shooter extends SubsystemBase {
   private SparkLimitSwitch turretReverseLimitSwitch = turretMotor.getReverseLimitSwitch();
 
   private double turretCurrentTarget = TurretSetpoints.kStow;
+  private boolean turretOverrideEnabled = false;
+  private double turretOverrideTarget = TurretSetpoints.kStow;
   private double hoodCurrentTarget = HoodSetpoints.kStow;
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
 
@@ -395,7 +397,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean turretAtSetpoint() {
-    boolean atSetpoint = Math.abs(getTurretPosition() - turretCurrentTarget) < 5;
+    boolean atSetpoint = Math.abs(getTurretPosition() - getActiveTurretTarget()) < 5;
     return turretDebouncer.calculate(atSetpoint);
   }
 
@@ -405,7 +407,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void stowTurret() {
-    setTurretAngle(-90);
+    setTurretOverride(0);
   }
 
   public boolean turretIsStowed() {
@@ -467,7 +469,20 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setTurretAngle(double angle) {
-    turretRelativeEncoder.setPosition(angle + ShooterConstants.kTurretMountingOffsetDegrees);
+    turretCurrentTarget = normalizeTurretTarget(angle);
+  }
+
+  public void setTurretOverride(double angle) {
+    turretOverrideEnabled = true;
+    turretOverrideTarget = normalizeTurretTarget(angle);
+  }
+
+  public void clearTurretOverride() {
+    turretOverrideEnabled = false;
+  }
+
+  private double getActiveTurretTarget() {
+    return turretOverrideEnabled ? turretOverrideTarget : turretCurrentTarget;
   }
 
   /** Sets up trigger to disable limit switch auto-zeroing once a switch is hit. */
@@ -496,8 +511,10 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
+    turretOverrideTarget = normalizeTurretTarget(turretOverrideTarget);
+    double activeTurretTarget = getActiveTurretTarget();
     turretController.setSetpoint(
-        turretCurrentTarget + ShooterConstants.kTurretMountingOffsetDegrees,
+        activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0);
     hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
@@ -509,7 +526,7 @@ public class Shooter extends SubsystemBase {
         "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());
     SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
 
-    SmartDashboard.putNumber("Shooter/Turret/Setpoint", turretCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Turret/Setpoint", activeTurretTarget);
     SmartDashboard.putNumber("Shooter/Turret/Position", getTurretPosition());
     SmartDashboard.putBoolean("Shooter/Turret/At Setpoint", turretAtSetpoint());
 

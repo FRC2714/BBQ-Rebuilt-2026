@@ -208,12 +208,13 @@ public class StateMachine extends SubsystemBase {
   /** Stows the intake then deploys the climbing mechanism. */
   public Command deployClimber() {
     return Commands.sequence(
-        m_shooter.stowTurretCommand(),
-        m_intake
-            .stow()
-            .repeatedly() // TODO - this is hacky since stow is a runOnce
-            .until(() -> m_intake.atSetpoint())
-            .andThen(m_climb.deploy()));
+            m_shooter.stowTurretCommand(),
+            m_intake
+                .stow()
+                .repeatedly() // TODO - this is hacky since stow is a runOnce
+                .until(() -> m_intake.atSetpoint())
+                .andThen(m_climb.deploy()))
+        .beforeStarting(() -> setState(State.Climbing));
   }
 
   /** Deploys climber and climbs. Only runs from Idle. */
@@ -221,8 +222,7 @@ public class StateMachine extends SubsystemBase {
     return deployClimber()
         .until((() -> m_climb.atSetpoint()))
         .andThen(m_climb.climb())
-        .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing)
-        .beforeStarting(() -> setState(State.Climbing));
+        .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing);
   }
 
   /** Reverses the climb and returns to Idle. Only runs from Climbing. */

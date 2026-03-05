@@ -81,7 +81,7 @@
   "eventMarkers": [
     {
       "name": "INTAKE",
-      "waypointRelativePos": 0.20602409638554195,
+      "waypointRelativePos": 0.47535449020931203,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -92,7 +92,7 @@
     },
     {
       "name": "SCORE",
-      "waypointRelativePos": 0.2767068273092359,
+      "waypointRelativePos": 0.7454422687373284,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

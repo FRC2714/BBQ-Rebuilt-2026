@@ -193,16 +193,16 @@ public final class Configs {
 
     static {
       climbConfig
-          .smartCurrentLimit(40)
+          .smartCurrentLimit(80) // TODO(jan): Tune
           .idleMode(IdleMode.kBrake)
-          .inverted(false)
+          .inverted(true)
           .voltageCompensation(12);
       climbConfig.absoluteEncoder.positionConversionFactor(360).inverted(true);
       climbConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          .p(0.01) // needs tuning
-          .outputRange(-0.5, 0.5); // needs tuning
+          .p(0.01) // TODO: needs tuning
+          .outputRange(-0.5, 0.5); // TODO: needs tuning
 
       // Faster slot for deploy/stow
       climbConfig

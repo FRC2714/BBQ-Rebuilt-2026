@@ -1,0 +1,66 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.4112,
+        "y": 2.2809999999999993
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.073530120481928,
+        "y": 2.352132530120481
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.782777777777778,
+        "y": 2.4174222222222226
+      },
+      "prevControl": {
+        "x": 6.627135235658035,
+        "y": 2.419294335798592
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Intake Near NZ"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "INTAKE",
+      "waypointRelativePos": 0.22531017369727158,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "INTAKE"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Double NZ + Steal",
+  "idealStartingState": {
+    "velocity": 5.0,
+    "rotation": -2.082565279730861
+  },
+  "useDefaultConstraints": true
+}

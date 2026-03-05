@@ -192,6 +192,27 @@ public final class Constants {
     public static final double kStowSetpoint = 0 + kZeroOffsetDegrees;
   }
 
+  public static final class AutoAimConstants {
+    // Aim at starting line since LUT is calibrated for the height of the hub
+    public static final Translation2d kRedLeftTarget =
+        new Translation2d(
+            FieldConstants.fieldLength - FieldConstants.LinesVertical.starting,
+            FieldConstants.fieldWidth - (FieldConstants.LinesHorizontal.leftTrenchOpenEnd - 0.6));
+    public static final Translation2d kRedRightTarget =
+        new Translation2d(
+            FieldConstants.fieldLength - FieldConstants.LinesVertical.starting,
+            FieldConstants.fieldWidth
+                - (FieldConstants.LinesHorizontal.rightTrenchOpenStart + 0.6));
+    public static final Translation2d kBlueLeftTarget =
+        new Translation2d(
+            FieldConstants.LinesVertical.starting,
+            FieldConstants.LinesHorizontal.leftTrenchOpenEnd - 0.6);
+    public static final Translation2d kBlueRightTarget =
+        new Translation2d(
+            FieldConstants.LinesVertical.starting,
+            FieldConstants.LinesHorizontal.rightTrenchOpenStart + 0.6);
+  }
+
   // For field constants
   public static boolean disableHAL = false;
 

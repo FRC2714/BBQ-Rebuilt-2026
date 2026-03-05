@@ -3,9 +3,12 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
@@ -16,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AutoAimConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
@@ -335,12 +339,27 @@ public class StateMachine extends SubsystemBase {
     m_state = state;
   }
 
+  StructPublisher<Pose2d> publisher =
+      NetworkTableInstance.getDefault().getStructTopic("Auto Aim Target", Pose2d.struct).publish();
+
+  private Translation2d getAutoAimTarget() {
+    double robotY = m_drivetrain.getPose().getY();
+    double centerY = FieldConstants.LinesHorizontal.center;
+
+    if (Field.isRed()) {
+      return robotY < centerY ? AutoAimConstants.kRedLeftTarget : AutoAimConstants.kRedRightTarget;
+    } else {
+      return robotY < centerY
+          ? AutoAimConstants.kBlueRightTarget
+          : AutoAimConstants.kBlueLeftTarget;
+    }
+  }
+
   private void runTargeting() {
     Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
     Rotation2d robotHeading = m_drivetrain.getPose().getRotation();
 
     if (m_drivetrain.isInAllianceZone()) {
-
       m_shooter.calculate(
           robotPosition,
           robotHeading,
@@ -350,20 +369,24 @@ public class StateMachine extends SubsystemBase {
       return;
     }
 
+    // Airstrike manual override takes priority
     double airstrikeX = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/x", 0));
     double airstrikeY = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/y", 0));
 
-    if (airstrikeX == 0 && airstrikeY == 0) {
-      return;
+    Translation2d target;
+    if (airstrikeX != 0 || airstrikeY != 0) {
+      target = new Translation2d(airstrikeX, airstrikeY);
+    } else {
+      target = getAutoAimTarget();
     }
 
-    Translation2d airstrikeTarget = new Translation2d(airstrikeX, airstrikeY);
+    publisher.set(new Pose2d(target, new Rotation2d()));
 
     m_shooter.calculate(
         robotPosition,
         robotHeading,
         m_drivetrain.getFieldRelativeVelocity(),
-        airstrikeTarget,
+        target,
         ShooterConstants.kLatencyCompensation);
   }
 

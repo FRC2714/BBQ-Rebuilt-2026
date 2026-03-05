@@ -5,7 +5,8 @@
   "pathFolders": [
     "Double NZ + Climb",
     "Double NZ + Depot",
-    "Double NZ + Steal"
+    "Double NZ + Steal",
+    "Double NZ + Steal Mirror"
   ],
   "autoFolders": [],
   "defaultMaxVel": 4.2,

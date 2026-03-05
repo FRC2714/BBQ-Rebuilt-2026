@@ -1,0 +1,67 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Move to Near NZ steal mirrored"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Near NZ to Score steal mirrored"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SCORE"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WAIT_FOR_SCORE"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Move to Middle-1 NZ steal mirrored"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Middle-1 NZ to Score steal mirrored"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SCORE"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WAIT_FOR_SCORE"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "High Bump to Steal"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

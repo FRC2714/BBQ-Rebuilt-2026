@@ -426,8 +426,9 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean turretIsStowed() {
-    boolean isStowed = Math.abs(getTurretPosition() - Constants.ShooterConstants.TurretSetpoints.kStow) < 5;
-    return turretDebouncer.calculate(isStowed);
+    boolean isStowed =
+        Math.abs(getTurretPosition() - Constants.ShooterConstants.TurretSetpoints.kStow) < 5;
+    return isStowed;
   }
 
   public Command stowTurretCommand() {

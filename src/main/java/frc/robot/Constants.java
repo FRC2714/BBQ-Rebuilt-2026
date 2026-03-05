@@ -129,7 +129,7 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final int kTurretCanId = 30;
+    public static final int kTurretCanId = 29;
     public static final int kTurretMaxRange = 220;
     public static final int kFwdLimitSwitchOffset = -90;
     public static final int kRevLimitSwitchOffset = 90;
@@ -144,13 +144,13 @@ public final class Constants {
     // Generalization of updating the targets
     public static final double kLatencyCompensation = 0.1;
 
-    public static final int kHoodCanId = 31; // TBD
+    public static final int kHoodCanId = 32;
     public static final double kHoodMaxAngle = 72.276537;
     public static final double kHoodMinAngle = 54.276537;
     public static final double kHoodMotorSpeed = 0.18; // Should this be flipped?
 
-    public static final int kFlywheelLeaderMotorId = 32;
-    public static final int kFlywheelFollowerMotorId = 33;
+    public static final int kFlywheelLeaderMotorId = 30;
+    public static final int kFlywheelFollowerMotorId = 31;
 
     public static final double kFlywheelDebounceTimeSeconds = 0.1;
     public static final double kTurretDebounceTimeSeconds = 0.1;
@@ -183,10 +183,13 @@ public final class Constants {
   public static final class ClimbConstants {
     public static final int kClimbMotorCanID = 45;
 
+    // The absolute encoder is zeroed such that the "zero position" (straight down) is 20 degrees
+    public static final double kZeroOffsetDegrees = 20;
+
     public static final double kPositionTolerance = 2.0;
-    public static final double kDeployedSetpoint = 100; // TBD
-    public static final double kClimbSetpoint = 180; // TBD
-    public static final double kStowSetpoint = 0;
+    public static final double kDeployedSetpoint = 90 + kZeroOffsetDegrees;
+    public static final double kClimbSetpoint = 150 + kZeroOffsetDegrees;
+    public static final double kStowSetpoint = 0 + kZeroOffsetDegrees;
   }
 
   // For field constants

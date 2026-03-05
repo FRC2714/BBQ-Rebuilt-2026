@@ -125,10 +125,10 @@ public final class Configs {
       flywheelConfigLeader
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(0.0001)
+          .p(Robot.isReal() ? 0.0001 : 0.001)
           .outputRange(-1, 1)
           .feedForward
-          .kV(0.00185);
+          .kV(Robot.isReal() ? 0.00185 : 0.00178);
 
       flywheelConfigFollower
           .idleMode(IdleMode.kCoast)

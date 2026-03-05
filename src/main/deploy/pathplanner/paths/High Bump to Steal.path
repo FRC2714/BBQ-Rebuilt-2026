@@ -8,36 +8,36 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.231867469879518,
-        "y": 5.625301204819276
+        "x": 6.859686162624821,
+        "y": 5.64586305278174
       },
       "isLocked": false,
       "linkedName": "2nd bump shoot mirrored"
     },
     {
       "anchor": {
-        "x": 8.608759036144578,
-        "y": 4.925927710843373
+        "x": 8.334693295292439,
+        "y": 4.998930099857347
       },
       "prevControl": {
-        "x": 8.152982516102218,
-        "y": 5.993404297258375
+        "x": 8.32175463623395,
+        "y": 6.072838801711842
       },
       "nextControl": {
-        "x": 9.02401204819277,
-        "y": 3.953361445783129
+        "x": 8.341735378633192,
+        "y": 4.414437182574933
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.1335180722891565,
-        "y": 0.8826746987951799
+        "x": 8.231184022824536,
+        "y": 0.8068045649072757
       },
       "prevControl": {
-        "x": 7.647120481927709,
-        "y": 1.7896746987951806
+        "x": 8.321754636233951,
+        "y": 1.6736947218259628
       },
       "nextControl": null,
       "isLocked": false,
@@ -52,6 +52,10 @@
     {
       "waypointRelativePos": 0.5,
       "rotationDegrees": -32.14660380498421
+    },
+    {
+      "waypointRelativePos": 0.6950959488272851,
+      "rotationDegrees": -51.43829918174091
     },
     {
       "waypointRelativePos": 1,
@@ -108,7 +112,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -118.1416012322618
+    "rotation": -90.0
   },
   "reversed": false,
   "folder": "Double NZ + Steal Mirror",

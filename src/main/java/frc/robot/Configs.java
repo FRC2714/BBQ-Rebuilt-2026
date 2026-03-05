@@ -162,29 +162,29 @@ public final class Configs {
 
     static {
       pivotConfig
-          .smartCurrentLimit(40) // needs tuning
-          .idleMode(IdleMode.kBrake) // needs tuning
-          .inverted(false) // needs tuning
-          .voltageCompensation(12); // needs tuning
-      pivotConfig
-          .absoluteEncoder
-          .positionConversionFactor(360)
-          .inverted(false)
-          .zeroCentered(true); // needs tuning
+          .smartCurrentLimit(60)
+          .idleMode(IdleMode.kBrake)
+          .inverted(true)
+          .voltageCompensation(12);
+      pivotConfig.absoluteEncoder.positionConversionFactor(360).inverted(true).zeroCentered(true);
+
+      // TODO: Tune PID
       pivotConfig
           .closedLoop
-          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning
-          .p(0.01) // needs tuning
-          .d(0) // needs tuning
-          .outputRange(-1.0, 1); // needs tuning
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+          .p(0.01)
+          .outputRange(-1, 1)
+          .feedForward
+          .kCos(0)
+          .kCosRatio(1);
     }
 
     static {
       rollerConfig
-          .smartCurrentLimit(40) // needs tuning
-          .idleMode(IdleMode.kBrake) // needs tuning
-          .inverted(false) // needs tuning
-          .voltageCompensation(12); // needs tuning
+          .smartCurrentLimit(40)
+          .idleMode(IdleMode.kBrake)
+          .inverted(true)
+          .voltageCompensation(12);
     }
   }
 

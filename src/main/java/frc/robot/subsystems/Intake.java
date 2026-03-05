@@ -170,7 +170,7 @@ public class Intake extends SubsystemBase {
         });
   }
 
-    public Command extend() {
+  public Command extend() {
     return this.runOnce(
         () -> {
           pivotExtend();

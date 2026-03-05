@@ -73,12 +73,12 @@ public final class Configs {
       turretConfig
           .smartCurrentLimit(20)
           .idleMode(IdleMode.kBrake)
-          .inverted(false)
+          .inverted(true)
           .voltageCompensation(12);
       turretConfig
           .externalEncoder
-          .positionConversionFactor(360)
-          .inverted(false)
+          .positionConversionFactor(6.25 * 360)
+          .inverted(true)
           .countsPerRevolution(8192);
       turretConfig
           .closedLoop
@@ -97,31 +97,38 @@ public final class Configs {
           .limitSwitchPositionSensor(FeedbackSensor.kAlternateOrExternalEncoder);
 
       hoodConfig
-          .smartCurrentLimit(40)
+          .smartCurrentLimit(20)
           .idleMode(IdleMode.kBrake)
-          .inverted(false)
+          .inverted(true)
           .voltageCompensation(12);
-      hoodConfig.externalEncoder.positionConversionFactor(360).inverted(false);
+      hoodConfig
+          .externalEncoder
+          .countsPerRevolution(8192)
+          .positionConversionFactor(16.363636)
+          .inverted(false);
       hoodConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
           .p(0.1)
-          .d(0)
-          .outputRange(-1, 1);
+          .outputRange(-0.33, 0.33) // TODO(jan): Tune
+          .feedForward
+          .kS(0.175);
 
       flywheelConfigLeader
           .smartCurrentLimit(60)
           .idleMode(IdleMode.kCoast)
-          .inverted(true)
+          .inverted(false)
           .voltageCompensation(12);
+
+      flywheelConfigLeader.encoder.uvwMeasurementPeriod(10).uvwAverageDepth(2);
 
       flywheelConfigLeader
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(0.001)
+          .p(Robot.isReal() ? 0.0001 : 0.001)
           .outputRange(-1, 1)
           .feedForward
-          .kV(0.00178);
+          .kV(Robot.isReal() ? 0.00185 : 0.00178);
 
       flywheelConfigFollower
           .idleMode(IdleMode.kCoast)
@@ -134,16 +141,18 @@ public final class Configs {
 
     static {
       dyeRotorConfig
-          .smartCurrentLimit(40) // needs tuning
-          .idleMode(IdleMode.kBrake) // needs tuning
-          .inverted(false) // needs tuning
-          .voltageCompensation(12); // needs tuning
+          .smartCurrentLimit(80)
+          .idleMode(IdleMode.kCoast)
+          .inverted(true)
+          .voltageCompensation(12);
+      dyeRotorConfig.encoder.uvwMeasurementPeriod(10).uvwAverageDepth(2);
       dyeRotorConfig
           .closedLoop
-          .feedbackSensor(FeedbackSensor.kPrimaryEncoder) // needs tuning
-          .p(0.01) // needs tuning
-          .d(0) // needs tuning
-          .outputRange(-0.5, 0.5); // needs tuning
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .p(0.0001)
+          .outputRange(-0.5, 0.5)
+          .feedForward
+          .kV(0.00185);
     }
   }
 
@@ -153,29 +162,29 @@ public final class Configs {
 
     static {
       pivotConfig
-          .smartCurrentLimit(40) // needs tuning
-          .idleMode(IdleMode.kBrake) // needs tuning
-          .inverted(false) // needs tuning
-          .voltageCompensation(12); // needs tuning
-      pivotConfig
-          .absoluteEncoder
-          .positionConversionFactor(360)
-          .inverted(false)
-          .zeroCentered(true); // needs tuning
+          .smartCurrentLimit(60)
+          .idleMode(IdleMode.kBrake)
+          .inverted(true)
+          .voltageCompensation(12);
+      pivotConfig.absoluteEncoder.positionConversionFactor(360).inverted(true).zeroCentered(true);
+
+      // TODO: Tune PID
       pivotConfig
           .closedLoop
-          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // needs tuning
-          .p(0.01) // needs tuning
-          .d(0) // needs tuning
-          .outputRange(-1.0, 1); // needs tuning
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+          .p(0.01)
+          .outputRange(-1, 1)
+          .feedForward
+          .kCos(0)
+          .kCosRatio(1);
     }
 
     static {
       rollerConfig
-          .smartCurrentLimit(40) // needs tuning
-          .idleMode(IdleMode.kBrake) // needs tuning
-          .inverted(false) // needs tuning
-          .voltageCompensation(12); // needs tuning
+          .smartCurrentLimit(40)
+          .idleMode(IdleMode.kBrake)
+          .inverted(false)
+          .voltageCompensation(12);
     }
   }
 
@@ -184,7 +193,7 @@ public final class Configs {
 
     static {
       climbConfig
-          .smartCurrentLimit(40)
+          .smartCurrentLimit(80)
           .idleMode(IdleMode.kBrake)
           .inverted(false)
           .voltageCompensation(12);
@@ -192,14 +201,20 @@ public final class Configs {
       climbConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          .p(0.01) // needs tuning
-          .outputRange(-0.5, 0.5); // needs tuning
+          .p(0.05)
+          .d(0.5)
+          .outputRange(-0.5, 0.5)
+          .feedForward
+          .kS(0.115);
 
       // Faster slot for deploy/stow
       climbConfig
           .closedLoop
-          .p(0.01, ClosedLoopSlot.kSlot1)
-          .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
+          .p(0.05, ClosedLoopSlot.kSlot1)
+          .d(0.5, ClosedLoopSlot.kSlot1)
+          .outputRange(-1, 1, ClosedLoopSlot.kSlot1)
+          .feedForward
+          .kS(0.115, ClosedLoopSlot.kSlot1);
     }
   }
 }

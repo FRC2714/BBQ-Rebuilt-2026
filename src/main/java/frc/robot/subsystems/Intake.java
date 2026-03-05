@@ -170,6 +170,13 @@ public class Intake extends SubsystemBase {
         });
   }
 
+  public Command extend() {
+    return this.runOnce(
+        () -> {
+          pivotExtend();
+        });
+  }
+
   @Override
   public void periodic() {
     intakeBar.setAngle(pivotEncoder.getPosition());

@@ -3,9 +3,12 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
@@ -165,9 +168,11 @@ public class StateMachine extends SubsystemBase {
     // startShooter (spin flywheel until at setpoint). If startShooter finishes
     // first, just run the
     // dye rotor immediately.
-    return m_shooter
-        .startShooter()
-        .until(() -> m_shooter.readyToShoot())
+    return m_intake
+        .extend()
+        .andThen(
+            preload().withDeadline(m_shooter.startShooter().until(() -> m_shooter.readyToShoot())))
+        .beforeStarting(() -> m_shooter.clearTurretOverride())
         .andThen(
             m_shooter
                 .startShooter()
@@ -209,18 +214,16 @@ public class StateMachine extends SubsystemBase {
 
   /** Stows the intake then deploys the climbing mechanism. */
   public Command deployClimber() {
-    return m_intake
-        .stow()
-        .repeatedly() // TODO - this is hacky since stow is a runOnce
-        .until(() -> m_intake.atSetpoint())
-        .andThen(m_climb.deploy())
+    return Commands.sequence(
+            m_shooter.stowTurretCommand(),
+            m_intake.stow().andThen(Commands.waitUntil(m_intake::atSetpoint)),
+            m_climb.deploy().until(m_climb::atSetpoint))
         .beforeStarting(() -> setState(State.Climbing));
   }
 
   /** Deploys climber and climbs. Only runs from Idle. */
   public Command climb() {
     return deployClimber()
-        .until((() -> m_climb.atSetpoint()))
         .andThen(m_climb.climb())
         .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing);
   }
@@ -245,7 +248,10 @@ public class StateMachine extends SubsystemBase {
 
   /** Runs the intake. Blocked while climbing. */
   public Command intakeSequence() {
-    return (m_intake.intake().onlyIf(StateMachine::isNotClimbing));
+    return (m_intake
+        .intake()
+        .beforeStarting(() -> m_shooter.clearTurretOverride())
+        .onlyIf(StateMachine::isNotClimbing));
   }
 
   /** Reverses the intake. Blocked while climbing. */
@@ -255,7 +261,9 @@ public class StateMachine extends SubsystemBase {
 
   /** Stows the intake. Blocked while climbing. */
   public Command stowSequence() {
-    return (m_intake.stow().onlyIf(StateMachine::isNotClimbing));
+    return m_shooter
+        .stowTurretCommand()
+        .andThen((m_intake.stow().onlyIf(StateMachine::isNotClimbing)));
   }
 
   // Auto commands
@@ -331,6 +339,9 @@ public class StateMachine extends SubsystemBase {
     m_state = state;
   }
 
+  StructPublisher<Pose2d> publisher =
+      NetworkTableInstance.getDefault().getStructTopic("Auto Aim Target", Pose2d.struct).publish();
+
   private Translation2d getAutoAimTarget() {
     double robotY = m_drivetrain.getPose().getY();
     double centerY = FieldConstants.LinesHorizontal.center;
@@ -368,6 +379,8 @@ public class StateMachine extends SubsystemBase {
     } else {
       target = getAutoAimTarget();
     }
+
+    publisher.set(new Pose2d(target, new Rotation2d()));
 
     m_shooter.calculate(
         robotPosition,

@@ -164,8 +164,11 @@ public class StateMachine extends SubsystemBase {
     // startShooter (spin flywheel until at setpoint). If startShooter finishes
     // first, just run the
     // dye rotor immediately.
-    return preload()
+    return m_intake.extend().andThen(
+    preload()
         .withDeadline(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()))
+                         ).beforeStarting(() -> m_shooter.clearTurretOverride())
+
         .andThen(
             m_shooter
                 .startShooter()
@@ -176,6 +179,7 @@ public class StateMachine extends SubsystemBase {
                       setState(State.Shooting);
                       m_drivetrain.setShootingStateTrue();
                     }))
+
         .finallyDo(
             () -> {
               m_drivetrain.setShootingStateFalse();
@@ -257,7 +261,9 @@ public class StateMachine extends SubsystemBase {
 
   /** Stows the intake. Blocked while climbing. */
   public Command stowSequence() {
-    return (m_intake.stow().onlyIf(StateMachine::isNotClimbing));
+    return m_shooter
+        .stowTurretCommand().andThen(
+    (m_intake.stow().onlyIf(StateMachine::isNotClimbing)));
   }
 
   // Auto commands

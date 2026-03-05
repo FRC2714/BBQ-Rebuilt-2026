@@ -164,9 +164,11 @@ public class StateMachine extends SubsystemBase {
     // startShooter (spin flywheel until at setpoint). If startShooter finishes
     // first, just run the
     // dye rotor immediately.
-    return m_shooter
-        .startShooter()
-        .until(() -> m_shooter.readyToShoot())
+    return m_intake
+        .extend()
+        .andThen(
+            preload().withDeadline(m_shooter.startShooter().until(() -> m_shooter.readyToShoot())))
+        .beforeStarting(() -> m_shooter.clearTurretOverride())
         .andThen(
             m_shooter
                 .startShooter()
@@ -208,18 +210,16 @@ public class StateMachine extends SubsystemBase {
 
   /** Stows the intake then deploys the climbing mechanism. */
   public Command deployClimber() {
-    return m_intake
-        .stow()
-        .repeatedly() // TODO - this is hacky since stow is a runOnce
-        .until(() -> m_intake.atSetpoint())
-        .andThen(m_climb.deploy())
+    return Commands.sequence(
+            m_shooter.stowTurretCommand(),
+            m_intake.stow().andThen(Commands.waitUntil(m_intake::atSetpoint)),
+            m_climb.deploy().until(m_climb::atSetpoint))
         .beforeStarting(() -> setState(State.Climbing));
   }
 
   /** Deploys climber and climbs. Only runs from Idle. */
   public Command climb() {
     return deployClimber()
-        .until((() -> m_climb.atSetpoint()))
         .andThen(m_climb.climb())
         .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing);
   }
@@ -244,7 +244,10 @@ public class StateMachine extends SubsystemBase {
 
   /** Runs the intake. Blocked while climbing. */
   public Command intakeSequence() {
-    return (m_intake.intake().onlyIf(StateMachine::isNotClimbing));
+    return (m_intake
+        .intake()
+        .beforeStarting(() -> m_shooter.clearTurretOverride())
+        .onlyIf(StateMachine::isNotClimbing));
   }
 
   /** Reverses the intake. Blocked while climbing. */
@@ -254,7 +257,9 @@ public class StateMachine extends SubsystemBase {
 
   /** Stows the intake. Blocked while climbing. */
   public Command stowSequence() {
-    return (m_intake.stow().onlyIf(StateMachine::isNotClimbing));
+    return m_shooter
+        .stowTurretCommand()
+        .andThen((m_intake.stow().onlyIf(StateMachine::isNotClimbing)));
   }
 
   // Auto commands

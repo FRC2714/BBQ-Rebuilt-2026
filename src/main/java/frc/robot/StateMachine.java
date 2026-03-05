@@ -209,7 +209,7 @@ public class StateMachine extends SubsystemBase {
   public Command deployClimber() {
     return Commands.sequence(
             m_shooter.stowTurretCommand(),
-            m_intake
+               m_intake
                 .stow()
                 .repeatedly() // TODO - this is hacky since stow is a runOnce
                 .until(() -> m_intake.atSetpoint())

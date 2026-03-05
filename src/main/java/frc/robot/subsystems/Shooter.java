@@ -426,28 +426,14 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean turretIsStowed() {
-    double turretPosition = turretRelativeEncoder.getPosition();
-    return Math.abs(turretPosition - Constants.ShooterConstants.TurretSetpoints.kStow)
-        <= Constants.ShooterConstants.kShooterPositionTolerance;
+    boolean isStowed = Math.abs(getTurretPosition() - Constants.ShooterConstants.TurretSetpoints.kStow) < 5;
+    return turretDebouncer.calculate(isStowed);
   }
 
   public Command stowTurretCommand() {
-    return Commands.runOnce(() -> stowTurret(), this).until(() -> turretAtSetpoint());
+    return Commands.runOnce(() -> stowTurret(), this).until(() -> turretIsStowed());
   }
 
-  /** Zeros turret encoder when a limit switch is hit. Resets on release. */
-  public void zeroTurret() {
-    if (!wasZeroed && turretMotor.getForwardLimitSwitch().isPressed()) {
-      wasZeroed = true;
-      turretRelativeEncoder.setPosition(ShooterConstants.kTurretMaxRange);
-    } else if (!wasZeroed && turretMotor.getReverseLimitSwitch().isPressed()) {
-      wasZeroed = true;
-      turretRelativeEncoder.setPosition(ShooterConstants.kTurretMinRange);
-    } else if (!turretMotor.getReverseLimitSwitch().isPressed()
-        && !turretMotor.getForwardLimitSwitch().isPressed()) {
-      wasZeroed = false;
-    }
-  }
 
   public Command zeroHood() {
     return new InstantCommand(
@@ -567,6 +553,8 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/Turret/Setpoint", activeTurretTarget);
     SmartDashboard.putNumber("Shooter/Turret/Position", getTurretPosition());
     SmartDashboard.putBoolean("Shooter/Turret/At Setpoint", turretAtSetpoint());
+        SmartDashboard.putBoolean("Shooter/Turret/Is Stowed", turretIsStowed());
+
 
     SmartDashboard.putNumber("Shooter/Hood/Setpoint", hoodCurrentTarget);
     SmartDashboard.putNumber("Shooter/Hood/Position", hoodRelativeEncoder.getPosition());

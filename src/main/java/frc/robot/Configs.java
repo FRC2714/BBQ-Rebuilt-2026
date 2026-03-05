@@ -73,12 +73,12 @@ public final class Configs {
       turretConfig
           .smartCurrentLimit(20)
           .idleMode(IdleMode.kBrake)
-          .inverted(false)
+          .inverted(true)
           .voltageCompensation(12);
       turretConfig
           .externalEncoder
-          .positionConversionFactor(360)
-          .inverted(false)
+          .positionConversionFactor(6.25 * 360)
+          .inverted(true)
           .countsPerRevolution(8192);
       turretConfig
           .closedLoop

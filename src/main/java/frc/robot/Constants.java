@@ -129,7 +129,7 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final int kTurretCanId = 30;
+    public static final int kTurretCanId = 29;
     public static final int kTurretMaxRange = 220;
     public static final int kFwdLimitSwitchOffset = -90;
     public static final int kRevLimitSwitchOffset = 90;

@@ -3,9 +3,12 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
@@ -336,6 +339,9 @@ public class StateMachine extends SubsystemBase {
     m_state = state;
   }
 
+  StructPublisher<Pose2d> publisher =
+      NetworkTableInstance.getDefault().getStructTopic("Auto Aim Target", Pose2d.struct).publish();
+
   private Translation2d getAutoAimTarget() {
     double robotY = m_drivetrain.getPose().getY();
     double centerY = FieldConstants.LinesHorizontal.center;
@@ -373,6 +379,8 @@ public class StateMachine extends SubsystemBase {
     } else {
       target = getAutoAimTarget();
     }
+
+    publisher.set(new Pose2d(target, new Rotation2d()));
 
     m_shooter.calculate(
         robotPosition,

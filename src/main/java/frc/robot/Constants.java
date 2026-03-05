@@ -193,14 +193,24 @@ public final class Constants {
   }
 
   public static final class AutoAimConstants {
+    // Aim at starting line since LUT is calibrated for the height of the hub
     public static final Translation2d kRedLeftTarget =
-        new Translation2d(Units.inchesToMeters(563), Units.inchesToMeters(60.8));
+        new Translation2d(
+            FieldConstants.fieldLength - FieldConstants.LinesVertical.starting,
+            FieldConstants.fieldWidth - (FieldConstants.LinesHorizontal.leftTrenchOpenEnd - 0.6));
     public static final Translation2d kRedRightTarget =
-        new Translation2d(Units.inchesToMeters(555.4), Units.inchesToMeters(259));
+        new Translation2d(
+            FieldConstants.fieldLength - FieldConstants.LinesVertical.starting,
+            FieldConstants.fieldWidth
+                - (FieldConstants.LinesHorizontal.rightTrenchOpenStart + 0.6));
     public static final Translation2d kBlueLeftTarget =
-        new Translation2d(Units.inchesToMeters(95), Units.inchesToMeters(263));
+        new Translation2d(
+            FieldConstants.LinesVertical.starting,
+            FieldConstants.LinesHorizontal.leftTrenchOpenEnd - 0.6);
     public static final Translation2d kBlueRightTarget =
-        new Translation2d(Units.inchesToMeters(93), Units.inchesToMeters(57));
+        new Translation2d(
+            FieldConstants.LinesVertical.starting,
+            FieldConstants.LinesHorizontal.rightTrenchOpenStart + 0.6);
   }
 
   // For field constants

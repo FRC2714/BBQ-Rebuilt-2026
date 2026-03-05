@@ -42,12 +42,6 @@
           "name": "INTAKE"
         }
       }
-    },
-    {
-      "name": "STOW",
-      "waypointRelativePos": 0.3841191066997539,
-      "endWaypointRelativePos": null,
-      "command": null
     }
   ],
   "globalConstraints": {

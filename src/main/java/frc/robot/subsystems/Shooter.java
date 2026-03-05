@@ -432,9 +432,12 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command stowTurretCommand() {
-    return Commands.runOnce(() -> stowTurret(), this).until(() -> turretIsStowed());
+    return this.run(
+            () -> {
+              stowTurret();
+            })
+        .until(() -> turretIsStowed());
   }
-
 
   public Command zeroHood() {
     return new InstantCommand(
@@ -554,8 +557,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/Turret/Setpoint", activeTurretTarget);
     SmartDashboard.putNumber("Shooter/Turret/Position", getTurretPosition());
     SmartDashboard.putBoolean("Shooter/Turret/At Setpoint", turretAtSetpoint());
-        SmartDashboard.putBoolean("Shooter/Turret/Is Stowed", turretIsStowed());
-
+    SmartDashboard.putBoolean("Shooter/Turret/Is Stowed", turretIsStowed());
 
     SmartDashboard.putNumber("Shooter/Hood/Setpoint", hoodCurrentTarget);
     SmartDashboard.putNumber("Shooter/Hood/Position", hoodRelativeEncoder.getPosition());

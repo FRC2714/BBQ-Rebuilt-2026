@@ -207,9 +207,10 @@ public class StateMachine extends SubsystemBase {
 
   /** Stows the intake then deploys the climbing mechanism. */
   public Command deployClimber() {
-    return Commands.sequence(
-            m_shooter.stowTurretCommand(),
-               m_intake
+    return m_shooter
+        .stowTurretCommand()
+        .andThen(
+            m_intake
                 .stow()
                 .repeatedly() // TODO - this is hacky since stow is a runOnce
                 .until(() -> m_intake.atSetpoint())

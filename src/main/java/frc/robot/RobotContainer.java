@@ -40,14 +40,14 @@ public class RobotContainer {
   public final Intake m_intake = new Intake();
   private final Climb m_climb = new Climb();
 
-  final StateMachine m_stateMachine =
-      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb);
-
-  private SendableChooser<Command> autoChooser;
-
   // The driver's controller
   CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);
+
+  final StateMachine m_stateMachine =
+      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb, m_driverController);
+
+  private SendableChooser<Command> autoChooser;
 
   private final Trigger rumble = new Trigger(() -> m_stateMachine.phaseShift());
   private final Trigger warningRumble = new Trigger(() -> m_stateMachine.phaseShiftWarning());
@@ -56,7 +56,6 @@ public class RobotContainer {
   public RobotContainer() {
     // NAMED COMMANDS FOR PATHPLANNER
     NamedCommands.registerCommand("SCORE", m_stateMachine.startShootingAuto());
-    NamedCommands.registerCommand("SCORE_INITAL", m_stateMachine.startShootingAuto());
     NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShootAuto());
     NamedCommands.registerCommand(
         "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));
@@ -117,22 +116,14 @@ public class RobotContainer {
 
     m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
 
-    m_driverController.x().onTrue(m_stateMachine.preloadCommand());
-
     // intake keybinds
     m_driverController.rightBumper().whileTrue(m_stateMachine.intakeSequence());
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
 
-    if (Robot.isSimulation()) {
-      m_driverController.y().toggleOnTrue(m_stateMachine.shoot());
-      m_driverController.leftBumper().whileTrue(m_stateMachine.intakeSequence());
-    }
-
-    // m_driverController.rightBumper().onTrue(m_robotDrive.translationalQuasistatic());
-    // m_driverController.leftBumper().onTrue(m_robotDrive.rotationalQuasistatic());
-    // m_driverController.x().onTrue(m_robotDrive.translationalDynamic());
-    // m_driverController.y().onTrue(m_robotDrive.rotationalDynamic());
+    m_driverController.povLeft().onTrue(m_stateMachine.deployClimber());
+    m_driverController.povUp().onTrue(m_stateMachine.climb());
+    m_driverController.povDown().onTrue(m_stateMachine.unclimb());
 
     rumble.onTrue(
         new StartEndCommand(

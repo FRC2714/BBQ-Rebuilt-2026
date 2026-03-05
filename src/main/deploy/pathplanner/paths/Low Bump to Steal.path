@@ -1,0 +1,124 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.439951807228915,
+        "y": 2.4504819277108436
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.652667617689016,
+        "y": 2.4370756062767476
+      },
+      "isLocked": false,
+      "linkedName": "2nd bump shoot"
+    },
+    {
+      "anchor": {
+        "x": 8.218245363766048,
+        "y": 2.721726105563481
+      },
+      "prevControl": {
+        "x": 7.852758675282029,
+        "y": 2.1506531548072023
+      },
+      "nextControl": {
+        "x": 8.425263908701854,
+        "y": 3.045192582025678
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.32175463623395,
+        "y": 6.862097004279601
+      },
+      "prevControl": {
+        "x": 8.166490727532096,
+        "y": 6.577446504992867
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.17781629116117825,
+      "rotationDegrees": 48.09076719107335
+    },
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 32.14660380498421
+    },
+    {
+      "waypointRelativePos": 0.7036247334754745,
+      "rotationDegrees": 62.123272786836544
+    },
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 88.09084756700365
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.7999999999999976,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "INTAKE",
+      "waypointRelativePos": 0.48615800135043724,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "INTAKE"
+        }
+      }
+    },
+    {
+      "name": "SCORE",
+      "waypointRelativePos": 0.7940580688723654,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "SCORE"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 88.56790381583535
+  },
+  "reversed": false,
+  "folder": "Double NZ + Steal",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 40.446232020841336
+  },
+  "useDefaultConstraints": true
+}

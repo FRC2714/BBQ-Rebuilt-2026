@@ -13,6 +13,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -86,6 +87,8 @@ public class Shooter extends SubsystemBase {
   private SparkLimitSwitch turretReverseLimitSwitch = turretMotor.getReverseLimitSwitch();
 
   private double turretCurrentTarget = TurretSetpoints.kStow;
+  private boolean turretOverrideEnabled = false;
+  private double turretOverrideTarget = TurretSetpoints.kStow;
   private double hoodCurrentTarget = HoodSetpoints.kStow;
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
 
@@ -99,6 +102,7 @@ public class Shooter extends SubsystemBase {
   public boolean turretUpdated = false;
 
   private boolean isShooting = false;
+  private boolean zeroingHood = false;
 
   /** Interpolatable lookup values for a given distance to target. */
   public record ShooterParams(double rpm, double hoodAngle, double timeOfFlight) {
@@ -269,6 +273,15 @@ public class Shooter extends SubsystemBase {
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     SmartDashboard.putData("Shooter/Mech2d", flyWheelMech);
+
+    if (Robot.isSimulation()) {
+      hoodSim.setState(
+          VecBuilder.fill(
+              Units.degreesToRadians(
+                  Math.random() * (ShooterConstants.kHoodMaxAngle - ShooterConstants.kHoodMinAngle)
+                      + ShooterConstants.kHoodMinAngle),
+              0.0));
+    }
   }
 
   /** Returns true if fuel is loaded (beam break in real, simulation flag in sim). */
@@ -395,7 +408,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean turretAtSetpoint() {
-    boolean atSetpoint = Math.abs(getTurretPosition() - turretCurrentTarget) < 5;
+    boolean atSetpoint = Math.abs(getTurretPosition() - getActiveTurretTarget()) < 5;
     return turretDebouncer.calculate(atSetpoint);
   }
 
@@ -404,21 +417,49 @@ public class Shooter extends SubsystemBase {
     return hoodDebouncer.calculate(atSetpoint);
   }
 
-  /** Zeros turret encoder when a limit switch is hit. Resets on release. */
-  public void zeroTurret() {
-    if (!wasZeroed && turretMotor.getForwardLimitSwitch().isPressed()) {
-      wasZeroed = true;
-      turretRelativeEncoder.setPosition(ShooterConstants.kTurretMaxRange);
-    } else if (!wasZeroed && turretMotor.getReverseLimitSwitch().isPressed()) {
-      wasZeroed = true;
-      turretRelativeEncoder.setPosition(ShooterConstants.kTurretMinRange);
-    } else if (!turretMotor.getReverseLimitSwitch().isPressed()
-        && !turretMotor.getForwardLimitSwitch().isPressed()) {
-      wasZeroed = false;
-    }
+  public boolean zeroingHood() {
+    return zeroingHood;
   }
 
-  /** Spins turret until it hits a limit switch, then stops. Only runs once. */
+  public void stowTurret() {
+    setTurretOverride(TurretSetpoints.kStow);
+  }
+
+  public boolean turretIsStowed() {
+    boolean isStowed =
+        Math.abs(getTurretPosition() - Constants.ShooterConstants.TurretSetpoints.kStow) < 5;
+    return isStowed;
+  }
+
+  public Command stowTurretCommand() {
+    return this.run(
+            () -> {
+              stowTurret();
+            })
+        .until(() -> turretIsStowed());
+  }
+
+  public Command zeroHood() {
+    return new InstantCommand(
+            () -> {
+              zeroingHood = true;
+            })
+        .andThen(
+            new RunCommand(() -> hoodMotor.set(Constants.ShooterConstants.kHoodMotorSpeed), this)
+                .until(
+                    () ->
+                        Math.abs(hoodMotor.get())
+                            < Constants.ShooterConstants.HoodSetpoints.kHoodVelocityTolerance))
+        .andThen(
+            new InstantCommand(
+                () -> {
+                  hoodMotor.set(0.0);
+                  hoodRelativeEncoder.setPosition(
+                      Constants.ShooterConstants.kHoodMaxAngle); // 72.276537
+                  zeroingHood = false;
+                }));
+  }
+
   public Command zeroTurretSequence() {
     if (!wasZeroed) {
       wasZeroed = true;
@@ -452,7 +493,20 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setTurretAngle(double angle) {
-    turretRelativeEncoder.setPosition(angle + ShooterConstants.kTurretMountingOffsetDegrees);
+    turretCurrentTarget = normalizeTurretTarget(angle);
+  }
+
+  public void setTurretOverride(double angle) {
+    turretOverrideEnabled = true;
+    turretOverrideTarget = normalizeTurretTarget(angle);
+  }
+
+  public void clearTurretOverride() {
+    turretOverrideEnabled = false;
+  }
+
+  private double getActiveTurretTarget() {
+    return turretOverrideEnabled ? turretOverrideTarget : turretCurrentTarget;
   }
 
   /** Sets up trigger to disable limit switch auto-zeroing once a switch is hit. */
@@ -481,25 +535,35 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
+    turretOverrideTarget = normalizeTurretTarget(turretOverrideTarget);
+    double activeTurretTarget = getActiveTurretTarget();
     turretController.setSetpoint(
-        turretCurrentTarget + ShooterConstants.kTurretMountingOffsetDegrees,
+        activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0);
-    hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-    flywheelController.setSetpoint(
-        isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+
+    SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
+    if (!zeroingHood) {
+      hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+      flywheelController.setSetpoint(
+          isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    }
 
     SmartDashboard.putNumber("Shooter/Flywheel/Expected Speed", flywheelCurrentTarget);
     SmartDashboard.putNumber(
         "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());
     SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
 
-    SmartDashboard.putNumber("Shooter/Turret/Setpoint", turretCurrentTarget);
+    SmartDashboard.putNumber("Shooter/Turret/Setpoint", activeTurretTarget);
     SmartDashboard.putNumber("Shooter/Turret/Position", getTurretPosition());
     SmartDashboard.putBoolean("Shooter/Turret/At Setpoint", turretAtSetpoint());
+    SmartDashboard.putBoolean("Shooter/Turret/Is Stowed", turretIsStowed());
 
     SmartDashboard.putNumber("Shooter/Hood/Setpoint", hoodCurrentTarget);
     SmartDashboard.putNumber("Shooter/Hood/Position", hoodRelativeEncoder.getPosition());
+    SmartDashboard.putString(
+        "Shooter/Hood/Current Command",
+        this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
     SmartDashboard.putBoolean("Shooter/Hood/At Setpoint", hoodAtSetpoint());
 
     SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());
@@ -516,6 +580,7 @@ public class Shooter extends SubsystemBase {
         "Shooter/Turret/rev limit switch pressed", turretMotor.getReverseLimitSwitch().isPressed());
 
     SmartDashboard.putBoolean("turret updated", turretUpdated);
+    getHoodPosition();
 
     turretPose3d =
         new Pose3d(
@@ -556,7 +621,6 @@ public class Shooter extends SubsystemBase {
         flywheelSim.getAngularVelocityRPM(), RobotController.getBatteryVoltage(), 0.02);
 
     simFlywheelVelocity += (flywheelCurrentTarget - simFlywheelVelocity) * 0.2;
-    simHoodPosition += (hoodCurrentTarget - simHoodPosition) * 0.05;
 
     turretSim.setInput(turretSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
     turretSim.update(0.02);
@@ -568,8 +632,12 @@ public class Shooter extends SubsystemBase {
         RobotController.getBatteryVoltage(),
         0.02);
 
+    SmartDashboard.putNumber(
+        "Shooter/Hood/Sim Position", Units.radiansToDegrees(hoodSim.getOutput(0)));
+
     hoodSim.setInput(hoodSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
     hoodSim.update(0.02);
+
     hoodSparkSim.iterate(
         Units.radiansPerSecondToRotationsPerMinute(hoodSim.getOutput(1) * 10),
         RobotController.getBatteryVoltage(),

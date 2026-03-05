@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Move to Near NZ"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Near NZ to Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SCORE"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WAIT_FOR_SCORE"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Move to Middle-1 NZ"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Middle-1 NZ to Score wClimb"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WAIT_FOR_SCORE"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CLIMB"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

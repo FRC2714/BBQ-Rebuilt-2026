@@ -57,9 +57,9 @@ public final class Constants {
     public static final int kFrontRightDrivingCanId = 5;
     public static final int kRearRightDrivingCanId = 1;
 
-    public static final int kFrontLeftTurningCanId = 8;
+    public static final int kFrontLeftTurningCanId = 6;
     public static final int kRearLeftTurningCanId = 4;
-    public static final int kFrontRightTurningCanId = 6;
+    public static final int kFrontRightTurningCanId = 8;
     public static final int kRearRightTurningCanId = 2;
 
     public static final boolean kGyroReversed = false;
@@ -137,12 +137,12 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final int kTurretCanId = 30;
+    public static final int kTurretCanId = 29;
     public static final int kTurretMaxRange = 220;
     public static final int kFwdLimitSwitchOffset = -90;
     public static final int kRevLimitSwitchOffset = 90;
     public static final int kTurretMinRange = -180;
-    public static final double kTurretMountingOffsetDegrees = 180.0;
+    public static final double kTurretMountingOffsetDegrees = 0.0;
     public static final Transform2d turretOffset =
         new Transform2d(
             Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));
@@ -152,24 +152,29 @@ public final class Constants {
     // Generalization of updating the targets
     public static final double kLatencyCompensation = 0.1;
 
-    public static final int kHoodCanId = 31; // TBD
+    public static final int kHoodCanId = 32;
     public static final double kHoodMaxAngle = 72.276537;
     public static final double kHoodMinAngle = 54.276537;
+    public static final double kHoodMotorSpeed = 0.18; // Should this be flipped?
 
-    public static final int kFlywheelLeaderMotorId = 32;
-    public static final int kFlywheelFollowerMotorId = 33;
+    public static final int kFlywheelLeaderMotorId = 30;
+    public static final int kFlywheelFollowerMotorId = 31;
 
     public static final double kFlywheelDebounceTimeSeconds = 0.1;
     public static final double kTurretDebounceTimeSeconds = 0.1;
     public static final double kHoodDebounceTimeSeconds = 0.1;
 
+    public static final double kShooterPositionTolerance =
+        1; // degrees in which the relative encoder and setpoitn values can be off
+
     public static final class TurretSetpoints {
-      public static final double kStow = 15.2;
+      public static final double kStow = 0;
     }
 
     public static final class HoodSetpoints {
       public static final double kStow = 15.2;
       public static final double kZeroOffsetDegrees = 0.0;
+      public static final double kHoodVelocityTolerance = 0.05;
     }
 
     public static final class FlywheelSetpoints {
@@ -184,14 +189,36 @@ public final class Constants {
   }
 
   public static final class ClimbConstants {
-    public static final int kLeftMotorCanID = 45;
-    public static final int kRightMotorCanID = 41;
-    public static final double kRetractSetpoint = 0.0; // TBD
-    public static final double kExtendSetpoint = 100.0; // TBD
-    public static final double kClimbSetpoint = 2.0; // TBD
+    public static final int kClimbMotorCanID = 45;
+
+    // The absolute encoder is zeroed such that the "zero position" (straight down) is 20 degrees
+    public static final double kZeroOffsetDegrees = 20;
+
     public static final double kPositionTolerance = 2.0;
-    public static final double kExtendSpeed = 0.5; // TBD
-    public static final double kRetractSpeed = -0.5; // TBD
+    public static final double kDeployedSetpoint = 90 + kZeroOffsetDegrees;
+    public static final double kClimbSetpoint = 150 + kZeroOffsetDegrees;
+    public static final double kStowSetpoint = 0 + kZeroOffsetDegrees;
+  }
+
+  public static final class AutoAimConstants {
+    // Aim at starting line since LUT is calibrated for the height of the hub
+    public static final Translation2d kRedLeftTarget =
+        new Translation2d(
+            FieldConstants.fieldLength - FieldConstants.LinesVertical.starting,
+            FieldConstants.fieldWidth - (FieldConstants.LinesHorizontal.leftTrenchOpenEnd - 0.6));
+    public static final Translation2d kRedRightTarget =
+        new Translation2d(
+            FieldConstants.fieldLength - FieldConstants.LinesVertical.starting,
+            FieldConstants.fieldWidth
+                - (FieldConstants.LinesHorizontal.rightTrenchOpenStart + 0.6));
+    public static final Translation2d kBlueLeftTarget =
+        new Translation2d(
+            FieldConstants.LinesVertical.starting,
+            FieldConstants.LinesHorizontal.leftTrenchOpenEnd - 0.6);
+    public static final Translation2d kBlueRightTarget =
+        new Translation2d(
+            FieldConstants.LinesVertical.starting,
+            FieldConstants.LinesHorizontal.rightTrenchOpenStart + 0.6);
   }
 
   // For field constants

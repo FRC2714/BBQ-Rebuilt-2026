@@ -9,6 +9,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import frc.robot.Constants.LimelightConstants;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -25,6 +26,7 @@ public class Publisher {
   private final Shooter m_shooter;
   private final Intake m_intake;
   private final DyeRotor m_dyeRotor;
+  private final Climb m_climb;
 
   /** 3d sim */
   StructArrayPublisher<Pose3d> publisherZeroedComponentPoses =
@@ -83,16 +85,18 @@ public class Publisher {
           .getStructArrayTopic("tagPosesRearRight", Pose3d.struct)
           .publish();
 
-  public Publisher(DriveSubsystem drivetrain, Shooter shooter, Intake intake, DyeRotor dyeRotor) {
+  public Publisher(
+      DriveSubsystem drivetrain, Shooter shooter, Intake intake, DyeRotor dyeRotor, Climb climb) {
     m_drivetrain = drivetrain;
     m_shooter = shooter;
     m_intake = intake;
     m_dyeRotor = dyeRotor;
+    m_climb = climb;
   }
 
   /** Publishes all NetworkTables data: poses, turret, Limelight measurements, and sim fuel. */
   public void publish() {
-    Pose3d[] zeroRobotPose = new Pose3d[4];
+    Pose3d[] zeroRobotPose = new Pose3d[5];
     for (int i = 0; i < zeroRobotPose.length; i++) {
       zeroRobotPose[i] = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, 0.0, 0.0));
     }
@@ -103,7 +107,9 @@ public class Publisher {
           m_shooter.getTurretPose3d(),
           m_shooter.getHoodPose3d(),
           m_shooter.getFlyWheelPose3d(),
-          new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, 0.0, 0.0))
+          new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, 0.0, 0.0)),
+          m_intake.getIntakePose3d(),
+          m_climb.getClimbPose3d()
         };
     publisherFinalComponentPoses.set(finalRobotPose);
 

@@ -352,6 +352,7 @@ public class DriveSubsystem extends SubsystemBase {
     } else {
       publisherModuleStates.set(swerveDriveSimulation.getMeasuredStates());
     }
+    SmartDashboard.putNumber("omegaRPS", omegaRps);
   }
 
   @Override

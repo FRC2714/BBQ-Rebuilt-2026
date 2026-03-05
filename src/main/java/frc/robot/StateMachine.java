@@ -251,7 +251,7 @@ public class StateMachine extends SubsystemBase {
 
   /** Runs the intake. Blocked while climbing. */
   public Command intakeSequence() {
-    return (m_intake.intake().onlyIf(StateMachine::isNotClimbing));
+    return (m_intake.intake().beforeStarting(() -> m_shooter.clearTurretOverride()).onlyIf(StateMachine::isNotClimbing));
   }
 
   /** Reverses the intake. Blocked while climbing. */

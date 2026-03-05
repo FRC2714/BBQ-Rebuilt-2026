@@ -134,7 +134,7 @@ public final class Constants {
     public static final int kFwdLimitSwitchOffset = -90;
     public static final int kRevLimitSwitchOffset = 90;
     public static final int kTurretMinRange = -180;
-    public static final double kTurretMountingOffsetDegrees = 180.0;
+    public static final double kTurretMountingOffsetDegrees = 0.0;
     public static final Transform2d turretOffset =
         new Transform2d(
             Units.inchesToMeters(-5), Units.inchesToMeters(0), Rotation2d.fromDegrees(0));

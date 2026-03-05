@@ -186,6 +186,17 @@ public final class Constants {
     public static final double kStowSetpoint = 0;
   }
 
+  public static final class AutoAimConstants {
+    public static final Translation2d kRedLeftTarget =
+        new Translation2d(Units.inchesToMeters(563), Units.inchesToMeters(60.8));
+    public static final Translation2d kRedRightTarget =
+        new Translation2d(Units.inchesToMeters(555.4), Units.inchesToMeters(259));
+    public static final Translation2d kBlueLeftTarget =
+        new Translation2d(Units.inchesToMeters(95), Units.inchesToMeters(263));
+    public static final Translation2d kBlueRightTarget =
+        new Translation2d(Units.inchesToMeters(93), Units.inchesToMeters(57));
+  }
+
   // For field constants
   public static boolean disableHAL = false;
 

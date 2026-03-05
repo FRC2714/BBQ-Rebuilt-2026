@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AutoAimConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
@@ -330,12 +331,24 @@ public class StateMachine extends SubsystemBase {
     m_state = state;
   }
 
+  private Translation2d getAutoAimTarget() {
+    double robotY = m_drivetrain.getPose().getY();
+    double centerY = FieldConstants.LinesHorizontal.center;
+
+    if (Field.isRed()) {
+      return robotY < centerY ? AutoAimConstants.kRedLeftTarget : AutoAimConstants.kRedRightTarget;
+    } else {
+      return robotY < centerY
+          ? AutoAimConstants.kBlueRightTarget
+          : AutoAimConstants.kBlueLeftTarget;
+    }
+  }
+
   private void runTargeting() {
     Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
     Rotation2d robotHeading = m_drivetrain.getPose().getRotation();
 
     if (m_drivetrain.isInAllianceZone()) {
-
       m_shooter.calculate(
           robotPosition,
           robotHeading,
@@ -345,20 +358,22 @@ public class StateMachine extends SubsystemBase {
       return;
     }
 
+    // Airstrike manual override takes priority
     double airstrikeX = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/x", 0));
     double airstrikeY = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/y", 0));
 
-    if (airstrikeX == 0 && airstrikeY == 0) {
-      return;
+    Translation2d target;
+    if (airstrikeX != 0 || airstrikeY != 0) {
+      target = new Translation2d(airstrikeX, airstrikeY);
+    } else {
+      target = getAutoAimTarget();
     }
-
-    Translation2d airstrikeTarget = new Translation2d(airstrikeX, airstrikeY);
 
     m_shooter.calculate(
         robotPosition,
         robotHeading,
         m_drivetrain.getFieldRelativeVelocity(),
-        airstrikeTarget,
+        target,
         ShooterConstants.kLatencyCompensation);
   }
 

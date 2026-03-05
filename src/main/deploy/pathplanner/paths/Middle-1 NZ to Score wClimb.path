@@ -76,17 +76,6 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "STOW_INTAKE",
-      "waypointRelativePos": 0.6729528535980207,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "STOW_INTAKE"
-        }
-      }
-    },
-    {
       "name": "SCORE",
       "waypointRelativePos": 0.7007444168734502,
       "endWaypointRelativePos": null,

@@ -116,8 +116,6 @@ public class RobotContainer {
 
     m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
 
-    // m_driverController.x().onTrue(m_stateMachine.preloadCommand());
-
     // intake keybinds
     m_driverController.rightBumper().whileTrue(m_stateMachine.intakeSequence());
 

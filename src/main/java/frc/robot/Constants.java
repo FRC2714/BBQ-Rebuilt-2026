@@ -180,10 +180,13 @@ public final class Constants {
   public static final class ClimbConstants {
     public static final int kClimbMotorCanID = 45;
 
+    // The absolute encoder is zeroed such that the "zero position" (straight down) is 20 degrees
+    public static final double kZeroOffsetDegrees = 20;
+
     public static final double kPositionTolerance = 2.0;
-    public static final double kDeployedSetpoint = 100; // TBD
-    public static final double kClimbSetpoint = 180; // TBD
-    public static final double kStowSetpoint = 0;
+    public static final double kDeployedSetpoint = 90 + kZeroOffsetDegrees;
+    public static final double kClimbSetpoint = 150 + kZeroOffsetDegrees;
+    public static final double kStowSetpoint = 0 + kZeroOffsetDegrees;
   }
 
   // For field constants

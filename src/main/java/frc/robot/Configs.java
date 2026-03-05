@@ -183,7 +183,7 @@ public final class Configs {
       rollerConfig
           .smartCurrentLimit(40)
           .idleMode(IdleMode.kBrake)
-          .inverted(true)
+          .inverted(false)
           .voltageCompensation(12);
     }
   }
@@ -193,22 +193,28 @@ public final class Configs {
 
     static {
       climbConfig
-          .smartCurrentLimit(80) // TODO(jan): Tune
+          .smartCurrentLimit(80)
           .idleMode(IdleMode.kBrake)
-          .inverted(true)
+          .inverted(false)
           .voltageCompensation(12);
       climbConfig.absoluteEncoder.positionConversionFactor(360).inverted(true);
       climbConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          .p(0.01) // TODO: needs tuning
-          .outputRange(-0.5, 0.5); // TODO: needs tuning
+          .p(0.05)
+          .d(0.5)
+          .outputRange(-0.5, 0.5)
+          .feedForward
+          .kS(0.115);
 
       // Faster slot for deploy/stow
       climbConfig
           .closedLoop
-          .p(0.01, ClosedLoopSlot.kSlot1)
-          .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
+          .p(0.05, ClosedLoopSlot.kSlot1)
+          .d(0.5, ClosedLoopSlot.kSlot1)
+          .outputRange(-1, 1, ClosedLoopSlot.kSlot1)
+          .feedForward
+          .kS(0.115, ClosedLoopSlot.kSlot1);
     }
   }
 }

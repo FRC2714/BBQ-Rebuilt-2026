@@ -231,7 +231,6 @@ public class StateMachine extends SubsystemBase {
         .unclimb()
         .until(() -> m_climb.atSetpoint())
         .onlyIf(() -> m_state == State.Climbing)
-        .beforeStarting(() -> m_shooter.clearTurretOverride())
         .andThen(() -> setState(State.Idle));
   }
 

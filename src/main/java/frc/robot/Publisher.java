@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
+import frc.robot.Constants.LimelightConstants;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
@@ -52,28 +53,36 @@ public class Publisher {
   DoubleArrayPublisher publisherPoseArray =
       NetworkTableInstance.getDefault().getDoubleArrayTopic("Robot Pose Array").publish();
 
-  StructPublisher<Pose2d> publisherLLright =
-      NetworkTableInstance.getDefault().getStructTopic("poseLLright", Pose2d.struct).publish();
+  StructPublisher<Pose2d> publisherLLfrontRight =
+      NetworkTableInstance.getDefault().getStructTopic("poseLLfrontRight", Pose2d.struct).publish();
 
-  StructPublisher<Pose2d> publisherLLleft =
-      NetworkTableInstance.getDefault().getStructTopic("poseLLleft", Pose2d.struct).publish();
+  StructPublisher<Pose2d> publisherLLfrontLeft =
+      NetworkTableInstance.getDefault().getStructTopic("poseLLfrontLeft", Pose2d.struct).publish();
 
-  StructPublisher<Pose2d> publisherLLfront =
-      NetworkTableInstance.getDefault().getStructTopic("poseLLfront", Pose2d.struct).publish();
+  StructPublisher<Pose2d> publisherLLrearLeft =
+      NetworkTableInstance.getDefault().getStructTopic("poseLLrearLeft", Pose2d.struct).publish();
 
-  StructArrayPublisher<Pose3d> tagPosesFrontArrayPublisher =
+  StructPublisher<Pose2d> publisherLLrearRight =
+      NetworkTableInstance.getDefault().getStructTopic("poseLLrearRight", Pose2d.struct).publish();
+
+  StructArrayPublisher<Pose3d> tagPosesFrontRightArrayPublisher =
       NetworkTableInstance.getDefault()
-          .getStructArrayTopic("tagPosesFront", Pose3d.struct)
+          .getStructArrayTopic("tagPosesFrontRight", Pose3d.struct)
           .publish();
 
-  StructArrayPublisher<Pose3d> tagPosesLeftArrayPublisher =
+  StructArrayPublisher<Pose3d> tagPosesFrontLeftArrayPublisher =
       NetworkTableInstance.getDefault()
-          .getStructArrayTopic("tagPosesLeft", Pose3d.struct)
+          .getStructArrayTopic("tagPosesFrontLeft", Pose3d.struct)
           .publish();
 
-  StructArrayPublisher<Pose3d> tagPosesRightArrayPublisher =
+  StructArrayPublisher<Pose3d> tagPosesRearLeftArrayPublisher =
       NetworkTableInstance.getDefault()
-          .getStructArrayTopic("tagPosesRight", Pose3d.struct)
+          .getStructArrayTopic("tagPosesRearLeft", Pose3d.struct)
+          .publish();
+
+  StructArrayPublisher<Pose3d> tagPosesRearRightArrayPublisher =
+      NetworkTableInstance.getDefault()
+          .getStructArrayTopic("tagPosesRearRight", Pose3d.struct)
           .publish();
 
   public Publisher(
@@ -119,17 +128,30 @@ public class Publisher {
     Pose2d pose = m_drivetrain.getPose();
     publisherPoseArray.set(
         new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});
-    var frontLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
-    var leftLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
-    var rightLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
-    publisherLLfront.set(frontLLMeasurement != null ? frontLLMeasurement.pose : new Pose2d());
-    publisherLLleft.set(leftLLMeasurement != null ? leftLLMeasurement.pose : new Pose2d());
-    publisherLLright.set(rightLLMeasurement != null ? rightLLMeasurement.pose : new Pose2d());
-    tagPosesFrontArrayPublisher.set(Vision.getCameraTargetPoses3d("limelight-front"));
-    tagPosesLeftArrayPublisher.set(Vision.getCameraTargetPoses3d("limelight-left"));
-    tagPosesRightArrayPublisher.set(Vision.getCameraTargetPoses3d("limelight-right"));
+    var frontRightLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kFrontRightName);
+    var frontLeftLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kFrontLeftName);
+    var rearLeftLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kRearLeftName);
+    var rearRightLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kRearRightName);
+    publisherLLfrontRight.set(
+        frontRightLLMeasurement != null ? frontRightLLMeasurement.pose : new Pose2d());
+    publisherLLfrontLeft.set(
+        frontLeftLLMeasurement != null ? frontLeftLLMeasurement.pose : new Pose2d());
+    publisherLLrearLeft.set(
+        rearLeftLLMeasurement != null ? rearLeftLLMeasurement.pose : new Pose2d());
+    publisherLLrearRight.set(
+        rearRightLLMeasurement != null ? rearRightLLMeasurement.pose : new Pose2d());
+    tagPosesFrontRightArrayPublisher.set(
+        Vision.getCameraTargetPoses3d(LimelightConstants.kFrontRightName));
+    tagPosesFrontLeftArrayPublisher.set(
+        Vision.getCameraTargetPoses3d(LimelightConstants.kFrontLeftName));
+    tagPosesRearLeftArrayPublisher.set(
+        Vision.getCameraTargetPoses3d(LimelightConstants.kRearLeftName));
+    tagPosesRearRightArrayPublisher.set(
+        Vision.getCameraTargetPoses3d(LimelightConstants.kRearRightName));
 
     if (Robot.isSimulation()) Simulation.getInstance().publish();
   }

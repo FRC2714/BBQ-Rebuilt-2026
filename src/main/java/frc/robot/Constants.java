@@ -34,9 +34,9 @@ public final class Constants {
     public static final double kBumperThickness = Units.inchesToMeters(3.5); // Needs to change
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(26.5);
+    public static final double kTrackWidth = Units.inchesToMeters(21.5);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(20.5);
+    public static final double kWheelBase = Units.inchesToMeters(26);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics =
         new SwerveDriveKinematics(
@@ -123,6 +123,14 @@ public final class Constants {
   }
 
   public static final class LimelightConstants {
+    public static final String kFrontRightName = "limelight-fr";
+    public static final String kFrontLeftName = "limelight-fl";
+    public static final String kRearLeftName = "limelight-rl";
+    public static final String kRearRightName = "limelight-rr";
+    public static final String[] kCameraNames = {
+      kFrontRightName, kFrontLeftName, kRearLeftName, kRearRightName
+    };
+
     public static final Matrix<N3, N1> m_stateStdDevs =
         VecBuilder.fill(0.15, 0.15, 0.00001); // TODO
     public static final Matrix<N3, N1> m_visionStdDevs = VecBuilder.fill(.7, .7, 999999); // TODO
@@ -231,8 +239,8 @@ public final class Constants {
       public static final double kPivotStow = 90; // needs tuning
       public static final double kPivotExtend = 0; // needs tuning
 
-     public static final double kPivotUpPower = 0.3;
-     public static final double kPivotDownPower = -0.3;
+      public static final double kPivotUpPower = 0.3;
+      public static final double kPivotDownPower = -0.3;
 
       public static final int kPivotThreshold = 1; // needs tuning
       public static final double kPivotVelocityThreshold = 0.1;

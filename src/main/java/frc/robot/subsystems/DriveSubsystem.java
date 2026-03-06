@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -291,39 +292,50 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition(),
         });
 
-    LimelightHelpers.SetRobotOrientation("limelight-right", getHeading(), 0, 0, 0, 0, 0);
-    LimelightHelpers.SetRobotOrientation("limelight-front", getHeading(), 0, 0, 0, 0, 0);
-    LimelightHelpers.SetRobotOrientation("limelight-left", getHeading(), 0, 0, 0, 0, 0);
+    for (String limelightName : LimelightConstants.kCameraNames) {
+      LimelightHelpers.SetRobotOrientation(limelightName, getHeading(), 0, 0, 0, 0, 0);
+    }
 
     LimelightHelpers.Flush();
 
     double omegaRps = Units.degreesToRotations(getTurnRate());
 
-    var frontLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
-    var leftLLMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
-    var rightLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
+    var frontRightLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kFrontRightName);
+    var frontLeftLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kFrontLeftName);
+    var rearLeftLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kRearLeftName);
+    var rearRightLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kRearRightName);
 
-    if (Math.abs(omegaRps) < 1) {
-      if (frontLLMeasurement != null && frontLLMeasurement.tagCount > 0) {
-        xyStdDev = .7 * (1 + frontLLMeasurement.avgTagDist * .5);
+    if (Math.abs(omegaRps) < .7) {
+      if (frontRightLLMeasurement != null && frontRightLLMeasurement.tagCount > 0) {
+        xyStdDev = .7 * (1 + frontRightLLMeasurement.avgTagDist * .5);
         m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
         m_poseEstimator.addVisionMeasurement(
-            frontLLMeasurement.pose, frontLLMeasurement.timestampSeconds);
+            frontRightLLMeasurement.pose, frontRightLLMeasurement.timestampSeconds);
       }
 
-      if (leftLLMeasurement != null && leftLLMeasurement.tagCount > 0) {
-        xyStdDev = .7 * (1 + leftLLMeasurement.avgTagDist * .5);
+      if (frontLeftLLMeasurement != null && frontLeftLLMeasurement.tagCount > 0) {
+        xyStdDev = .7 * (1 + frontLeftLLMeasurement.avgTagDist * .5);
         m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
         m_poseEstimator.addVisionMeasurement(
-            leftLLMeasurement.pose, leftLLMeasurement.timestampSeconds);
+            frontLeftLLMeasurement.pose, frontLeftLLMeasurement.timestampSeconds);
       }
-      if (rightLLMeasurement != null && rightLLMeasurement.tagCount > 0) {
-        xyStdDev = .7 * (1 + rightLLMeasurement.avgTagDist * .5);
+
+      if (rearLeftLLMeasurement != null && rearLeftLLMeasurement.tagCount > 0) {
+        xyStdDev = .7 * (1 + rearLeftLLMeasurement.avgTagDist * .5);
         m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
         m_poseEstimator.addVisionMeasurement(
-            rightLLMeasurement.pose, rightLLMeasurement.timestampSeconds);
+            rearLeftLLMeasurement.pose, rearLeftLLMeasurement.timestampSeconds);
+      }
+
+      if (rearRightLLMeasurement != null && rearRightLLMeasurement.tagCount > 0) {
+        xyStdDev = .7 * (1 + rearRightLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
+        m_poseEstimator.addVisionMeasurement(
+            rearRightLLMeasurement.pose, rearRightLLMeasurement.timestampSeconds);
       }
     }
 
@@ -533,19 +545,27 @@ public class DriveSubsystem extends SubsystemBase {
         },
         pose);
 
-    LimelightHelpers.SetRobotOrientation("limelight-front", 0, 0, 0, 0, 0, 0);
-    LimelightHelpers.SetRobotOrientation("limelight-right", 0, 0, 0, 0, 0, 0);
-    LimelightHelpers.SetRobotOrientation("limelight-left", 0, 0, 0, 0, 0, 0);
-
-    LimelightHelpers.SetIMUMode("limelight-front", 1);
-    LimelightHelpers.SetIMUMode("limelight-right", 1);
-    LimelightHelpers.SetIMUMode("limelight-left", 1);
+    for (String limelightName : LimelightConstants.kCameraNames) {
+      LimelightHelpers.SetRobotOrientation(limelightName, 0, 0, 0, 0, 0, 0);
+      LimelightHelpers.SetIMUMode(limelightName, 1);
+    }
 
     // Switch back to fused mode after seeding
-    new WaitCommand(0.1)
-        .andThen(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-front", 4)))
-        .alongWith(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-right", 4)))
-        .alongWith(new InstantCommand(() -> LimelightHelpers.SetIMUMode("limelight-left", 4)));
+    CommandScheduler.getInstance()
+        .schedule(
+            new WaitCommand(0.1)
+                .andThen(
+                    new InstantCommand(
+                        () -> LimelightHelpers.SetIMUMode(LimelightConstants.kFrontRightName, 4)))
+                .alongWith(
+                    new InstantCommand(
+                        () -> LimelightHelpers.SetIMUMode(LimelightConstants.kFrontLeftName, 4)))
+                .alongWith(
+                    new InstantCommand(
+                        () -> LimelightHelpers.SetIMUMode(LimelightConstants.kRearLeftName, 4)))
+                .alongWith(
+                    new InstantCommand(
+                        () -> LimelightHelpers.SetIMUMode(LimelightConstants.kRearRightName, 4))));
   }
 
   /** Sets the current heading as the driver's forward direction. */

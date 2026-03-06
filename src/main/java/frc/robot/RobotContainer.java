@@ -134,8 +134,8 @@ public class RobotContainer {
     m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
 
     // intake keybinds
-    m_driverController.rightBumper().whileTrue(m_stateMachine.intakeSequence());
-    m_driverController.leftBumper().whileTrue(m_stateMachine.extakeSequence());
+    m_driverController.rightTrigger().whileTrue(m_stateMachine.intakeSequence());
+    m_driverController.leftTrigger().whileTrue(m_stateMachine.extakeSequence());
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
 

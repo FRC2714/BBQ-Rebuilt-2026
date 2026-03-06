@@ -232,6 +232,7 @@ public final class Constants {
       public static final double kPivotExtend = 0; // needs tuning
 
       public static final int kPivotThreshold = 1; // needs tuning
+      public static final double kPivotVelocityThreshold = 0.1;
     }
   }
 }

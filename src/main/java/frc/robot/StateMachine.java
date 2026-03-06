@@ -142,6 +142,7 @@ public class StateMachine extends SubsystemBase {
     // startPreload.onTrue(this.preloadCommand());
 
     m_shooter.configureShooterBindings();
+    m_intake.configureBindings();
   }
 
   public boolean phaseShift() {

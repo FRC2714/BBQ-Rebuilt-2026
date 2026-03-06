@@ -267,6 +267,10 @@ public class StateMachine extends SubsystemBase {
         .andThen((m_intake.stow().onlyIf(StateMachine::isNotClimbing)));
   }
 
+  public Command extendIntakeSequence() {
+    return m_intake.extend().onlyIf(StateMachine::isNotClimbing);
+  }
+
   // Auto commands
 
   /**

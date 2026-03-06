@@ -103,6 +103,7 @@ public class Shooter extends SubsystemBase {
 
   private boolean isShooting = false;
   private boolean zeroingHood = false;
+  private boolean hasHoodBeenZeroed = false;
 
   /** Interpolatable lookup values for a given distance to target. */
   public record ShooterParams(double rpm, double hoodAngle, double timeOfFlight) {
@@ -460,7 +461,12 @@ public class Shooter extends SubsystemBase {
               hoodRelativeEncoder.setPosition(
                   Constants.ShooterConstants.kHoodMaxAngle); // 72.276537
               zeroingHood = false;
+              hasHoodBeenZeroed = true;
             });
+  }
+
+  public Command zeroHoodIfNeeded() {
+    return zeroHood().onlyIf(() -> !hasHoodBeenZeroed);
   }
 
   public Command zeroTurretSequence() {
@@ -547,7 +553,11 @@ public class Shooter extends SubsystemBase {
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
     if (!zeroingHood) {
-      hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+      if (hasHoodBeenZeroed) {
+        // Only move hood if we know it has been zeroed
+        hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+      }
+
       flywheelController.setSetpoint(
           isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     }

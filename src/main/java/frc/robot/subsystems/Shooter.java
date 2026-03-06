@@ -408,7 +408,7 @@ public class Shooter extends SubsystemBase {
 
   public boolean flywheelAtSetpoint() {
     boolean atSetpoint =
-        Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
+        Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 300;
     return flywheelDebouncer.calculate(atSetpoint);
   }
 
@@ -473,12 +473,11 @@ public class Shooter extends SubsystemBase {
     return zeroHood().onlyIf(() -> !hasHoodBeenZeroed);
   }
 
-  public Command zeroTurretSequence() {
-    if (!wasZeroed) {
-      wasZeroed = true;
+  public Command zeroTurretSequenceRight() {
+
       return new RunCommand(
               () -> {
-                turretMotor.set(1);
+                turretMotor.set(.35);
               },
               this)
           .until(
@@ -486,9 +485,20 @@ public class Shooter extends SubsystemBase {
                   turretMotor.getForwardLimitSwitch().isPressed()
                       || turretMotor.getReverseLimitSwitch().isPressed())
           .andThen(new InstantCommand(() -> turretMotor.set(0), this));
-    } else {
-      return new InstantCommand();
-    }
+  }
+
+    public Command zeroTurretSequenceLeft() {
+
+      return new RunCommand(
+              () -> {
+                turretMotor.set(-.35);
+              },
+              this)
+          .until(
+              () ->
+                  turretMotor.getForwardLimitSwitch().isPressed()
+                      || turretMotor.getReverseLimitSwitch().isPressed())
+          .andThen(new InstantCommand(() -> turretMotor.set(0), this));
   }
 
   /** Disables limit-switch-triggered motor stop so turret can move freely after zeroing. */

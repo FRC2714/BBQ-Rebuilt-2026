@@ -439,25 +439,28 @@ public class Shooter extends SubsystemBase {
         .until(() -> turretIsStowed());
   }
 
+  private Debouncer zeroHoodDebouncer = new Debouncer(0.25, DebounceType.kRising);
+
   public Command zeroHood() {
-    return new InstantCommand(
+    return this.runOnce(
             () -> {
+              zeroHoodDebouncer.calculate(false);
+              hoodMotor.set(Constants.ShooterConstants.kHoodZeroingSpeed);
               zeroingHood = true;
             })
         .andThen(
-            new RunCommand(() -> hoodMotor.set(Constants.ShooterConstants.kHoodMotorSpeed), this)
-                .until(
-                    () ->
-                        Math.abs(hoodMotor.get())
-                            < Constants.ShooterConstants.HoodSetpoints.kHoodVelocityTolerance))
+            Commands.waitUntil(
+                () ->
+                    zeroHoodDebouncer.calculate(
+                        Math.abs(hoodRelativeEncoder.getVelocity())
+                            < Constants.ShooterConstants.HoodSetpoints.kHoodVelocityTolerance)))
         .andThen(
-            new InstantCommand(
-                () -> {
-                  hoodMotor.set(0.0);
-                  hoodRelativeEncoder.setPosition(
-                      Constants.ShooterConstants.kHoodMaxAngle); // 72.276537
-                  zeroingHood = false;
-                }));
+            () -> {
+              hoodMotor.set(0.0);
+              hoodRelativeEncoder.setPosition(
+                  Constants.ShooterConstants.kHoodMaxAngle); // 72.276537
+              zeroingHood = false;
+            });
   }
 
   public Command zeroTurretSequence() {

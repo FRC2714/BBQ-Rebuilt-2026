@@ -570,14 +570,18 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putBoolean("Shooter/Turret/wasZeroed", wasZeroed);
     // SmartDashboard.putString(
     //     "Shooter/Turret/fwd limit switch behavior",
-    //     turretMotor.configAccessor.limitSwitch.getForwardLimitSwitchTriggerBehavior().toString());
+    //
+    // turretMotor.configAccessor.limitSwitch.getForwardLimitSwitchTriggerBehavior().toString());
     // SmartDashboard.putString(
     //     "Shooter/Turret/rev limit switch behavior",
-    //     turretMotor.configAccessor.limitSwitch.getReverseLimitSwitchTriggerBehavior().toString());
+    //
+    // turretMotor.configAccessor.limitSwitch.getReverseLimitSwitchTriggerBehavior().toString());
     // SmartDashboard.putBoolean(
-    //     "Shooter/Turret/fwd limit switch pressed", turretMotor.getForwardLimitSwitch().isPressed());
+    //     "Shooter/Turret/fwd limit switch pressed",
+    // turretMotor.getForwardLimitSwitch().isPressed());
     // SmartDashboard.putBoolean(
-    //     "Shooter/Turret/rev limit switch pressed", turretMotor.getReverseLimitSwitch().isPressed());
+    //     "Shooter/Turret/rev limit switch pressed",
+    // turretMotor.getReverseLimitSwitch().isPressed());
 
     SmartDashboard.putBoolean("turret updated", turretUpdated);
     getHoodPosition();

@@ -8,7 +8,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -83,7 +82,7 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "WAIT_FOR_SCORE_INITIAL", m_stateMachine.waitForScore(AutoConstants.kShootInitialTimeout));
     NamedCommands.registerCommand(
-        "FLIP_POSE",new InstantCommand(() -> m_robotDrive.zeroPose(180), m_robotDrive));
+        "FLIP_POSE", new InstantCommand(() -> m_robotDrive.zeroPose(180), m_robotDrive));
 
     // Configure the button bindings
     configureButtonBindings();

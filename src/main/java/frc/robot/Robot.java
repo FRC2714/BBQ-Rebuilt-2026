@@ -125,7 +125,6 @@ public class Robot extends TimedRobot {
     LimelightHelpers.SetIMUMode(LimelightConstants.kFrontLeftName, 4);
     LimelightHelpers.SetIMUMode(LimelightConstants.kRearLeftName, 4);
     LimelightHelpers.SetIMUMode(LimelightConstants.kRearRightName, 4);
-
   }
 
   /** This function is called periodically during autonomous. */

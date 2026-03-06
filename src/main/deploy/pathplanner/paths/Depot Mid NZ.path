@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.258966666666668,
-        "y": 5.6915555555555555
+        "x": 5.2729200115658905,
+        "y": 5.467433333333333
       },
       "isLocked": false,
       "linkedName": "Depot Score"
@@ -60,7 +60,7 @@
   "folder": "Double NZ + Depot",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -22.135491878100332
+    "rotation": -1.3714693749489235
   },
   "useDefaultConstraints": true
 }

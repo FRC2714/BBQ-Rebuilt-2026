@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.564722222222223,
-        "y": 5.779255555555555
+        "x": 6.564721712940543,
+        "y": 5.779261435606538
       },
       "isLocked": false,
       "linkedName": "Depot Near NZ"
@@ -20,8 +20,8 @@
         "y": 5.467433333333333
       },
       "prevControl": {
-        "x": 4.742511111111112,
-        "y": 5.516155555555555
+        "x": 4.7425109417168105,
+        "y": 5.516159993483842
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.5,
-      "rotationDegrees": -26.913500796492038
+      "rotationDegrees": 0.9423801479411731
     }
   ],
   "constraintZones": [],
@@ -47,7 +47,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -22.135491878100332
+    "rotation": -1.3714693749489235
   },
   "reversed": false,
   "folder": "Double NZ + Depot",

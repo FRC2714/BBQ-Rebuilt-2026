@@ -8,6 +8,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -81,6 +82,8 @@ public class RobotContainer {
         "WAIT_FOR_SCORE", m_stateMachine.waitForScore(AutoConstants.kShootTimeout));
     NamedCommands.registerCommand(
         "WAIT_FOR_SCORE_INITIAL", m_stateMachine.waitForScore(AutoConstants.kShootInitialTimeout));
+    NamedCommands.registerCommand(
+        "FLIP_POSE",new InstantCommand(() -> m_robotDrive.zeroPose(180), m_robotDrive));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -115,6 +118,7 @@ public class RobotContainer {
 
     extendIntakeButton.onTrue(m_stateMachine.extendIntakeSequence());
     retractIntakeButton.onTrue(m_stateMachine.stowSequence());
+    button5.onTrue(m_stateMachine.zeroPoseAuto());
 
     zeroHoodButton.onTrue(m_shooter.zeroHood());
 
@@ -124,7 +128,7 @@ public class RobotContainer {
 
     m_driverController
         .back()
-        .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(), m_robotDrive));
+        .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(0), m_robotDrive));
     m_driverController
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));

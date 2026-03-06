@@ -3,6 +3,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -12,6 +13,7 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -144,6 +146,21 @@ public class StateMachine extends SubsystemBase {
     m_shooter.configureShooterBindings();
     m_intake.configureBindings();
   }
+
+    public Command zeroPoseAuto() {
+        return Commands.runOnce(
+          ()->{
+            if(Field.isRed())
+            {
+              m_drivetrain.zeroPose(180);
+
+            }
+            else{
+              m_drivetrain.zeroPose(0);
+            }
+          }).ignoringDisable(true);
+      } 
+    
 
   public boolean phaseShift() {
     return phaseShiftActive;

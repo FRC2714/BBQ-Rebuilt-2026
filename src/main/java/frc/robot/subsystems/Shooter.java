@@ -539,8 +539,8 @@ public class Shooter extends SubsystemBase {
             () ->
                 turretMotor.getForwardLimitSwitch().isPressed()
                     || turretMotor.getReverseLimitSwitch().isPressed());
-    disableLimitSwitch.onTrue(
-        Commands.runOnce(() -> disableLimitSwitchAutoZeroing()).ignoringDisable(true));
+    // disableLimitSwitch.onTrue(
+    //     Commands.runOnce(() -> disableLimitSwitchAutoZeroing()).ignoringDisable(true));
   }
 
   public Pose3d getTurretPose3d() {

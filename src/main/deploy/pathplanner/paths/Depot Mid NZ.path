@@ -3,33 +3,52 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.4659888888888895,
-        "y": 5.467433333333333
+        "x": 3.2213975903614456,
+        "y": 5.4228192771084345
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.2729200115658905,
-        "y": 5.467433333333333
+        "x": 5.028328713038446,
+        "y": 5.4228192771084345
       },
       "isLocked": false,
       "linkedName": "Depot Score"
     },
     {
       "anchor": {
-        "x": 8.127939759036146,
-        "y": 4.47210843373494
+        "x": 8.226289156626505,
+        "y": 4.00221686746988
       },
       "prevControl": {
-        "x": 7.843819277108434,
-        "y": 6.31889156626506
+        "x": 8.062373493975903,
+        "y": 6.351674698795181
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "Depot Mid NZ"
     }
   ],
-  "rotationTargets": [],
-  "constraintZones": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.14854771784232443,
+      "rotationDegrees": -27.46721224367781
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 0.3702233250620337,
+      "constraints": {
+        "maxVelocity": 2.5,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
@@ -54,7 +73,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -62.378925016924505
+    "rotation": -77.90524292298768
   },
   "reversed": false,
   "folder": "Double NZ + Depot",

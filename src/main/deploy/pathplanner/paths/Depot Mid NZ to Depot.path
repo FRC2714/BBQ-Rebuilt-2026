@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.127939759036146,
-        "y": 4.47210843373494
+        "x": 8.226289156626505,
+        "y": 4.00221686746988
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.919628647925033,
-        "y": 5.076263989290497
+        "x": 7.017978045515393,
+        "y": 4.606372423025436
       },
       "isLocked": false,
       "linkedName": "Depot Mid NZ"
@@ -60,7 +60,7 @@
       "minWaypointRelativePos": 0.7126550868486359,
       "maxWaypointRelativePos": 2.0,
       "constraints": {
-        "maxVelocity": 2.0,
+        "maxVelocity": 1.8,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -110,7 +110,7 @@
   "folder": "Double NZ + Depot",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -62.378925016924505
+    "rotation": -77.90524292298768
   },
   "useDefaultConstraints": true
 }

@@ -537,10 +537,10 @@ public class Shooter extends SubsystemBase {
     turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
     turretOverrideTarget = normalizeTurretTarget(turretOverrideTarget);
     double activeTurretTarget = getActiveTurretTarget();
-    turretController.setSetpoint(
-        activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0);
+    // turretController.setSetpoint(
+    //     activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
+    //     ControlType.kPosition,
+    //     ClosedLoopSlot.kSlot0);
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
     if (!zeroingHood) {
@@ -568,16 +568,16 @@ public class Shooter extends SubsystemBase {
 
     SmartDashboard.putBoolean("Shooter/Ready To Shoot", readyToShoot());
     SmartDashboard.putBoolean("Shooter/Turret/wasZeroed", wasZeroed);
-    SmartDashboard.putString(
-        "Shooter/Turret/fwd limit switch behavior",
-        turretMotor.configAccessor.limitSwitch.getForwardLimitSwitchTriggerBehavior().toString());
-    SmartDashboard.putString(
-        "Shooter/Turret/rev limit switch behavior",
-        turretMotor.configAccessor.limitSwitch.getReverseLimitSwitchTriggerBehavior().toString());
-    SmartDashboard.putBoolean(
-        "Shooter/Turret/fwd limit switch pressed", turretMotor.getForwardLimitSwitch().isPressed());
-    SmartDashboard.putBoolean(
-        "Shooter/Turret/rev limit switch pressed", turretMotor.getReverseLimitSwitch().isPressed());
+    // SmartDashboard.putString(
+    //     "Shooter/Turret/fwd limit switch behavior",
+    //     turretMotor.configAccessor.limitSwitch.getForwardLimitSwitchTriggerBehavior().toString());
+    // SmartDashboard.putString(
+    //     "Shooter/Turret/rev limit switch behavior",
+    //     turretMotor.configAccessor.limitSwitch.getReverseLimitSwitchTriggerBehavior().toString());
+    // SmartDashboard.putBoolean(
+    //     "Shooter/Turret/fwd limit switch pressed", turretMotor.getForwardLimitSwitch().isPressed());
+    // SmartDashboard.putBoolean(
+    //     "Shooter/Turret/rev limit switch pressed", turretMotor.getReverseLimitSwitch().isPressed());
 
     SmartDashboard.putBoolean("turret updated", turretUpdated);
     getHoodPosition();

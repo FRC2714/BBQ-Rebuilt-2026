@@ -142,6 +142,7 @@ public class StateMachine extends SubsystemBase {
     // startPreload.onTrue(this.preloadCommand());
 
     m_shooter.configureShooterBindings();
+    m_intake.configureBindings();
   }
 
   public boolean phaseShift() {
@@ -264,6 +265,10 @@ public class StateMachine extends SubsystemBase {
     return m_shooter
         .stowTurretCommand()
         .andThen((m_intake.stow().onlyIf(StateMachine::isNotClimbing)));
+  }
+
+  public Command extendIntakeSequence() {
+    return m_intake.extend().onlyIf(StateMachine::isNotClimbing);
   }
 
   // Auto commands

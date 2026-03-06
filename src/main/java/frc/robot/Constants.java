@@ -220,8 +220,8 @@ public final class Constants {
 
     public static final class RollerConstants {
       public static final int kIntakeRollerCanId = 10; // needs tuning
-      public static final double kIntakeRollerPower = 0.5; // needs tuning
-      public static final double kExtakeRollerPower = -0.5; // needs tuning
+      public static final double kIntakeRollerPower = 1; // needs tuning
+      public static final double kExtakeRollerPower = -1; // needs tuning
       public static final double kRollerStop = 0.0; // needs tuning
     }
 
@@ -231,7 +231,11 @@ public final class Constants {
       public static final double kPivotStow = 90; // needs tuning
       public static final double kPivotExtend = 0; // needs tuning
 
+     public static final double kPivotUpPower = 0.3;
+     public static final double kPivotDownPower = -0.3;
+
       public static final int kPivotThreshold = 1; // needs tuning
+      public static final double kPivotVelocityThreshold = 0.1;
     }
   }
 }

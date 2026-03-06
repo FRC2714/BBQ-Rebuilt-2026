@@ -166,13 +166,13 @@ public final class Configs {
           .idleMode(IdleMode.kBrake)
           .inverted(true)
           .voltageCompensation(12);
-      pivotConfig.absoluteEncoder.positionConversionFactor(360).inverted(true).zeroCentered(true);
+      pivotConfig.encoder.positionConversionFactor(360.0 / 75);
 
       // TODO: Tune PID
       pivotConfig
           .closedLoop
-          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          .p(0.01)
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .p(0.1)
           .outputRange(-1, 1)
           .feedForward
           .kCos(0)

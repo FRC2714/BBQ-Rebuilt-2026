@@ -4,17 +4,16 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
-import com.revrobotics.sim.SparkAbsoluteEncoderSim;
 import com.revrobotics.sim.SparkFlexSim;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.sim.SparkRelativeEncoderSim;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -32,6 +31,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Configs;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
@@ -47,7 +47,7 @@ public class Intake extends SubsystemBase {
           Constants.IntakeConstants.PivotConstants.kIntakePivotCanId, MotorType.kBrushless);
 
   private SparkClosedLoopController intakePivotController = pivotMotor.getClosedLoopController();
-  private AbsoluteEncoder pivotEncoder = pivotMotor.getAbsoluteEncoder();
+  private RelativeEncoder pivotEncoder = pivotMotor.getEncoder();
 
   // creates new roller motor
   private SparkFlex rollerMotor =
@@ -58,23 +58,26 @@ public class Intake extends SubsystemBase {
   private double pivotSetpoint = 0;
   private Pose3d intakePose3d = new Pose3d();
 
+  private Debouncer bottomHardStopDebouncer = new Debouncer(0.5, DebounceType.kRising);
+  private Debouncer topHardStopDebouncer = new Debouncer(0.5, DebounceType.kRising);
+
   // Simulation
   DCMotor pivotMotorSim = DCMotor.getNeoVortex(1);
   DCMotor rollerMotorSim = DCMotor.getNeoVortex(1);
   SparkFlexSim pivotSparkSim = new SparkFlexSim(pivotMotor, pivotMotorSim);
   SparkFlexSim rollerSparkSim = new SparkFlexSim(rollerMotor, rollerMotorSim);
-  SparkAbsoluteEncoderSim pivotEncoderSim = pivotSparkSim.getAbsoluteEncoderSim();
+  SparkRelativeEncoderSim pivotEncoderSim = pivotSparkSim.getRelativeEncoderSim();
 
   SingleJointedArmSim pivotSim =
       new SingleJointedArmSim(
           pivotMotorSim,
-          40, // gearing
+          75, // gearing
           SingleJointedArmSim.estimateMOI(0.15, 4.5), // moment of inertia
           0.15, // length of arm
           Units.degreesToRadians(0), // min angle
-          Units.degreesToRadians(Constants.IntakeConstants.PivotConstants.kPivotStow + 20),
+          Units.degreesToRadians(Constants.IntakeConstants.PivotConstants.kPivotStow),
           true,
-          0); // max angle
+          Units.degreesToRadians(90)); // max angle
   FlywheelSim rollerSim =
       new FlywheelSim(
           LinearSystemId.createFlywheelSystem(rollerMotorSim, 0.0005, 1), rollerMotorSim);
@@ -91,16 +94,46 @@ public class Intake extends SubsystemBase {
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     SmartDashboard.putData("Intake/Mech2d", intakeMech);
+
+    // Assume intake is stowed on startup
+    pivotEncoder.setPosition(Constants.IntakeConstants.PivotConstants.kPivotStow);
+  }
+
+  public void configureBindings() {
+    new Trigger(
+            () ->
+                bottomHardStopDebouncer.calculate(
+                    pivotMotor.getAppliedOutput() < 0 && !isPivotMoving()))
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  pivotMotor.stopMotor();
+                  pivotEncoder.setPosition(Constants.IntakeConstants.PivotConstants.kPivotExtend);
+                }));
+
+    new Trigger(
+            () ->
+                topHardStopDebouncer.calculate(
+                    pivotMotor.getAppliedOutput() > 0 && !isPivotMoving()))
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  pivotMotor.stopMotor();
+                  pivotEncoder.setPosition(Constants.IntakeConstants.PivotConstants.kPivotStow);
+                }));
+  }
+
+  private boolean isPivotMoving() {
+    return Math.abs(pivotEncoder.getVelocity())
+        > IntakeConstants.PivotConstants.kPivotVelocityThreshold;
   }
 
   private void pivotExtend() {
-    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotExtend;
-    intakePivotController.setSetpoint(pivotSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    pivotMotor.set(IntakeConstants.PivotConstants.kPivotDownPower);
   }
 
   private void pivotStow() {
-    pivotSetpoint = Constants.IntakeConstants.PivotConstants.kPivotStow;
-    intakePivotController.setSetpoint(pivotSetpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    pivotMotor.set(IntakeConstants.PivotConstants.kPivotUpPower);
   }
 
   private void setRollerPower(double power) {
@@ -183,6 +216,7 @@ public class Intake extends SubsystemBase {
     intakeRollerMotorSim.setAngle(Units.rotationsToDegrees(rollerEncoder.getPosition()));
 
     SmartDashboard.putNumber("Intake/Pivot/Position", pivotEncoder.getPosition());
+    SmartDashboard.putNumber("Intake/Pivot/Velocity", pivotEncoder.getVelocity());
     SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSetpoint);
     SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
 
@@ -205,13 +239,11 @@ public class Intake extends SubsystemBase {
         pivotSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
     pivotSim.update(0.02);
 
-    pivotEncoderSim.iterate(
-        Units.radiansPerSecondToRotationsPerMinute(pivotSim.getVelocityRadPerSec()), 0.02);
+    SmartDashboard.putNumber(
+        "Intake/Pivot/Sim Position", Units.radiansToDegrees(pivotSim.getAngleRads()));
 
-    // TODO(jan): I think this should have the gear ratio multiplied, but when it is, the pid goes
-    // crazy
     pivotSparkSim.iterate(
-        Units.radiansPerSecondToRotationsPerMinute(pivotSim.getVelocityRadPerSec()),
+        Units.radiansPerSecondToRotationsPerMinute(pivotSim.getVelocityRadPerSec() * 75),
         RobotController.getBatteryVoltage(),
         0.02);
 

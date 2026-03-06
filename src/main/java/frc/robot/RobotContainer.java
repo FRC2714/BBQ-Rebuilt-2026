@@ -133,10 +133,12 @@ public class RobotContainer {
 
     // intake keybinds
     m_driverController.rightBumper().whileTrue(m_stateMachine.intakeSequence());
+    m_driverController.leftBumper().whileTrue(m_stateMachine.extakeSequence());
+
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
 
-    // m_driverController.povLeft().onTrue(m_stateMachine.deployClimber());
+    // m_driverController.povLeft().onTrue(m_stateMachine.deplo\[]yClimber());
     // m_driverController.povUp().onTrue(m_stateMachine.climb());
     // m_driverController.povDown().onTrue(m_stateMachine.unclimb());
 

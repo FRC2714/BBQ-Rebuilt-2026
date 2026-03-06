@@ -129,11 +129,11 @@ public class Intake extends SubsystemBase {
   }
 
   private void pivotExtend() {
-    pivotMotor.set(-1);
+    pivotMotor.set(IntakeConstants.PivotConstants.kPivotDownPower);
   }
 
   private void pivotStow() {
-    pivotMotor.set(1);
+    pivotMotor.set(IntakeConstants.PivotConstants.kPivotUpPower);
   }
 
   private void setRollerPower(double power) {

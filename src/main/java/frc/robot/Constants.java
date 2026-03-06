@@ -138,10 +138,10 @@ public final class Constants {
 
   public static final class ShooterConstants {
     public static final int kTurretCanId = 29;
-    public static final int kTurretMaxRange = 220;
-    public static final int kFwdLimitSwitchOffset = -90;
-    public static final int kRevLimitSwitchOffset = 90;
-    public static final int kTurretMinRange = -180;
+    public static final int kTurretMaxRange = 200;
+    public static final double kFwdLimitSwitchOffset = 16.33;
+    public static final double kRevLimitSwitchOffset = -16.33;
+    public static final int kTurretMinRange = -200;
     public static final double kTurretMountingOffsetDegrees = 0.0;
     public static final Transform2d turretOffset =
         new Transform2d(
@@ -155,7 +155,7 @@ public final class Constants {
     public static final int kHoodCanId = 32;
     public static final double kHoodMaxAngle = 72.276537;
     public static final double kHoodMinAngle = 54.276537;
-    public static final double kHoodMotorSpeed = 0.18; // Should this be flipped?
+    public static final double kHoodZeroingSpeed = 0.1;
 
     public static final int kFlywheelLeaderMotorId = 30;
     public static final int kFlywheelFollowerMotorId = 31;
@@ -174,7 +174,7 @@ public final class Constants {
     public static final class HoodSetpoints {
       public static final double kStow = 15.2;
       public static final double kZeroOffsetDegrees = 0.0;
-      public static final double kHoodVelocityTolerance = 0.05;
+      public static final double kHoodVelocityTolerance = 0.5;
     }
 
     public static final class FlywheelSetpoints {
@@ -239,8 +239,8 @@ public final class Constants {
       public static final double kPivotStow = 90; // needs tuning
       public static final double kPivotExtend = 0; // needs tuning
 
-      public static final double kPivotUpPower = 0.3;
-      public static final double kPivotDownPower = -0.3;
+      public static final double kPivotUpPower = 0.42;
+      public static final double kPivotDownPower = -0.42;
 
       public static final int kPivotThreshold = 1; // needs tuning
       public static final double kPivotVelocityThreshold = 0.1;

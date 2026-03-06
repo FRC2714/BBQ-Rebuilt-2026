@@ -54,7 +54,7 @@ public class RobotContainer {
   private final JoystickButton button5 = new JoystickButton(m_operatorBox, 5);
   private final JoystickButton button6 = new JoystickButton(m_operatorBox, 6);
   private final JoystickButton button8 = new JoystickButton(m_operatorBox, 8);
-  private final JoystickButton button9 = new JoystickButton(m_operatorBox, 9);
+  private final JoystickButton zeroHoodButton = new JoystickButton(m_operatorBox, 9);
 
   final StateMachine m_stateMachine =
       new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb, m_driverController);
@@ -116,6 +116,8 @@ public class RobotContainer {
     extendIntakeButton.onTrue(m_stateMachine.extendIntakeSequence());
     retractIntakeButton.onTrue(m_stateMachine.stowSequence());
 
+    zeroHoodButton.onTrue(m_shooter.zeroHood());
+
     m_driverController
         .leftStick()
         .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
@@ -132,8 +134,8 @@ public class RobotContainer {
     m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
 
     // intake keybinds
-    m_driverController.rightBumper().whileTrue(m_stateMachine.intakeSequence());
-    m_driverController.leftBumper().whileTrue(m_stateMachine.extakeSequence());
+    m_driverController.rightTrigger().whileTrue(m_stateMachine.intakeSequence());
+    m_driverController.leftTrigger().whileTrue(m_stateMachine.extakeSequence());
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
 

@@ -103,6 +103,7 @@ public class Shooter extends SubsystemBase {
 
   private boolean isShooting = false;
   private boolean zeroingHood = false;
+  private boolean hasHoodBeenZeroed = false;
 
   /** Interpolatable lookup values for a given distance to target. */
   public record ShooterParams(double rpm, double hoodAngle, double timeOfFlight) {
@@ -275,6 +276,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putData("Shooter/Mech2d", flyWheelMech);
 
     if (Robot.isSimulation()) {
+      hasHoodBeenZeroed = true;
       hoodSim.setState(
           VecBuilder.fill(
               Units.degreesToRadians(
@@ -282,6 +284,8 @@ public class Shooter extends SubsystemBase {
                       + ShooterConstants.kHoodMinAngle),
               0.0));
     }
+
+    turretRelativeEncoder.setPosition(0);
   }
 
   /** Returns true if fuel is loaded (beam break in real, simulation flag in sim). */
@@ -439,25 +443,33 @@ public class Shooter extends SubsystemBase {
         .until(() -> turretIsStowed());
   }
 
+  private Debouncer zeroHoodDebouncer = new Debouncer(0.25, DebounceType.kRising);
+
   public Command zeroHood() {
-    return new InstantCommand(
+    return this.runOnce(
             () -> {
+              zeroHoodDebouncer.calculate(false);
+              hoodMotor.set(Constants.ShooterConstants.kHoodZeroingSpeed);
               zeroingHood = true;
             })
         .andThen(
-            new RunCommand(() -> hoodMotor.set(Constants.ShooterConstants.kHoodMotorSpeed), this)
-                .until(
-                    () ->
-                        Math.abs(hoodMotor.get())
-                            < Constants.ShooterConstants.HoodSetpoints.kHoodVelocityTolerance))
+            Commands.waitUntil(
+                () ->
+                    zeroHoodDebouncer.calculate(
+                        Math.abs(hoodRelativeEncoder.getVelocity())
+                            < Constants.ShooterConstants.HoodSetpoints.kHoodVelocityTolerance)))
         .andThen(
-            new InstantCommand(
-                () -> {
-                  hoodMotor.set(0.0);
-                  hoodRelativeEncoder.setPosition(
-                      Constants.ShooterConstants.kHoodMaxAngle); // 72.276537
-                  zeroingHood = false;
-                }));
+            () -> {
+              hoodMotor.set(0.0);
+              hoodRelativeEncoder.setPosition(
+                  Constants.ShooterConstants.kHoodMaxAngle); // 72.276537
+              zeroingHood = false;
+              hasHoodBeenZeroed = true;
+            });
+  }
+
+  public Command zeroHoodIfNeeded() {
+    return zeroHood().onlyIf(() -> !hasHoodBeenZeroed);
   }
 
   public Command zeroTurretSequence() {
@@ -537,14 +549,18 @@ public class Shooter extends SubsystemBase {
     turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
     turretOverrideTarget = normalizeTurretTarget(turretOverrideTarget);
     double activeTurretTarget = getActiveTurretTarget();
-    // turretController.setSetpoint(
-    //     activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
-    //     ControlType.kPosition,
-    //     ClosedLoopSlot.kSlot0);
+    turretController.setSetpoint(
+        activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0);
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
     if (!zeroingHood) {
-      hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+      if (hasHoodBeenZeroed) {
+        // Only move hood if we know it has been zeroed
+        hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+      }
+
       flywheelController.setSetpoint(
           isShooting ? flywheelCurrentTarget : 0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     }

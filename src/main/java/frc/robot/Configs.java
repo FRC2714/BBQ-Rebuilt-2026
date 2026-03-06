@@ -77,14 +77,14 @@ public final class Configs {
           .voltageCompensation(12);
       turretConfig
           .externalEncoder
-          .positionConversionFactor(6.25 * 360)
+          .positionConversionFactor(360.0 / 6.25)
           .inverted(true)
           .countsPerRevolution(8192);
       turretConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
           .pid(0.08, 0, 0)
-          .outputRange(-1, 1);
+          .outputRange(-0.66, 0.66);
       turretConfig
           .limitSwitch
           .forwardLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotorAndSetPosition)

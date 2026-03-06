@@ -284,6 +284,8 @@ public class Shooter extends SubsystemBase {
                       + ShooterConstants.kHoodMinAngle),
               0.0));
     }
+
+    turretRelativeEncoder.setPosition(0);
   }
 
   /** Returns true if fuel is loaded (beam break in real, simulation flag in sim). */
@@ -547,10 +549,10 @@ public class Shooter extends SubsystemBase {
     turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
     turretOverrideTarget = normalizeTurretTarget(turretOverrideTarget);
     double activeTurretTarget = getActiveTurretTarget();
-    // turretController.setSetpoint(
-    //     activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
-    //     ControlType.kPosition,
-    //     ClosedLoopSlot.kSlot0);
+    turretController.setSetpoint(
+        activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0);
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
     if (!zeroingHood) {

@@ -286,6 +286,7 @@ public class Shooter extends SubsystemBase {
     }
 
     turretRelativeEncoder.setPosition(0);
+    hoodRelativeEncoder.setPosition(ShooterConstants.kHoodMaxAngle);
   }
 
   /** Returns true if fuel is loaded (beam break in real, simulation flag in sim). */

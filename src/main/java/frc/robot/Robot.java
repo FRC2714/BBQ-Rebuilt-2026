@@ -126,7 +126,6 @@ public class Robot extends TimedRobot {
     LimelightHelpers.SetIMUMode(LimelightConstants.kRearLeftName, 4);
     LimelightHelpers.SetIMUMode(LimelightConstants.kRearRightName, 4);
 
-    CommandScheduler.getInstance().schedule(m_robotContainer.m_shooter.zeroHoodIfNeeded());
   }
 
   /** This function is called periodically during autonomous. */

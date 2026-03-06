@@ -41,12 +41,10 @@ public class RobotContainer {
   public final Intake m_intake = new Intake();
   private final Climb m_climb = new Climb();
 
-
   Joystick m_operatorBox = new Joystick(1); // operator controller 1
   // The driver's controller
   CommandXboxController m_driverController =
       new CommandXboxController(OIConstants.kDriverControllerPort);
-
 
   private final JoystickButton leftSwitch = new JoystickButton(m_operatorBox, 1);
   private final JoystickButton middleSwitch = new JoystickButton(m_operatorBox, 2);
@@ -57,8 +55,6 @@ public class RobotContainer {
   private final JoystickButton button6 = new JoystickButton(m_operatorBox, 6);
   private final JoystickButton button8 = new JoystickButton(m_operatorBox, 8);
   private final JoystickButton button9 = new JoystickButton(m_operatorBox, 9);
-
-
 
   final StateMachine m_stateMachine =
       new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb, m_driverController);

@@ -52,9 +52,9 @@ public class RobotContainer {
   private final JoystickButton extendIntakeButton = new JoystickButton(m_operatorBox, 4);
   private final JoystickButton retractIntakeButton = new JoystickButton(m_operatorBox, 7);
   private final JoystickButton button5 = new JoystickButton(m_operatorBox, 5);
-  private final JoystickButton button6 = new JoystickButton(m_operatorBox, 6);
+  private final JoystickButton button9 = new JoystickButton(m_operatorBox, 9);
   private final JoystickButton button8 = new JoystickButton(m_operatorBox, 8);
-  private final JoystickButton zeroHoodButton = new JoystickButton(m_operatorBox, 9);
+  private final JoystickButton zeroHoodButton = new JoystickButton(m_operatorBox, 6);
 
   final StateMachine m_stateMachine =
       new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb, m_driverController);
@@ -132,7 +132,9 @@ public class RobotContainer {
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
-    m_driverController.povRight().onTrue(m_shooter.zeroTurretSequence());
+    button9.onTrue(m_shooter.zeroTurretSequenceRight());
+    button8.onTrue(m_shooter.zeroTurretSequenceLeft());
+
 
     m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
 

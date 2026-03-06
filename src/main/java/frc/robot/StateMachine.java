@@ -155,7 +155,6 @@ public class StateMachine extends SubsystemBase {
               } else {
                 m_drivetrain.zeroPose(0);
                 System.out.println("zeroed blue");
-
               }
             })
         .ignoringDisable(true);
@@ -187,8 +186,7 @@ public class StateMachine extends SubsystemBase {
     // dye rotor immediately.
     return m_intake
         .extend()
-        .andThen(
-            preload().withDeadline(m_shooter.startShooter().until(() -> m_shooter.readyToShoot())))
+        .andThen(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()))
         .beforeStarting(() -> m_shooter.clearTurretOverride())
         .andThen(
             m_shooter

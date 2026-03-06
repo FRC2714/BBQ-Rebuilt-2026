@@ -45,12 +45,6 @@
           "data": {
             "name": "WAIT_FOR_SCORE"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CLIMB"
-          }
         }
       ]
     }

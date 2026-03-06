@@ -150,9 +150,12 @@ public class StateMachine extends SubsystemBase {
             () -> {
               if (Field.isRed()) {
                 m_drivetrain.zeroPose(180);
+                System.out.println("zeroed red");
 
               } else {
                 m_drivetrain.zeroPose(0);
+                System.out.println("zeroed blue");
+
               }
             })
         .ignoringDisable(true);

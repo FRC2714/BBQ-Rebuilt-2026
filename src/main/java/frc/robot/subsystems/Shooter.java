@@ -276,6 +276,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putData("Shooter/Mech2d", flyWheelMech);
 
     if (Robot.isSimulation()) {
+      hasHoodBeenZeroed = true;
       hoodSim.setState(
           VecBuilder.fill(
               Units.degreesToRadians(

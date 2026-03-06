@@ -181,7 +181,7 @@ public final class Configs {
 
     static {
       rollerConfig
-          .smartCurrentLimit(40)
+          .smartCurrentLimit(80)
           .idleMode(IdleMode.kBrake)
           .inverted(false)
           .voltageCompensation(12);

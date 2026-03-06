@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 0.5913777777777778,
-        "y": 5.9351666666666665
+        "x": 0.9047228915662651,
+        "y": 5.980132530120482
       },
       "prevControl": {
-        "x": 2.3064,
-        "y": 5.886444444444444
+        "x": 2.619745113788487,
+        "y": 5.931410307898259
       },
       "nextControl": null,
       "isLocked": false,
@@ -71,17 +71,6 @@
   ],
   "pointTowardsZones": [],
   "eventMarkers": [
-    {
-      "name": "STOW",
-      "waypointRelativePos": 0.31166253101737784,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "STOW_INTAKE"
-        }
-      }
-    },
     {
       "name": "SCORE",
       "waypointRelativePos": 0.9429280397022329,

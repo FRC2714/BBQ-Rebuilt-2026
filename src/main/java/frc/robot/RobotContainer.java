@@ -121,9 +121,9 @@ public class RobotContainer {
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
 
-    m_driverController.povLeft().onTrue(m_stateMachine.deployClimber());
-    m_driverController.povUp().onTrue(m_stateMachine.climb());
-    m_driverController.povDown().onTrue(m_stateMachine.unclimb());
+    // m_driverController.povLeft().onTrue(m_stateMachine.deployClimber());
+    // m_driverController.povUp().onTrue(m_stateMachine.climb());
+    // m_driverController.povDown().onTrue(m_stateMachine.unclimb());
 
     rumble.onTrue(
         new StartEndCommand(

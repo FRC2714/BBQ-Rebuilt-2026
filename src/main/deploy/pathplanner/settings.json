@@ -6,7 +6,8 @@
     "Double NZ + Climb",
     "Double NZ + Depot",
     "Double NZ + Steal",
-    "Double NZ + Steal Mirror"
+    "Double NZ + Steal Mirror",
+    "Preload"
   ],
   "autoFolders": [],
   "defaultMaxVel": 4.2,

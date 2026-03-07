@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "Preload"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "SCORE"

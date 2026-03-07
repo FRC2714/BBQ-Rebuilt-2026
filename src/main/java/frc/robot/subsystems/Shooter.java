@@ -475,30 +475,30 @@ public class Shooter extends SubsystemBase {
 
   public Command zeroTurretSequenceRight() {
 
-      return new RunCommand(
-              () -> {
-                turretMotor.set(.35);
-              },
-              this)
-          .until(
-              () ->
-                  turretMotor.getForwardLimitSwitch().isPressed()
-                      || turretMotor.getReverseLimitSwitch().isPressed())
-          .andThen(new InstantCommand(() -> turretMotor.set(0), this));
+    return new RunCommand(
+            () -> {
+              turretMotor.set(.35);
+            },
+            this)
+        .until(
+            () ->
+                turretMotor.getForwardLimitSwitch().isPressed()
+                    || turretMotor.getReverseLimitSwitch().isPressed())
+        .andThen(new InstantCommand(() -> turretMotor.set(0), this));
   }
 
-    public Command zeroTurretSequenceLeft() {
+  public Command zeroTurretSequenceLeft() {
 
-      return new RunCommand(
-              () -> {
-                turretMotor.set(-.35);
-              },
-              this)
-          .until(
-              () ->
-                  turretMotor.getForwardLimitSwitch().isPressed()
-                      || turretMotor.getReverseLimitSwitch().isPressed())
-          .andThen(new InstantCommand(() -> turretMotor.set(0), this));
+    return new RunCommand(
+            () -> {
+              turretMotor.set(-.35);
+            },
+            this)
+        .until(
+            () ->
+                turretMotor.getForwardLimitSwitch().isPressed()
+                    || turretMotor.getReverseLimitSwitch().isPressed())
+        .andThen(new InstantCommand(() -> turretMotor.set(0), this));
   }
 
   /** Disables limit-switch-triggered motor stop so turret can move freely after zeroing. */

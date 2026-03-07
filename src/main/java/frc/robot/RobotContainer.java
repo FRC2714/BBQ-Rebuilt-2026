@@ -67,7 +67,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // NAMED COMMANDS FOR PATHPLANNER
-    NamedCommands.registerCommand("SCORE", m_stateMachine.startShootingAuto());
+    NamedCommands.registerCommand("SCORE", m_stateMachine.shoot());
     NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShootAuto());
     NamedCommands.registerCommand(
         "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));
@@ -135,7 +135,6 @@ public class RobotContainer {
     button9.onTrue(m_shooter.zeroTurretSequenceRight());
     button8.onTrue(m_shooter.zeroTurretSequenceLeft());
     leftSwitch.whileTrue(m_stateMachine.toggleOverride());
-
 
     m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
 

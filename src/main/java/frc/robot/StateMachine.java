@@ -206,8 +206,10 @@ public class StateMachine extends SubsystemBase {
         .onlyIf(() -> m_state == State.Idle);
   }
 
-  public Command toggleOverride(){
-    return Commands.runEnd(()->m_shooter.setTurretOverride(0), ()->m_shooter.clearTurretOverride()).ignoringDisable(true);
+  public Command toggleOverride() {
+    return Commands.runEnd(
+            () -> m_shooter.setTurretOverride(0), () -> m_shooter.clearTurretOverride())
+        .ignoringDisable(true);
   }
 
   /** Stops the flywheel and dye rotor, returns to Idle. */
@@ -298,6 +300,7 @@ public class StateMachine extends SubsystemBase {
   public Command startShootingAuto() {
     return Commands.runOnce(
         () -> {
+          
           startShootingRotorPosition = m_dyeRotor.getRotorPosition();
           setState(State.Shooting);
           m_drivetrain.setShootingStateTrue();

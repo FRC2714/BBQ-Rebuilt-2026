@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.8616405135520675,
+        "x": 1.9688730385164046,
         "y": 4.067346647646221
       },
       "prevControl": {
-        "x": 3.120413694721825,
-        "y": 3.9638373751783167
+        "x": 2.22700427960057,
+        "y": 4.041469329529244
       },
       "nextControl": null,
       "isLocked": false,
@@ -54,7 +54,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -179.52649194126505
   },
   "reversed": false,
   "folder": "Preload",

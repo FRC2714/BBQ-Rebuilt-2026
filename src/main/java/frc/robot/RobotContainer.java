@@ -67,8 +67,10 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // NAMED COMMANDS FOR PATHPLANNER
-    NamedCommands.registerCommand("SCORE", m_stateMachine.shoot());
-    NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShootAuto());
+    NamedCommands.registerCommand("SCORE", m_shooter.startShooter());
+    NamedCommands.registerCommand("STOP_SHOOTING", m_shooter.stopShooter());
+    NamedCommands.registerCommand("DYEROTOR", m_dyeRotor.start());
+    NamedCommands.registerCommand("STOP_DYEROTOR", m_dyeRotor.stop());
     NamedCommands.registerCommand(
         "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));
     NamedCommands.registerCommand("CLIMB", m_stateMachine.climb());
@@ -116,10 +118,10 @@ public class RobotContainer {
     m_stateMachine.configureBindings();
 
     extendIntakeButton.onTrue(m_stateMachine.extendIntakeSequence());
-    retractIntakeButton.onTrue(m_stateMachine.stowSequence());
+    retractIntakeButton.onTrue(m_stateMachine.retractIntakeSequence());
     button5.onTrue(m_stateMachine.zeroPoseAuto());
 
-    zeroHoodButton.onTrue(m_shooter.zeroHood());
+    // zeroHoodButton.onTrue(m_shooter.zeroHood());
 
     m_driverController
         .leftStick()
@@ -141,6 +143,11 @@ public class RobotContainer {
     // intake keybinds
     m_driverController.rightTrigger().whileTrue(m_stateMachine.intakeSequence());
     m_driverController.leftTrigger().whileTrue(m_stateMachine.extakeSequence());
+    m_driverController.leftBumper().whileTrue(m_dyeRotor.start()).whileFalse(m_dyeRotor.stop());
+    m_driverController
+        .rightBumper()
+        .whileTrue(m_shooter.startShooter())
+        .whileFalse(m_shooter.stopShooter());
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
 

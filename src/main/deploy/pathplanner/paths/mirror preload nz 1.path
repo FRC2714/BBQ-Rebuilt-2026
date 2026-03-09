@@ -3,47 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.4697574893009984,
-        "y": 4.067346647646221
+        "x": 3.5732667617689007,
+        "y": 5.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1733845992986476,
-        "y": 4.067346647646221
+        "x": 3.27689387176655,
+        "y": 5.0
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.9688730385164046,
-        "y": 4.067346647646221
+        "x": 2.266462196861626,
+        "y": 5.2059486447931524
       },
       "prevControl": {
-        "x": 2.228298120604815,
-        "y": 4.067346647646221
+        "x": 2.5258872789500364,
+        "y": 5.2059486447931524
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "front climb shoot mirror"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "INTAKE",
-      "waypointRelativePos": 0.25388251181634003,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "INTAKE"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -54,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.8814039965820182
+    "rotation": -29.054604099077146
   },
   "reversed": false,
-  "folder": "Preload",
+  "folder": "Preload + NZ Mirror",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

@@ -530,8 +530,8 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /** Zeroes the heading of the robot. */
-  public void zeroPose() {
-    Pose2d pose = new Pose2d();
+  public void zeroPose(double heading) {
+    Pose2d pose = new Pose2d(0, 0, Rotation2d.fromDegrees(heading));
 
     m_gyro.setYaw(pose.getRotation().getRotations());
     m_poseEstimator.resetRotation(pose.getRotation());
@@ -546,7 +546,7 @@ public class DriveSubsystem extends SubsystemBase {
         pose);
 
     for (String limelightName : LimelightConstants.kCameraNames) {
-      LimelightHelpers.SetRobotOrientation(limelightName, 0, 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation(limelightName, heading, 0, 0, 0, 0, 0);
       LimelightHelpers.SetIMUMode(limelightName, 1);
     }
 

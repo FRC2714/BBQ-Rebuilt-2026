@@ -52,9 +52,9 @@ public class RobotContainer {
   private final JoystickButton extendIntakeButton = new JoystickButton(m_operatorBox, 4);
   private final JoystickButton retractIntakeButton = new JoystickButton(m_operatorBox, 7);
   private final JoystickButton button5 = new JoystickButton(m_operatorBox, 5);
-  private final JoystickButton button6 = new JoystickButton(m_operatorBox, 6);
+  private final JoystickButton button9 = new JoystickButton(m_operatorBox, 9);
   private final JoystickButton button8 = new JoystickButton(m_operatorBox, 8);
-  private final JoystickButton zeroHoodButton = new JoystickButton(m_operatorBox, 9);
+  private final JoystickButton zeroHoodButton = new JoystickButton(m_operatorBox, 6);
 
   final StateMachine m_stateMachine =
       new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb, m_driverController);
@@ -67,8 +67,10 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // NAMED COMMANDS FOR PATHPLANNER
-    NamedCommands.registerCommand("SCORE", m_stateMachine.startShootingAuto());
-    NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShootAuto());
+    NamedCommands.registerCommand("SCORE", m_shooter.startShooter());
+    NamedCommands.registerCommand("STOP_SHOOTING", m_shooter.stopShooter());
+    NamedCommands.registerCommand("DYEROTOR", m_dyeRotor.start());
+    NamedCommands.registerCommand("STOP_DYEROTOR", m_dyeRotor.stop());
     NamedCommands.registerCommand(
         "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));
     NamedCommands.registerCommand("CLIMB", m_stateMachine.climb());
@@ -81,6 +83,8 @@ public class RobotContainer {
         "WAIT_FOR_SCORE", m_stateMachine.waitForScore(AutoConstants.kShootTimeout));
     NamedCommands.registerCommand(
         "WAIT_FOR_SCORE_INITIAL", m_stateMachine.waitForScore(AutoConstants.kShootInitialTimeout));
+    NamedCommands.registerCommand(
+        "FLIP_POSE", new InstantCommand(() -> m_robotDrive.zeroPose(180), m_robotDrive));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -114,9 +118,10 @@ public class RobotContainer {
     m_stateMachine.configureBindings();
 
     extendIntakeButton.onTrue(m_stateMachine.extendIntakeSequence());
-    retractIntakeButton.onTrue(m_stateMachine.stowSequence());
+    retractIntakeButton.onTrue(m_stateMachine.retractIntakeSequence());
+    button5.onTrue(m_stateMachine.zeroPoseAuto());
 
-    zeroHoodButton.onTrue(m_shooter.zeroHood());
+    // zeroHoodButton.onTrue(m_shooter.zeroHood());
 
     m_driverController
         .leftStick()
@@ -124,18 +129,25 @@ public class RobotContainer {
 
     m_driverController
         .back()
-        .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(), m_robotDrive));
+        .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(0), m_robotDrive));
     m_driverController
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
-    m_driverController.povRight().onTrue(m_shooter.zeroTurretSequence());
+    button9.onTrue(m_shooter.zeroTurretSequenceRight());
+    button8.onTrue(m_shooter.zeroTurretSequenceLeft());
+    leftSwitch.whileTrue(m_stateMachine.toggleOverride());
 
     m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
 
     // intake keybinds
     m_driverController.rightTrigger().whileTrue(m_stateMachine.intakeSequence());
     m_driverController.leftTrigger().whileTrue(m_stateMachine.extakeSequence());
+    m_driverController.leftBumper().whileTrue(m_dyeRotor.start()).whileFalse(m_dyeRotor.stop());
+    m_driverController
+        .rightBumper()
+        .whileTrue(m_shooter.startShooter())
+        .whileFalse(m_shooter.stopShooter());
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
 

@@ -3,38 +3,43 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.43068888888889,
-        "y": 5.672066666666666
+        "x": 1.969,
+        "y": 3.097
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.610129007685584,
-        "y": 5.672066666666666
+        "x": 3.3403708987161194,
+        "y": 2.1136091298145514
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "front climb shoot"
     },
     {
       "anchor": {
-        "x": 8.291855421686748,
-        "y": 5.672066666666666
+        "x": 8.25706134094151,
+        "y": 2.501768901569187
       },
       "prevControl": {
-        "x": 7.405110977242304,
-        "y": 5.574622222222221
+        "x": 7.25706134094151,
+        "y": 2.501768901569187
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Depot Near NZ"
+      "linkedName": "low nz "
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.30063965884861327,
+      "rotationDegrees": 0.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "INTAKE",
-      "waypointRelativePos": 0.2193548387096812,
+      "waypointRelativePos": 0.4294395678595552,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -57,10 +62,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Double NZ + Depot",
+  "folder": "Preload + NZ",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 22.81430124198533
   },
   "useDefaultConstraints": true
 }

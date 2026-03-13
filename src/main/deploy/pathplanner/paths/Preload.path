@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.43068888888889,
-        "y": 5.672066666666666
+        "x": 3.4697574893009984,
+        "y": 4.067346647646221
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.610129007685584,
-        "y": 5.672066666666666
+        "x": 3.1733845992986476,
+        "y": 4.067346647646221
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.291855421686748,
-        "y": 5.672066666666666
+        "x": 1.9688730385164046,
+        "y": 4.067346647646221
       },
       "prevControl": {
-        "x": 7.405110977242304,
-        "y": 5.574622222222221
+        "x": 2.228298120604815,
+        "y": 4.067346647646221
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Depot Near NZ"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "INTAKE",
-      "waypointRelativePos": 0.2193548387096812,
+      "waypointRelativePos": 0.25388251181634003,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -45,7 +45,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.2,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -54,13 +54,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 0.8814039965820182
   },
   "reversed": false,
-  "folder": "Double NZ + Depot",
+  "folder": "Preload",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

@@ -286,6 +286,7 @@ public class Shooter extends SubsystemBase {
     }
 
     turretRelativeEncoder.setPosition(0);
+    hoodRelativeEncoder.setPosition(ShooterConstants.kHoodMaxAngle);
   }
 
   /** Returns true if fuel is loaded (beam break in real, simulation flag in sim). */
@@ -407,7 +408,7 @@ public class Shooter extends SubsystemBase {
 
   public boolean flywheelAtSetpoint() {
     boolean atSetpoint =
-        Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 100;
+        Math.abs(flywheelRelativeEncoder.getVelocity() - flywheelCurrentTarget) < 300;
     return flywheelDebouncer.calculate(atSetpoint);
   }
 
@@ -472,22 +473,32 @@ public class Shooter extends SubsystemBase {
     return zeroHood().onlyIf(() -> !hasHoodBeenZeroed);
   }
 
-  public Command zeroTurretSequence() {
-    if (!wasZeroed) {
-      wasZeroed = true;
-      return new RunCommand(
-              () -> {
-                turretMotor.set(1);
-              },
-              this)
-          .until(
-              () ->
-                  turretMotor.getForwardLimitSwitch().isPressed()
-                      || turretMotor.getReverseLimitSwitch().isPressed())
-          .andThen(new InstantCommand(() -> turretMotor.set(0), this));
-    } else {
-      return new InstantCommand();
-    }
+  public Command zeroTurretSequenceRight() {
+
+    return new RunCommand(
+            () -> {
+              turretMotor.set(.35);
+            },
+            this)
+        .until(
+            () ->
+                turretMotor.getForwardLimitSwitch().isPressed()
+                    || turretMotor.getReverseLimitSwitch().isPressed())
+        .andThen(new InstantCommand(() -> turretMotor.set(0), this));
+  }
+
+  public Command zeroTurretSequenceLeft() {
+
+    return new RunCommand(
+            () -> {
+              turretMotor.set(-.35);
+            },
+            this)
+        .until(
+            () ->
+                turretMotor.getForwardLimitSwitch().isPressed()
+                    || turretMotor.getReverseLimitSwitch().isPressed())
+        .andThen(new InstantCommand(() -> turretMotor.set(0), this));
   }
 
   /** Disables limit-switch-triggered motor stop so turret can move freely after zeroing. */
@@ -528,8 +539,8 @@ public class Shooter extends SubsystemBase {
             () ->
                 turretMotor.getForwardLimitSwitch().isPressed()
                     || turretMotor.getReverseLimitSwitch().isPressed());
-    disableLimitSwitch.onTrue(
-        Commands.runOnce(() -> disableLimitSwitchAutoZeroing()).ignoringDisable(true));
+    // disableLimitSwitch.onTrue(
+    //     Commands.runOnce(() -> disableLimitSwitchAutoZeroing()).ignoringDisable(true));
   }
 
   public Pose3d getTurretPose3d() {
@@ -549,16 +560,17 @@ public class Shooter extends SubsystemBase {
     turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
     turretOverrideTarget = normalizeTurretTarget(turretOverrideTarget);
     double activeTurretTarget = getActiveTurretTarget();
-    turretController.setSetpoint(
-        activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0);
+    // turretController.setSetpoint(
+    //     activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
+    //     ControlType.kPosition,
+    //     ClosedLoopSlot.kSlot0);
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
     if (!zeroingHood) {
       if (hasHoodBeenZeroed) {
         // Only move hood if we know it has been zeroed
-        hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        // hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition,
+        // ClosedLoopSlot.kSlot0);
       }
 
       flywheelController.setSetpoint(

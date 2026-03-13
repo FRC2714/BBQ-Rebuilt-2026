@@ -3,49 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.43068888888889,
-        "y": 5.672066666666666
+        "x": 3.5732667617689007,
+        "y": 5.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.610129007685584,
-        "y": 5.672066666666666
+        "x": 3.27689387176655,
+        "y": 5.0
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.291855421686748,
-        "y": 5.672066666666666
+        "x": 2.266462196861626,
+        "y": 5.2059486447931524
       },
       "prevControl": {
-        "x": 7.405110977242304,
-        "y": 5.574622222222221
+        "x": 2.5258872789500364,
+        "y": 5.2059486447931524
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Depot Near NZ"
+      "linkedName": "front climb shoot mirror"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "INTAKE",
-      "waypointRelativePos": 0.2193548387096812,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "INTAKE"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.2,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -54,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -29.054604099077146
   },
   "reversed": false,
-  "folder": "Double NZ + Depot",
+  "folder": "Preload + NZ Mirror",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

@@ -210,6 +210,20 @@ public class Intake extends SubsystemBase {
         });
   }
 
+  public Command agitateOut() {
+    return this.runOnce(
+        () -> {
+          pivotMotor.set(-.2);
+        });
+  }
+
+  public Command agitateIn() {
+    return this.runOnce(
+        () -> {
+          pivotMotor.set(.2);
+        });
+  }
+
   @Override
   public void periodic() {
     intakeBar.setAngle(pivotEncoder.getPosition());

@@ -3,47 +3,40 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.43068888888889,
-        "y": 5.672066666666666
+        "x": 8.282938659058486,
+        "y": 5.568231098430813
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.610129007685584,
-        "y": 5.672066666666666
+        "x": 6.445649072753208,
+        "y": 5.619985734664765
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "high nz mirror"
     },
     {
       "anchor": {
-        "x": 8.291855421686748,
-        "y": 5.672066666666666
+        "x": 2.66756062767475,
+        "y": 5.4517831669044226
       },
       "prevControl": {
-        "x": 7.405110977242304,
-        "y": 5.574622222222221
+        "x": 4.207261055634806,
+        "y": 5.4647218259629105
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Depot Near NZ"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.7334754797441344,
+      "rotationDegrees": 0.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "INTAKE",
-      "waypointRelativePos": 0.2193548387096812,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "INTAKE"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.2,
     "maxAcceleration": 3.0,
@@ -54,10 +47,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -37.874983651098205
   },
   "reversed": false,
-  "folder": "Double NZ + Depot",
+  "folder": "Preload + NZ Mirror",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

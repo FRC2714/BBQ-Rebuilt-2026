@@ -95,6 +95,12 @@ public final class Configs {
           .reverseLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotorAndSetPosition)
           .reverseLimitSwitchPosition(ShooterConstants.kRevLimitSwitchOffset)
           .limitSwitchPositionSensor(FeedbackSensor.kAlternateOrExternalEncoder);
+      turretConfig
+          .softLimit
+          .forwardSoftLimitEnabled(true)
+          .forwardSoftLimit(ShooterConstants.kTurretMaxRange)
+          .reverseSoftLimitEnabled(true)
+          .reverseSoftLimit(ShooterConstants.kTurretMinRange);
 
       hoodConfig
           .smartCurrentLimit(20)

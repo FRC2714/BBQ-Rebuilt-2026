@@ -6,7 +6,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -145,6 +144,21 @@ public class StateMachine extends SubsystemBase {
     m_intake.configureBindings();
   }
 
+  public Command zeroPoseAuto() {
+    return Commands.runOnce(
+            () -> {
+              if (Field.isRed()) {
+                m_drivetrain.zeroPose(180);
+                System.out.println("zeroed red");
+
+              } else {
+                m_drivetrain.zeroPose(0);
+                System.out.println("zeroed blue");
+              }
+            })
+        .ignoringDisable(true);
+  }
+
   public boolean phaseShift() {
     return phaseShiftActive;
   }
@@ -171,8 +185,7 @@ public class StateMachine extends SubsystemBase {
     // dye rotor immediately.
     return m_intake
         .extend()
-        .andThen(
-            preload().withDeadline(m_shooter.startShooter().until(() -> m_shooter.readyToShoot())))
+        .andThen(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()))
         .beforeStarting(() -> m_shooter.clearTurretOverride())
         .andThen(
             m_shooter
@@ -190,6 +203,12 @@ public class StateMachine extends SubsystemBase {
               CommandScheduler.getInstance().schedule(stopShoot());
             })
         .onlyIf(() -> m_state == State.Idle);
+  }
+
+  public Command toggleOverride() {
+    return Commands.runEnd(
+            () -> m_shooter.setTurretOverride(0), () -> m_shooter.clearTurretOverride())
+        .ignoringDisable(true);
   }
 
   /** Stops the flywheel and dye rotor, returns to Idle. */
@@ -268,7 +287,11 @@ public class StateMachine extends SubsystemBase {
   }
 
   public Command extendIntakeSequence() {
-    return m_intake.extend().onlyIf(StateMachine::isNotClimbing);
+    return m_intake.agitateOut().onlyIf(StateMachine::isNotClimbing);
+  }
+
+  public Command retractIntakeSequence() {
+    return m_intake.agitateIn().onlyIf(StateMachine::isNotClimbing);
   }
 
   // Auto commands
@@ -320,6 +343,14 @@ public class StateMachine extends SubsystemBase {
     return m_intake.stow().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout);
   }
 
+  public Command manualDyeRotor() {
+    return Commands.runEnd(() -> m_dyeRotor.start(), () -> m_dyeRotor.stop());
+  }
+
+  public Command manualFlywheel() {
+    return Commands.runEnd(() -> m_shooter.startShooter(), () -> m_shooter.stopShooter());
+  }
+
   /**
    * Runs shooter and dye rotor for a duration, then stops. Only runs if already in Shooting state.
    *
@@ -364,26 +395,26 @@ public class StateMachine extends SubsystemBase {
     Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
     Rotation2d robotHeading = m_drivetrain.getPose().getRotation();
 
-    if (m_drivetrain.isInAllianceZone()) {
-      m_shooter.calculate(
-          robotPosition,
-          robotHeading,
-          m_drivetrain.getFieldRelativeVelocity(),
-          Field.getAllianceHub().toTranslation2d(),
-          ShooterConstants.kLatencyCompensation);
-      return;
-    }
+    // if (m_drivetrain.isInAllianceZone()) {
+    m_shooter.calculate(
+        robotPosition,
+        robotHeading,
+        m_drivetrain.getFieldRelativeVelocity(),
+        Field.getAllianceHub().toTranslation2d(),
+        ShooterConstants.kLatencyCompensation);
+    //   return;
+    // }
 
     // Airstrike manual override takes priority
-    double airstrikeX = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/x", 0));
-    double airstrikeY = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/y", 0));
+    // double airstrikeX = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/x", 0));
+    // double airstrikeY = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/y", 0));
 
     Translation2d target;
-    if (airstrikeX != 0 || airstrikeY != 0) {
-      target = new Translation2d(airstrikeX, airstrikeY);
-    } else {
-      target = getAutoAimTarget();
-    }
+    // if (airstrikeX != 0 || airstrikeY != 0) {
+    //   target = new Translation2d(airstrikeX, airstrikeY);
+    // } else {
+    target = getAutoAimTarget();
+    // }
 
     publisher.set(new Pose2d(target, new Rotation2d()));
 

@@ -148,8 +148,8 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
-    CommandScheduler.getInstance().schedule(m_robotContainer.m_stateMachine.unclimb());
-    // CommandScheduler.getInstance().schedule(m_robotContainer.m_shooter.zeroHoodIfNeeded());
+    // CommandScheduler.getInstance().schedule(m_robotContainer.m_stateMachine.unclimb());
+    CommandScheduler.getInstance().schedule(m_robotContainer.m_shooter.zeroHoodIfNeeded());
 
     LimelightHelpers.SetIMUMode(LimelightConstants.kFrontRightName, 4); // 4 is internal imu + gyro
     LimelightHelpers.SetIMUMode(LimelightConstants.kFrontLeftName, 4);

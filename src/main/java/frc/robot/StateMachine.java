@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -395,26 +396,26 @@ public class StateMachine extends SubsystemBase {
     Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
     Rotation2d robotHeading = m_drivetrain.getPose().getRotation();
 
-    // if (m_drivetrain.isInAllianceZone()) {
-    m_shooter.calculate(
-        robotPosition,
-        robotHeading,
-        m_drivetrain.getFieldRelativeVelocity(),
-        Field.getAllianceHub().toTranslation2d(),
-        ShooterConstants.kLatencyCompensation);
-    //   return;
-    // }
+    if (m_drivetrain.isInAllianceZone()) {
+      m_shooter.calculate(
+          robotPosition,
+          robotHeading,
+          m_drivetrain.getFieldRelativeVelocity(),
+          Field.getAllianceHub().toTranslation2d(),
+          ShooterConstants.kLatencyCompensation);
+      return;
+    }
 
     // Airstrike manual override takes priority
-    // double airstrikeX = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/x", 0));
-    // double airstrikeY = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/y", 0));
+    double airstrikeX = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/x", 0));
+    double airstrikeY = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/y", 0));
 
     Translation2d target;
-    // if (airstrikeX != 0 || airstrikeY != 0) {
-    //   target = new Translation2d(airstrikeX, airstrikeY);
-    // } else {
-    target = getAutoAimTarget();
-    // }
+    if (airstrikeX != 0 || airstrikeY != 0) {
+      target = new Translation2d(airstrikeX, airstrikeY);
+    } else {
+      target = getAutoAimTarget();
+    }
 
     publisher.set(new Pose2d(target, new Rotation2d()));
 

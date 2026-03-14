@@ -72,7 +72,7 @@ public final class Configs {
     static {
       turretConfig
           .smartCurrentLimit(20)
-          .idleMode(IdleMode.kBrake)
+          .idleMode(IdleMode.kCoast)
           .inverted(true)
           .voltageCompensation(12);
       turretConfig
@@ -80,11 +80,12 @@ public final class Configs {
           .positionConversionFactor(360.0 / 6.25)
           .inverted(true)
           .countsPerRevolution(8192);
+      turretConfig.encoder.positionConversionFactor(360.0 / (6.25 * 25));
       turretConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
-          .pid(0.08, 0, 0)
-          .outputRange(-0.66, 0.66);
+          .pid(0.05, 0, 0)
+          .outputRange(-1, 1);
       turretConfig
           .limitSwitch
           .forwardLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotorAndSetPosition)

@@ -87,7 +87,7 @@ public class Shooter extends SubsystemBase {
   private SparkLimitSwitch turretReverseLimitSwitch = turretMotor.getReverseLimitSwitch();
 
   private double turretCurrentTarget = TurretSetpoints.kStow;
-  private boolean turretOverrideEnabled = false;
+  private boolean turretOverrideEnabled = true;
   private double turretOverrideTarget = TurretSetpoints.kStow;
   private double hoodCurrentTarget = HoodSetpoints.kStow;
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
@@ -560,17 +560,16 @@ public class Shooter extends SubsystemBase {
     turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
     turretOverrideTarget = normalizeTurretTarget(turretOverrideTarget);
     double activeTurretTarget = getActiveTurretTarget();
-    // turretController.setSetpoint(
-    //     activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
-    //     ControlType.kPosition,
-    //     ClosedLoopSlot.kSlot0);
+    turretController.setSetpoint(
+        activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0);
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
     if (!zeroingHood) {
       if (hasHoodBeenZeroed) {
         // Only move hood if we know it has been zeroed
-        // hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition,
-        // ClosedLoopSlot.kSlot0);
+        hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
       }
 
       flywheelController.setSetpoint(

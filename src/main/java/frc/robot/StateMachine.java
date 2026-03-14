@@ -186,7 +186,7 @@ public class StateMachine extends SubsystemBase {
     // dye rotor immediately.
     return m_intake
         .extend()
-        .andThen(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()))
+        .andThen(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()).raceWith(Commands.waitSeconds(3)))
         .beforeStarting(() -> m_shooter.clearTurretOverride())
         .andThen(
             m_shooter
@@ -397,12 +397,12 @@ public class StateMachine extends SubsystemBase {
     Rotation2d robotHeading = m_drivetrain.getPose().getRotation();
 
     if (m_drivetrain.isInAllianceZone()) {
-      m_shooter.calculate(
-          robotPosition,
-          robotHeading,
-          m_drivetrain.getFieldRelativeVelocity(),
-          Field.getAllianceHub().toTranslation2d(),
-          ShooterConstants.kLatencyCompensation);
+    m_shooter.calculate(
+        robotPosition,
+        robotHeading,
+        m_drivetrain.getFieldRelativeVelocity(),
+        Field.getAllianceHub().toTranslation2d(),
+        ShooterConstants.kLatencyCompensation);
       return;
     }
 
@@ -414,7 +414,7 @@ public class StateMachine extends SubsystemBase {
     if (airstrikeX != 0 || airstrikeY != 0) {
       target = new Translation2d(airstrikeX, airstrikeY);
     } else {
-      target = getAutoAimTarget();
+    target = getAutoAimTarget();
     }
 
     publisher.set(new Pose2d(target, new Rotation2d()));

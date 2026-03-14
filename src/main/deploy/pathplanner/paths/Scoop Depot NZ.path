@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.057481927710843,
-        "y": 5.63044578313253
+        "x": 3.5732667617689007,
+        "y": 5.632924393723252
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.058668164553719,
-        "y": 5.656589665591852
+        "x": 5.574452998611776,
+        "y": 5.659068276182574
       },
       "isLocked": false,
       "linkedName": "backed depot"
@@ -114,7 +114,21 @@
       "rotationDegrees": -176.9335144988741
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.6205266711681312,
+      "maxWaypointRelativePos": 3.011478730587451,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {

@@ -191,7 +191,11 @@ public class StateMachine extends SubsystemBase {
                 .startShooter()
                 .until(() -> m_shooter.readyToShoot())
                 .raceWith(Commands.waitSeconds(1.5)))
-        .beforeStarting(() -> m_shooter.clearTurretOverride())
+        .beforeStarting(
+            () -> {
+              m_shooter.clearTurretOverride();
+              m_drivetrain.setShootingStateTrue();
+            })
         .andThen(
             m_shooter
                 .startShooter()
@@ -200,7 +204,6 @@ public class StateMachine extends SubsystemBase {
                     () -> {
                       startShootingRotorPosition = m_dyeRotor.getRotorPosition();
                       setState(State.Shooting);
-                      m_drivetrain.setShootingStateTrue();
                     }))
         .finallyDo(
             () -> {

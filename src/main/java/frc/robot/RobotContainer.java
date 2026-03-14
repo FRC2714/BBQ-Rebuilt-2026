@@ -69,22 +69,11 @@ public class RobotContainer {
     // NAMED COMMANDS FOR PATHPLANNER
     NamedCommands.registerCommand("SCORE", m_stateMachine.shoot());
     NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShoot());
-    NamedCommands.registerCommand("DYEROTOR", m_dyeRotor.start());
-    NamedCommands.registerCommand("STOP_DYEROTOR", m_dyeRotor.stop());
     NamedCommands.registerCommand(
         "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));
-    NamedCommands.registerCommand("CLIMB", m_stateMachine.climb());
-    NamedCommands.registerCommand(
-        "EXTAKE", m_stateMachine.extakeSequenceAuto(AutoConstants.kExtakeTimeout));
     NamedCommands.registerCommand(
         "STOW_INTAKE", m_stateMachine.stowSequenceAuto(AutoConstants.kStowTimeout));
     NamedCommands.registerCommand("PRELOAD", m_stateMachine.preloadCommand());
-    NamedCommands.registerCommand(
-        "WAIT_FOR_SCORE", m_stateMachine.waitForScore(AutoConstants.kShootTimeout));
-    NamedCommands.registerCommand(
-        "WAIT_FOR_SCORE_INITIAL", m_stateMachine.waitForScore(AutoConstants.kShootInitialTimeout));
-    NamedCommands.registerCommand(
-        "FLIP_POSE", new InstantCommand(() -> m_robotDrive.zeroPose(180), m_robotDrive));
 
     // Configure the button bindings
     configureButtonBindings();

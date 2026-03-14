@@ -141,6 +141,10 @@ public class StateMachine extends SubsystemBase {
     //     new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning()).and(xNewPress);
     // startPreload.onTrue(this.preloadCommand());
 
+    Trigger shooterButton = new Trigger(() -> m_driverHID.getAButton());
+    shooterButton.and(() -> m_state == State.Idle).onTrue(this.shoot());
+    shooterButton.and(() -> m_state == State.Shooting).onFalse(this.stopShoot());
+
     m_shooter.configureShooterBindings();
     m_intake.configureBindings();
   }
@@ -205,11 +209,6 @@ public class StateMachine extends SubsystemBase {
                       startShootingRotorPosition = m_dyeRotor.getRotorPosition();
                       setState(State.Shooting);
                     }))
-        .finallyDo(
-            () -> {
-              m_drivetrain.setShootingStateFalse();
-              CommandScheduler.getInstance().schedule(stopShoot());
-            })
         .onlyIf(() -> m_state == State.Idle);
   }
 
@@ -227,6 +226,7 @@ public class StateMachine extends SubsystemBase {
         .withName("stop shooting")
         .beforeStarting(
             () -> {
+              m_drivetrain.setShootingStateFalse();
               m_state = State.Idle;
             });
   }

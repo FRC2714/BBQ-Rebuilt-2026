@@ -136,7 +136,7 @@ public class RobotContainer {
     button8.onTrue(m_shooter.zeroTurretSequenceLeft());
     leftSwitch.whileTrue(m_stateMachine.toggleOverride());
 
-    m_driverController.a().toggleOnTrue(m_stateMachine.shoot());
+    // Shooter moved to state machine bindings
 
     // intake keybinds
     m_driverController.rightTrigger().whileTrue(m_stateMachine.intakeSequence());

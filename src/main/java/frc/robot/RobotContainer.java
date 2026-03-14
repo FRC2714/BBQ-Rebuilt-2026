@@ -67,8 +67,8 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // NAMED COMMANDS FOR PATHPLANNER
-    NamedCommands.registerCommand("SCORE", m_shooter.startShooter());
-    NamedCommands.registerCommand("STOP_SHOOTING", m_shooter.stopShooter());
+    NamedCommands.registerCommand("SCORE", m_stateMachine.shoot());
+    NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShoot());
     NamedCommands.registerCommand("DYEROTOR", m_dyeRotor.start());
     NamedCommands.registerCommand("STOP_DYEROTOR", m_dyeRotor.stop());
     NamedCommands.registerCommand(

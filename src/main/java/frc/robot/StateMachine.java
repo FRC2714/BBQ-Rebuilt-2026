@@ -190,7 +190,7 @@ public class StateMachine extends SubsystemBase {
             m_shooter
                 .startShooter()
                 .until(() -> m_shooter.readyToShoot())
-                .raceWith(Commands.waitSeconds(3)))
+                .raceWith(Commands.waitSeconds(1.5)))
         .beforeStarting(() -> m_shooter.clearTurretOverride())
         .andThen(
             m_shooter

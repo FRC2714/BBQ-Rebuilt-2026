@@ -3,47 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.43068888888889,
-        "y": 5.672066666666666
+        "x": 3.5820120481927713,
+        "y": 5.63044578313253
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.610129007685584,
-        "y": 5.672066666666666
+        "x": 3.3320120481927713,
+        "y": 5.63044578313253
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.291855421686748,
-        "y": 5.672066666666666
+        "x": 3.057481927710843,
+        "y": 5.63044578313253
       },
       "prevControl": {
-        "x": 7.405110977242304,
-        "y": 5.574622222222221
+        "x": 3.306846602668527,
+        "y": 5.648257545629509
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Depot Near NZ"
+      "linkedName": "backed depot"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "INTAKE",
-      "waypointRelativePos": 0.2193548387096812,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "INTAKE"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.2,
     "maxAcceleration": 3.0,
@@ -57,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Double NZ + Depot",
+  "folder": "Scoop Depot NZ",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

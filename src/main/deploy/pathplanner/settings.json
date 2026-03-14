@@ -3,13 +3,8 @@
   "robotLength": 0.914,
   "holonomicMode": true,
   "pathFolders": [
-    "Double NZ + Climb",
-    "Double NZ + Depot",
-    "Double NZ + Steal",
-    "Double NZ + Steal Mirror",
-    "Preload + NZ Mirror",
     "Preload",
-    "Preload + NZ"
+    "Scoop Depot NZ"
   ],
   "autoFolders": [],
   "defaultMaxVel": 4.2,

@@ -1,0 +1,151 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.057481927710843,
+        "y": 5.63044578313253
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.058668164553719,
+        "y": 5.656589665591852
+      },
+      "isLocked": false,
+      "linkedName": "backed depot"
+    },
+    {
+      "anchor": {
+        "x": 6.096305278174036,
+        "y": 6.046961483594864
+      },
+      "prevControl": {
+        "x": 5.675427853145488,
+        "y": 5.5272482507406435
+      },
+      "nextControl": {
+        "x": 6.402944039496665,
+        "y": 6.42560907191488
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.183152639087017,
+        "y": 7.1855634807417985
+      },
+      "prevControl": {
+        "x": 6.514203178137184,
+        "y": 7.221416400335317
+      },
+      "nextControl": {
+        "x": 8.370796039971887,
+        "y": 7.121910714960001
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.183152639087017,
+        "y": 4.403751783166904
+      },
+      "prevControl": {
+        "x": 8.577932452176142,
+        "y": 4.308653159547191
+      },
+      "nextControl": {
+        "x": 6.613851640513552,
+        "y": 4.442567760342368
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.979857346647646,
+        "y": 5.1930099857346645
+      },
+      "prevControl": {
+        "x": 6.406833095577745,
+        "y": 4.960114122681883
+      },
+      "nextControl": {
+        "x": 4.991642485547773,
+        "y": 5.7320362736073225
+      },
+      "isLocked": false,
+      "linkedName": "Depot after scoop"
+    },
+    {
+      "anchor": {
+        "x": 3.210984308131241,
+        "y": 5.529415121255349
+      },
+      "prevControl": {
+        "x": 4.297831669044222,
+        "y": 5.529415121255349
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": -37.77500996542958
+    },
+    {
+      "waypointRelativePos": 2,
+      "rotationDegrees": -64.3978124485582
+    },
+    {
+      "waypointRelativePos": 2.5352697095435706,
+      "rotationDegrees": -92.00692740653488
+    },
+    {
+      "waypointRelativePos": 3,
+      "rotationDegrees": -167.2756443145776
+    },
+    {
+      "waypointRelativePos": 4,
+      "rotationDegrees": -176.9335144988741
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "INTAKE",
+      "waypointRelativePos": 1.2559081701553025,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "INTAKE"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "Scoop Depot NZ",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

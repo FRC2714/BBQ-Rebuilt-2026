@@ -186,7 +186,11 @@ public class StateMachine extends SubsystemBase {
     // dye rotor immediately.
     return m_intake
         .extend()
-        .andThen(m_shooter.startShooter().until(() -> m_shooter.readyToShoot()))
+        .andThen(
+            m_shooter
+                .startShooter()
+                .until(() -> m_shooter.readyToShoot())
+                .raceWith(Commands.waitSeconds(1.5)))
         .beforeStarting(() -> m_shooter.clearTurretOverride())
         .andThen(
             m_shooter

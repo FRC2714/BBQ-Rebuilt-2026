@@ -394,8 +394,6 @@ public class Shooter extends SubsystemBase {
         });
   }
 
-  
-
   /** Disables the flywheel. */
   public Command stopShooter() {
     return this.run(

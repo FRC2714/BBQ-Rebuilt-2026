@@ -569,8 +569,7 @@ public class Shooter extends SubsystemBase {
     if (!zeroingHood) {
       if (hasHoodBeenZeroed) {
         // Only move hood if we know it has been zeroed
-        hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition,
-        ClosedLoopSlot.kSlot0);
+        hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
       }
 
       flywheelController.setSetpoint(

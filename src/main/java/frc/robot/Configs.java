@@ -80,9 +80,7 @@ public final class Configs {
           .positionConversionFactor(360.0 / 6.25)
           .inverted(true)
           .countsPerRevolution(8192);
-      turretConfig
-          .encoder
-          .positionConversionFactor(360.0 / (6.25 * 25));
+      turretConfig.encoder.positionConversionFactor(360.0 / (6.25 * 25));
       turretConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)

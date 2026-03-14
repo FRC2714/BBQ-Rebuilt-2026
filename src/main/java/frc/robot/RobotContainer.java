@@ -121,8 +121,6 @@ public class RobotContainer {
     retractIntakeButton.onTrue(m_stateMachine.retractIntakeSequence());
     button5.onTrue(m_stateMachine.zeroPoseAuto());
 
-    // zeroHoodButton.onTrue(m_shooter.zeroHood());
-
     m_driverController
         .leftStick()
         .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));

@@ -127,7 +127,7 @@ public final class Configs {
           .inverted(false)
           .voltageCompensation(12);
 
-      flywheelConfigLeader.encoder.uvwMeasurementPeriod(10).uvwAverageDepth(2);
+      flywheelConfigLeader.encoder.quadratureMeasurementPeriod(8).quadratureAverageDepth(2);
 
       flywheelConfigLeader
           .closedLoop
@@ -152,7 +152,7 @@ public final class Configs {
           .idleMode(IdleMode.kCoast)
           .inverted(true)
           .voltageCompensation(12);
-      dyeRotorConfig.encoder.uvwMeasurementPeriod(10).uvwAverageDepth(2);
+      dyeRotorConfig.encoder.quadratureMeasurementPeriod(8).quadratureAverageDepth(2);
       dyeRotorConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)

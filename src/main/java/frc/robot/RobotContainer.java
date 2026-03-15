@@ -122,6 +122,7 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
     button9.onTrue(m_shooter.zeroTurretSequenceRight());
+
     button8.onTrue(m_shooter.zeroTurretSequenceLeft());
     leftSwitch.whileTrue(m_stateMachine.toggleOverride());
 

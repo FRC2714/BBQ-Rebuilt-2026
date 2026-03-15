@@ -291,7 +291,7 @@ public class StateMachine extends SubsystemBase {
   public Command stowSequence() {
     return m_shooter
         .stowTurretCommand()
-        .andThen((m_intake.stow().onlyIf(StateMachine::isNotClimbing)));
+        .andThen((m_intake.stow().onlyIf(StateMachine::isNotClimbing)).alongWith(stopShoot()));
   }
 
   public Command extendIntakeSequence() {
@@ -416,9 +416,10 @@ public class StateMachine extends SubsystemBase {
     // Airstrike manual override takes priority
     double airstrikeX = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/x", 0));
     double airstrikeY = Units.inchesToMeters(SmartDashboard.getNumber("airstrike/y", 0));
+    boolean airstrikeHasTarget = SmartDashboard.getBoolean("airstrike/hasTarget", false);
 
     Translation2d target;
-    if (airstrikeX != 0 || airstrikeY != 0) {
+    if (airstrikeHasTarget) {
       target = new Translation2d(airstrikeX, airstrikeY);
     } else {
       target = getAutoAimTarget();

@@ -291,7 +291,7 @@ public class StateMachine extends SubsystemBase {
   public Command stowSequence() {
     return m_shooter
         .stowTurretCommand()
-        .andThen((m_intake.stow().onlyIf(StateMachine::isNotClimbing)));
+        .andThen((m_intake.stow().onlyIf(StateMachine::isNotClimbing)).alongWith(stopShoot()));
   }
 
   public Command extendIntakeSequence() {

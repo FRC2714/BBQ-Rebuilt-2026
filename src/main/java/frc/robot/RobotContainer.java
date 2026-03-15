@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -138,9 +139,10 @@ public class RobotContainer {
 
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
 
-    // m_driverController.povLeft().onTrue(m_stateMachine.deplo\[]yClimber());
-    // m_driverController.povUp().onTrue(m_stateMachine.climb());
-    // m_driverController.povDown().onTrue(m_stateMachine.unclimb());
+    m_driverController.povUp().onTrue(Commands.runOnce(()->m_robotDrive.zeroPose(0)).ignoringDisable(true));
+    m_driverController.povRight().onTrue(Commands.runOnce(()->m_robotDrive.zeroPose(270)).ignoringDisable(true));
+    m_driverController.povDown().onTrue(Commands.runOnce(()->m_robotDrive.zeroPose(180)).ignoringDisable(true));
+    m_driverController.povLeft().onTrue(Commands.runOnce(()->m_robotDrive.zeroPose(90)).ignoringDisable(true));
 
     rumble.onTrue(
         new StartEndCommand(

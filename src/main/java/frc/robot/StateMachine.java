@@ -290,7 +290,8 @@ public class StateMachine extends SubsystemBase {
   /** Stows the intake. Blocked while climbing. */
   public Command stowSequence() {
     return m_shooter
-        .stowTurretCommand().andThen((m_intake.stow().onlyIf(StateMachine::isNotClimbing)).alongWith(m_dyeRotor.stop()));
+        .stowTurretCommand()
+        .andThen((m_intake.stow().onlyIf(StateMachine::isNotClimbing)).alongWith(stopShoot()));
   }
 
   public Command extendIntakeSequence() {

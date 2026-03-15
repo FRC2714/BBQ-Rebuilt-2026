@@ -132,7 +132,7 @@ public final class Configs {
       flywheelConfigLeader
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(Robot.isReal() ? 0.0001 : 0.001)
+          .p(Robot.isReal() ? 0.001 : 0.001)
           .outputRange(-1, 1)
           .feedForward
           .kV(Robot.isReal() ? 0.00185 : 0.00178);
@@ -174,16 +174,23 @@ public final class Configs {
           .inverted(true)
           .voltageCompensation(12);
       pivotConfig.encoder.positionConversionFactor(360.0 / 75);
+      pivotConfig.absoluteEncoder.zeroCentered(true).positionConversionFactor(360);
 
       // TODO: Tune PID
       pivotConfig
           .closedLoop
-          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
           .p(0.1)
           .outputRange(-1, 1)
           .feedForward
           .kCos(0)
           .kCosRatio(1);
+      pivotConfig
+          .softLimit
+          .forwardSoftLimit(85)
+          .reverseSoftLimit(5)
+          .forwardSoftLimitEnabled(true)
+          .reverseSoftLimitEnabled(true);
     }
 
     static {

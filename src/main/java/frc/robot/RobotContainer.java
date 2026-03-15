@@ -130,14 +130,13 @@ public class RobotContainer {
 
     // intake keybinds
     m_driverController.rightTrigger().whileTrue(m_stateMachine.intakeSequence());
-    m_driverController.leftTrigger().whileTrue(m_stateMachine.extakeSequence());
-    m_driverController.leftBumper().whileTrue(m_dyeRotor.start()).whileFalse(m_dyeRotor.stop());
     m_driverController
-        .rightBumper()
-        .whileTrue(m_shooter.startShooter())
-        .whileFalse(m_shooter.stopShooter());
-
+        .leftTrigger()
+        .onTrue(m_stateMachine.shoot())
+        .onFalse(m_stateMachine.stopShoot());
+    m_driverController.leftBumper().whileTrue(m_dyeRotor.start()).whileFalse(m_dyeRotor.stop());
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
+    m_driverController.rightBumper().whileTrue(m_stateMachine.extakeSequence());
 
     // m_driverController.povLeft().onTrue(m_stateMachine.deplo\[]yClimber());
     // m_driverController.povUp().onTrue(m_stateMachine.climb());

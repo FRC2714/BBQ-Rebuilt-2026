@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Configs;
 import frc.robot.Constants;
+import frc.robot.Constants.AgitationConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Robot;
 import frc.robot.Simulation;
@@ -208,6 +209,33 @@ public class Intake extends SubsystemBase {
         () -> {
           pivotExtend();
         });
+  }
+
+  /**
+   * Cycles the intake stow/extend with rollers to agitate fuel. Runs for a fixed number of cycles
+   * and then finishes, leaving the intake extended with rollers stopped.
+   */
+  public Command agitate() {
+    Command sequence = Commands.none();
+    for (int i = 0; i < AgitationConstants.kAgitationCount; i++) {
+      sequence =
+          sequence.andThen(
+              // Stow phase: retract pivot, stop roller
+              this.run(
+                      () -> {
+                        setRollerPower(IntakeConstants.RollerConstants.kRollerStop);
+                        pivotStow();
+                      })
+                  .withTimeout(AgitationConstants.kStowDurationSeconds),
+              // Extend phase: extend pivot, run roller
+              this.run(
+                      () -> {
+                        setRollerPower(IntakeConstants.RollerConstants.kIntakeRollerPower);
+                        pivotExtend();
+                      })
+                  .withTimeout(AgitationConstants.kExtendDurationSeconds));
+    }
+    return sequence.finallyDo(() -> setRollerPower(IntakeConstants.RollerConstants.kRollerStop));
   }
 
   public Command agitateOut() {

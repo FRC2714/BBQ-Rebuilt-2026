@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoAimConstants;
+import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
@@ -177,6 +178,10 @@ public class StateMachine extends SubsystemBase {
     return wholeSeconds == 138 || wholeSeconds == 113 || wholeSeconds == 88 || wholeSeconds == 63;
   }
 
+  private boolean isIntaking() {
+    return m_driverHID.getRightTriggerAxis() > OIConstants.kTriggerButtonThreshold;
+  }
+
   /** Spins up flywheel, preloads fuel, then fires. Only runs from Idle. */
   public Command shoot() {
     // Run preload (dye rotor until fuel loaded, then stop) in parallel with
@@ -198,7 +203,7 @@ public class StateMachine extends SubsystemBase {
         .andThen(
             m_shooter
                 .startShooter()
-                .alongWith(m_dyeRotor.start())
+                .alongWith(m_dyeRotor.start(), m_intake.agitate().onlyIf(() -> !isIntaking()))
                 .beforeStarting(
                     () -> {
                       startShootingRotorPosition = m_dyeRotor.getRotorPosition();

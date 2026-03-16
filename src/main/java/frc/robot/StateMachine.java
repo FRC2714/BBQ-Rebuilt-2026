@@ -141,6 +141,9 @@ public class StateMachine extends SubsystemBase {
     //     new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning()).and(xNewPress);
     // startPreload.onTrue(this.preloadCommand());
 
+    Trigger agitate = new Trigger(() -> m_state == State.Shooting && !isIntaking());
+    agitate.whileTrue(m_intake.agitate());
+
     m_shooter.configureShooterBindings();
     m_intake.configureBindings();
   }
@@ -203,7 +206,7 @@ public class StateMachine extends SubsystemBase {
         .andThen(
             m_shooter
                 .startShooter()
-                .alongWith(m_dyeRotor.start(), m_intake.agitate().onlyIf(() -> !isIntaking()))
+                .alongWith(m_dyeRotor.start())
                 .beforeStarting(
                     () -> {
                       startShootingRotorPosition = m_dyeRotor.getRotorPosition();

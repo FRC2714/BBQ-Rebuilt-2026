@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -48,7 +49,7 @@ public class Intake extends SubsystemBase {
           Constants.IntakeConstants.PivotConstants.kIntakePivotCanId, MotorType.kBrushless);
 
   private SparkClosedLoopController intakePivotController = pivotMotor.getClosedLoopController();
-  private RelativeEncoder pivotEncoder = pivotMotor.getEncoder();
+  private AbsoluteEncoder pivotEncoder = pivotMotor.getAbsoluteEncoder();
 
   // creates new roller motor
   private SparkFlex rollerMotor =
@@ -95,9 +96,6 @@ public class Intake extends SubsystemBase {
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     SmartDashboard.putData("Intake/Mech2d", intakeMech);
-
-    // Assume intake is stowed on startup
-    pivotEncoder.setPosition(Constants.IntakeConstants.PivotConstants.kPivotStow);
   }
 
   public void configureBindings() {
@@ -109,7 +107,6 @@ public class Intake extends SubsystemBase {
             Commands.runOnce(
                 () -> {
                   pivotMotor.stopMotor();
-                  pivotEncoder.setPosition(Constants.IntakeConstants.PivotConstants.kPivotExtend);
                 }));
 
     new Trigger(
@@ -120,7 +117,6 @@ public class Intake extends SubsystemBase {
             Commands.runOnce(
                 () -> {
                   pivotMotor.stopMotor();
-                  pivotEncoder.setPosition(Constants.IntakeConstants.PivotConstants.kPivotStow);
                 }));
   }
 
@@ -146,6 +142,10 @@ public class Intake extends SubsystemBase {
   }
 
   public double getIntakePivotPosition() {
+    if (Robot.isSimulation()) {
+      return Units.radiansToDegrees(pivotSim.getAngleRads());
+    }
+
     return pivotEncoder.getPosition();
   }
 

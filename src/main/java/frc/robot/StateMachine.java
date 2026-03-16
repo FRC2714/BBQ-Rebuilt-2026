@@ -120,7 +120,6 @@ public class StateMachine extends SubsystemBase {
     Trigger resumeShooter =
         new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
     resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
-
     // Trigger xNewPress =
     //     new Trigger(
     //         () -> {
@@ -140,10 +139,6 @@ public class StateMachine extends SubsystemBase {
     // Trigger startPreload =
     //     new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning()).and(xNewPress);
     // startPreload.onTrue(this.preloadCommand());
-
-    Trigger shooterButton = new Trigger(() -> m_driverHID.getAButton());
-    shooterButton.and(() -> m_state == State.Idle).onTrue(this.shoot());
-    shooterButton.and(() -> m_state == State.Shooting).onFalse(this.stopShoot());
 
     m_shooter.configureShooterBindings();
     m_intake.configureBindings();

@@ -185,12 +185,16 @@ public final class Configs {
           .feedForward
           .kCos(0)
           .kCosRatio(1);
-      pivotConfig
-          .softLimit
-          .forwardSoftLimit(85)
-          .reverseSoftLimit(5)
-          .forwardSoftLimitEnabled(true)
-          .reverseSoftLimitEnabled(true);
+
+      // Sim doesn't work as expected with soft limits
+      if (Robot.isReal()) {
+        pivotConfig
+            .softLimit
+            .forwardSoftLimit(85)
+            .reverseSoftLimit(5)
+            .forwardSoftLimitEnabled(true)
+            .reverseSoftLimitEnabled(true);
+      }
     }
 
     static {

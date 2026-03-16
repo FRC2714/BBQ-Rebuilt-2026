@@ -141,6 +141,10 @@ public class Intake extends SubsystemBase {
   }
 
   public double getIntakePivotPosition() {
+    if (Robot.isSimulation()) {
+      return Units.radiansToDegrees(pivotSim.getAngleRads());
+    }
+
     return pivotEncoder.getPosition();
   }
 

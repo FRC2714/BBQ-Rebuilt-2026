@@ -225,9 +225,9 @@ public final class Constants {
   public static boolean disableHAL = false;
 
   public static final class AgitationConstants {
-    public static final double kStowDurationSeconds = 0.75;
+    public static final double kStowDurationSeconds = 0.25;
     public static final double kExtendDurationSeconds = 0.5;
-    public static final int kAgitationCount = 2;
+    public static final int kAgitationCount = 4;
   }
 
   public static final class IntakeConstants {

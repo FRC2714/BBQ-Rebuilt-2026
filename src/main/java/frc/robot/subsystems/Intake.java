@@ -133,6 +133,7 @@ public class Intake extends SubsystemBase {
     pivotMotor.set(IntakeConstants.PivotConstants.kPivotUpPower);
   }
 
+
   private void setRollerPower(double power) {
     rollerMotor.set(power);
   }
@@ -224,14 +225,14 @@ public class Intake extends SubsystemBase {
               this.run(
                       () -> {
                         setRollerPower(IntakeConstants.RollerConstants.kRollerStop);
-                        pivotStow();
+                  pivotMotor.set(AgitationConstants.kAgitateInPower);
                       })
                   .withTimeout(AgitationConstants.kStowDurationSeconds),
               // Extend phase: extend pivot, run roller
               this.run(
                       () -> {
                         setRollerPower(IntakeConstants.RollerConstants.kIntakeRollerPower);
-                        pivotExtend();
+               pivotMotor.set(AgitationConstants.kAgitateOutPower);
                       })
                   .withTimeout(AgitationConstants.kExtendDurationSeconds));
     }
@@ -241,14 +242,14 @@ public class Intake extends SubsystemBase {
   public Command agitateOut() {
     return this.runOnce(
         () -> {
-          pivotMotor.set(-.2);
+          pivotMotor.set(AgitationConstants.kAgitateOutPower);
         });
   }
 
   public Command agitateIn() {
     return this.runOnce(
         () -> {
-          pivotMotor.set(.2);
+          pivotMotor.set(AgitationConstants.kAgitateInPower);
         });
   }
 

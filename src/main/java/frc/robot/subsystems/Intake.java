@@ -216,26 +216,22 @@ public class Intake extends SubsystemBase {
    * and then finishes, leaving the intake extended with rollers stopped.
    */
   public Command agitate() {
-    Command sequence = Commands.none();
-    for (int i = 0; i < AgitationConstants.kAgitationCount; i++) {
-      sequence =
-          sequence.andThen(
-              // Stow phase: retract pivot, stop roller
-              this.run(
-                      () -> {
-                        setRollerPower(IntakeConstants.RollerConstants.kRollerStop);
-                        pivotMotor.set(AgitationConstants.kAgitateInPower);
-                      })
-                  .withTimeout(AgitationConstants.kStowDurationSeconds),
-              // Extend phase: extend pivot, run roller
-              this.run(
-                      () -> {
-                        setRollerPower(IntakeConstants.RollerConstants.kIntakeRollerPower);
-                        pivotMotor.set(AgitationConstants.kAgitateOutPower);
-                      })
-                  .withTimeout(AgitationConstants.kExtendDurationSeconds));
-    }
-    return sequence.finallyDo(() -> setRollerPower(IntakeConstants.RollerConstants.kRollerStop));
+    return this.run(
+            () -> {
+              setRollerPower(IntakeConstants.RollerConstants.kRollerStop);
+              pivotMotor.set(AgitationConstants.kAgitateInPower);
+            })
+        .withTimeout(AgitationConstants.kStowDurationSeconds)
+        .andThen(
+            // Extend phase: extend pivot, run roller
+            this.run(
+                    () -> {
+                      setRollerPower(IntakeConstants.RollerConstants.kIntakeRollerPower);
+                      pivotMotor.set(AgitationConstants.kAgitateOutPower);
+                    })
+                .withTimeout(AgitationConstants.kExtendDurationSeconds))
+        .repeatedly()
+        .finallyDo(() -> setRollerPower(IntakeConstants.RollerConstants.kRollerStop));
   }
 
   public Command agitateOut() {

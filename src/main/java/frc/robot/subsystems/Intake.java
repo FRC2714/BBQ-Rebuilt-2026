@@ -231,7 +231,11 @@ public class Intake extends SubsystemBase {
                     })
                 .withTimeout(AgitationConstants.kExtendDurationSeconds))
         .repeatedly()
-        .finallyDo(() -> setRollerPower(IntakeConstants.RollerConstants.kRollerStop));
+        .finallyDo(
+            () -> {
+              setRollerPower(IntakeConstants.RollerConstants.kRollerStop);
+              pivotExtend();
+            });
   }
 
   public Command agitateOut() {

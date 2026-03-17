@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoAimConstants;
+import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
@@ -140,6 +141,9 @@ public class StateMachine extends SubsystemBase {
     //     new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning()).and(xNewPress);
     // startPreload.onTrue(this.preloadCommand());
 
+    Trigger agitate = new Trigger(() -> m_state == State.Shooting && !isIntaking());
+    agitate.whileTrue(m_intake.agitate());
+
     m_shooter.configureShooterBindings();
     m_intake.configureBindings();
   }
@@ -175,6 +179,10 @@ public class StateMachine extends SubsystemBase {
   private boolean isPhaseShiftWarningTime(double matchTime) {
     int wholeSeconds = (int) Math.round(matchTime);
     return wholeSeconds == 138 || wholeSeconds == 113 || wholeSeconds == 88 || wholeSeconds == 63;
+  }
+
+  private boolean isIntaking() {
+    return m_driverHID.getRightTriggerAxis() > OIConstants.kTriggerButtonThreshold;
   }
 
   /** Spins up flywheel, preloads fuel, then fires. Only runs from Idle. */

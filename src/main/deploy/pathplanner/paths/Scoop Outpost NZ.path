@@ -1,0 +1,189 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.647578313253012,
+        "y": 2.5696867469879515
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.648764550095887,
+        "y": 2.54354286452863
+      },
+      "isLocked": false,
+      "linkedName": "backed outpost"
+    },
+    {
+      "anchor": {
+        "x": 6.772903614457831,
+        "y": 1.302072289156627
+      },
+      "prevControl": {
+        "x": 5.765025101832803,
+        "y": 2.246958394742587
+      },
+      "nextControl": {
+        "x": 7.122590361445783,
+        "y": 0.9742409638554218
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.062373493975903,
+        "y": 1.859385542168675
+      },
+      "prevControl": {
+        "x": 7.7369569763031025,
+        "y": 1.1362377251180105
+      },
+      "nextControl": {
+        "x": 8.45577108433735,
+        "y": 2.7336024096385545
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.8219638554216875,
+        "y": 4.1542048192771084
+      },
+      "prevControl": {
+        "x": 8.70570643516487,
+        "y": 4.0998206605236823
+      },
+      "nextControl": {
+        "x": 7.111662650602409,
+        "y": 4.197915662650602
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.095385542168674,
+        "y": 2.700819277108434
+      },
+      "prevControl": {
+        "x": 7.756397590361445,
+        "y": 2.886590361445784
+      },
+      "nextControl": {
+        "x": 5.025909864644925,
+        "y": 2.581206865806435
+      },
+      "isLocked": false,
+      "linkedName": "Outpost after scoop"
+    },
+    {
+      "anchor": {
+        "x": 2.9482048192771084,
+        "y": 2.5696867469879515
+      },
+      "prevControl": {
+        "x": 4.035052180190093,
+        "y": 2.5696867469879515
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 37.77500996542958
+    },
+    {
+      "waypointRelativePos": 2,
+      "rotationDegrees": 72.52522574374426
+    },
+    {
+      "waypointRelativePos": 2.518672199170134,
+      "rotationDegrees": 95.35545582117129
+    },
+    {
+      "waypointRelativePos": 3.4149377593360963,
+      "rotationDegrees": -97.76572868964877
+    },
+    {
+      "waypointRelativePos": 4,
+      "rotationDegrees": -116.72784503581586
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "angular",
+      "minWaypointRelativePos": 2.615384615384615,
+      "maxWaypointRelativePos": 3.4888337468982695,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 150.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.21339950372209496,
+      "maxWaypointRelativePos": 4.253101736972699,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "INTAKE",
+      "waypointRelativePos": 0.8585607940446743,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "INTAKE"
+        }
+      }
+    },
+    {
+      "name": "SCORE",
+      "waypointRelativePos": 4.69975186104218,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "SCORE"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -122.8113667980681
+  },
+  "reversed": false,
+  "folder": "Scoop Outpost NZ",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "useDefaultConstraints": true
+}

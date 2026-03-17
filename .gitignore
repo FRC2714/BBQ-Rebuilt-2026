@@ -189,3 +189,4 @@ compile_commands.json
 *.revlog
 
 *.claude
+CLAUDE.md

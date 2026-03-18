@@ -36,12 +36,12 @@
         "y": 6.473937232524964
       },
       "prevControl": {
-        "x": 7.868901569186875,
-        "y": 6.723937232524964
+        "x": 7.3384165477888725,
+        "y": 6.784465049928674
       },
       "nextControl": {
-        "x": 7.868901569186875,
-        "y": 5.957362181074093
+        "x": 8.302520283128725,
+        "y": 6.220111643876074
       },
       "isLocked": false,
       "linkedName": null
@@ -52,12 +52,12 @@
         "y": 4.170855920114123
       },
       "prevControl": {
-        "x": 7.946533523537802,
-        "y": 4.817788873038516
+        "x": 8.088858773181169,
+        "y": 4.364935805991441
       },
       "nextControl": {
-        "x": 7.799256977389717,
-        "y": 3.5904843218044817
+        "x": 7.43059484500696,
+        "y": 3.784114692896553
       },
       "isLocked": false,
       "linkedName": "nz_to_score"
@@ -118,7 +118,7 @@
       "constraints": {
         "maxVelocity": 2.0,
         "maxAcceleration": 3.0,
-        "maxAngularVelocity": 120.0,
+        "maxAngularVelocity": 70.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
         "unlimited": false
@@ -136,13 +136,39 @@
         "nominalVoltage": 12.0,
         "unlimited": false
       }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 1.417960837272113,
+      "constraints": {
+        "maxVelocity": 1.7,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 30.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 4.1593517893315255,
+      "maxWaypointRelativePos": 5.0,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
     }
   ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "INTAKE",
-      "waypointRelativePos": 0.9,
+      "waypointRelativePos": 0.45914922349763554,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",

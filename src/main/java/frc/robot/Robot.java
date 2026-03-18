@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.utils.LimelightHelpers;
 import org.ironmaple.simulation.SimulatedArena;
@@ -107,6 +108,7 @@ public class Robot extends TimedRobot {
     if (Robot.isSimulation()) {
       SimulatedArena.getInstance().resetFieldForAuto();
     }
+    m_robotContainer.m_stateMachine.disablePassing();
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -147,6 +149,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.m_stateMachine.enablePassing();
+    m_robotContainer.middleSwitch.onTrue(Commands.runOnce(()->m_robotContainer.m_stateMachine.disablePassing())).onFalse(Commands.runOnce(()->m_robotContainer.m_stateMachine.enablePassing()));
 
     // CommandScheduler.getInstance().schedule(m_robotContainer.m_stateMachine.unclimb());
     CommandScheduler.getInstance().schedule(m_robotContainer.m_shooter.zeroHoodIfNeeded());

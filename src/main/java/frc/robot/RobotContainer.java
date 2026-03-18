@@ -70,7 +70,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("SCORE", m_stateMachine.shoot());
     NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShoot());
     NamedCommands.registerCommand(
-        "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));
+        "INTAKE", m_stateMachine.intakeSequence());
     NamedCommands.registerCommand(
         "STOW_INTAKE", m_stateMachine.stowSequenceAuto(AutoConstants.kStowTimeout));
     NamedCommands.registerCommand("PRELOAD", m_stateMachine.preloadCommand());

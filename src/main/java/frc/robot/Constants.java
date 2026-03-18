@@ -235,8 +235,8 @@ public final class Constants {
 
     public static final class RollerConstants {
       public static final int kIntakeRollerCanId = 10; // needs tuning
-      public static final double kIntakeRollerPower = -1; // needs tuning
-      public static final double kExtakeRollerPower = 1; // needs tuning
+      public static final double kIntakeRollerPower = 1; // needs tuning
+      public static final double kExtakeRollerPower = -1; // needs tuning
       public static final double kRollerStop = 0.0; // needs tuning
     }
 

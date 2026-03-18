@@ -150,7 +150,10 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     m_robotContainer.m_stateMachine.enablePassing();
-    m_robotContainer.middleSwitch.onTrue(Commands.runOnce(()->m_robotContainer.m_stateMachine.disablePassing())).onFalse(Commands.runOnce(()->m_robotContainer.m_stateMachine.enablePassing()));
+    m_robotContainer
+        .middleSwitch
+        .onTrue(Commands.runOnce(() -> m_robotContainer.m_stateMachine.disablePassing()))
+        .onFalse(Commands.runOnce(() -> m_robotContainer.m_stateMachine.enablePassing()));
 
     // CommandScheduler.getInstance().schedule(m_robotContainer.m_stateMachine.unclimb());
     CommandScheduler.getInstance().schedule(m_robotContainer.m_shooter.zeroHoodIfNeeded());

@@ -223,11 +223,11 @@ public class StateMachine extends SubsystemBase {
         .ignoringDisable(true);
   }
 
-  public void enablePassing(){
+  public void enablePassing() {
     disablePassing = false;
   }
 
-  public void disablePassing(){
+  public void disablePassing() {
     disablePassing = true;
   }
 
@@ -439,14 +439,14 @@ public class StateMachine extends SubsystemBase {
     }
 
     publisher.set(new Pose2d(target, new Rotation2d()));
-    if(!disablePassing){
-    m_shooter.calculate(
-        robotPosition,
-        robotHeading,
-        m_drivetrain.getFieldRelativeVelocity(),
-        target,
-        ShooterConstants.kLatencyCompensation);
-    }else{
+    if (!disablePassing) {
+      m_shooter.calculate(
+          robotPosition,
+          robotHeading,
+          m_drivetrain.getFieldRelativeVelocity(),
+          target,
+          ShooterConstants.kLatencyCompensation);
+    } else {
       m_shooter.setTurretAngle(0);
     }
   }

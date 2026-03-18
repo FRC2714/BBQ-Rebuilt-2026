@@ -8,7 +8,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -70,12 +69,13 @@ public class RobotContainer {
   public RobotContainer() {
     // NAMED COMMANDS FOR PATHPLANNER
     NamedCommands.registerCommand("SCORE", m_stateMachine.shoot());
-    NamedCommands.registerCommand("ENABLE_PASSING", Commands.runOnce(()->m_stateMachine.enablePassing()));
-    NamedCommands.registerCommand("DISABLE_PASSING", Commands.runOnce(()->m_stateMachine.disablePassing()));
+    NamedCommands.registerCommand(
+        "ENABLE_PASSING", Commands.runOnce(() -> m_stateMachine.enablePassing()));
+    NamedCommands.registerCommand(
+        "DISABLE_PASSING", Commands.runOnce(() -> m_stateMachine.disablePassing()));
 
     NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShoot());
-    NamedCommands.registerCommand(
-        "INTAKE", m_stateMachine.intakeSequence());
+    NamedCommands.registerCommand("INTAKE", m_stateMachine.intakeSequence());
     NamedCommands.registerCommand(
         "STOW_INTAKE", m_stateMachine.stowSequenceAuto(AutoConstants.kStowTimeout));
     NamedCommands.registerCommand("PRELOAD", m_stateMachine.preloadCommand());

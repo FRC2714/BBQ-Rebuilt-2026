@@ -216,7 +216,7 @@ public class Intake extends SubsystemBase {
    * and then finishes, leaving the intake extended with rollers stopped.
    */
   public Command agitate() {
-    return this.run(
+    return Commands.run(
             () -> {
               setRollerPower(IntakeConstants.RollerConstants.kRollerStop);
               pivotMotor.set(AgitationConstants.kAgitateInPower);
@@ -224,7 +224,7 @@ public class Intake extends SubsystemBase {
         .withTimeout(AgitationConstants.kStowDurationSeconds)
         .andThen(
             // Extend phase: extend pivot, run roller
-            this.run(
+            Commands.run(
                     () -> {
                       setRollerPower(IntakeConstants.RollerConstants.kIntakeRollerPower);
                       pivotMotor.set(AgitationConstants.kAgitateOutPower);

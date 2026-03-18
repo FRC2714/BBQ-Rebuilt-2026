@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Configs;
 import frc.robot.Constants;
+import frc.robot.Constants.AgitationConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Robot;
 import frc.robot.Simulation;
@@ -47,7 +49,7 @@ public class Intake extends SubsystemBase {
           Constants.IntakeConstants.PivotConstants.kIntakePivotCanId, MotorType.kBrushless);
 
   private SparkClosedLoopController intakePivotController = pivotMotor.getClosedLoopController();
-  private RelativeEncoder pivotEncoder = pivotMotor.getEncoder();
+  private AbsoluteEncoder pivotEncoder = pivotMotor.getAbsoluteEncoder();
 
   // creates new roller motor
   private SparkFlex rollerMotor =
@@ -94,9 +96,6 @@ public class Intake extends SubsystemBase {
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     SmartDashboard.putData("Intake/Mech2d", intakeMech);
-
-    // Assume intake is stowed on startup
-    pivotEncoder.setPosition(Constants.IntakeConstants.PivotConstants.kPivotStow);
   }
 
   public void configureBindings() {
@@ -108,7 +107,6 @@ public class Intake extends SubsystemBase {
             Commands.runOnce(
                 () -> {
                   pivotMotor.stopMotor();
-                  pivotEncoder.setPosition(Constants.IntakeConstants.PivotConstants.kPivotExtend);
                 }));
 
     new Trigger(
@@ -119,7 +117,6 @@ public class Intake extends SubsystemBase {
             Commands.runOnce(
                 () -> {
                   pivotMotor.stopMotor();
-                  pivotEncoder.setPosition(Constants.IntakeConstants.PivotConstants.kPivotStow);
                 }));
   }
 
@@ -145,6 +142,10 @@ public class Intake extends SubsystemBase {
   }
 
   public double getIntakePivotPosition() {
+    if (Robot.isSimulation()) {
+      return Units.radiansToDegrees(pivotSim.getAngleRads());
+    }
+
     return pivotEncoder.getPosition();
   }
 
@@ -210,17 +211,44 @@ public class Intake extends SubsystemBase {
         });
   }
 
+  /**
+   * Cycles the intake stow/extend with rollers to agitate fuel. Runs for a fixed number of cycles
+   * and then finishes, leaving the intake extended with rollers stopped.
+   */
+  public Command agitate() {
+    return this.run(
+            () -> {
+              setRollerPower(IntakeConstants.RollerConstants.kRollerStop);
+              pivotMotor.set(AgitationConstants.kAgitateInPower);
+            })
+        .withTimeout(AgitationConstants.kStowDurationSeconds)
+        .andThen(
+            // Extend phase: extend pivot, run roller
+            this.run(
+                    () -> {
+                      setRollerPower(IntakeConstants.RollerConstants.kIntakeRollerPower);
+                      pivotMotor.set(AgitationConstants.kAgitateOutPower);
+                    })
+                .withTimeout(AgitationConstants.kExtendDurationSeconds))
+        .repeatedly()
+        .finallyDo(
+            () -> {
+              setRollerPower(IntakeConstants.RollerConstants.kRollerStop);
+              pivotExtend();
+            });
+  }
+
   public Command agitateOut() {
     return this.runOnce(
         () -> {
-          pivotMotor.set(-.2);
+          pivotMotor.set(AgitationConstants.kAgitateOutPower);
         });
   }
 
   public Command agitateIn() {
     return this.runOnce(
         () -> {
-          pivotMotor.set(.2);
+          pivotMotor.set(AgitationConstants.kAgitateInPower);
         });
   }
 

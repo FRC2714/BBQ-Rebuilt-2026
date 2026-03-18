@@ -123,6 +123,7 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));
 
     button9.onTrue(m_shooter.zeroTurretSequenceRight());
+
     button8.onTrue(m_shooter.zeroTurretSequenceLeft());
     leftSwitch.whileTrue(m_stateMachine.toggleOverride());
 
@@ -130,14 +131,13 @@ public class RobotContainer {
 
     // intake keybinds
     m_driverController.rightTrigger().whileTrue(m_stateMachine.intakeSequence());
-    m_driverController.leftTrigger().whileTrue(m_stateMachine.extakeSequence());
-    m_driverController.leftBumper().whileTrue(m_dyeRotor.start()).whileFalse(m_dyeRotor.stop());
     m_driverController
-        .rightBumper()
-        .whileTrue(m_shooter.startShooter())
-        .whileFalse(m_shooter.stopShooter());
-
+        .leftTrigger()
+        .onTrue(m_stateMachine.shoot())
+        .onFalse(m_stateMachine.stopShoot());
+    m_driverController.leftBumper().whileTrue(m_dyeRotor.start()).whileFalse(m_dyeRotor.stop());
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
+    m_driverController.rightBumper().whileTrue(m_stateMachine.extakeSequence());
 
     m_driverController.povUp().onTrue(Commands.runOnce(()->m_robotDrive.zeroPose(0)).ignoringDisable(true));
     m_driverController.povRight().onTrue(Commands.runOnce(()->m_robotDrive.zeroPose(270)).ignoringDisable(true));

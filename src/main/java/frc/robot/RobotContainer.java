@@ -140,6 +140,7 @@ public class RobotContainer {
         .onFalse(m_stateMachine.stopShoot());
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
     m_driverController.rightBumper().whileTrue(m_stateMachine.extakeSequence());
+    m_driverController.a().onTrue(m_dyeRotor.unjam());
 
     // m_driverController.povLeft().onTrue(m_stateMachine.deplo\[]yClimber());
     // m_driverController.povUp().onTrue(m_stateMachine.climb());

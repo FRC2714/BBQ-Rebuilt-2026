@@ -64,16 +64,16 @@
     },
     {
       "anchor": {
-        "x": 7.390171184022824,
+        "x": 7.377232524964336,
         "y": 5.361212553495007
       },
       "prevControl": {
-        "x": 7.933594864479314,
-        "y": 4.882482168330956
+        "x": 8.074796867732916,
+        "y": 5.166543434582845
       },
       "nextControl": {
-        "x": 6.490614547779593,
-        "y": 6.153679113994998
+        "x": 6.264507845934379,
+        "y": 5.671740370898717
       },
       "isLocked": false,
       "linkedName": null
@@ -84,12 +84,28 @@
         "y": 5.76231098430813
       },
       "prevControl": {
-        "x": 3.6262678260073007,
-        "y": 5.605750815677645
+        "x": 3.8320986999806013,
+        "y": 5.751413725178826
+      },
+      "nextControl": {
+        "x": 2.9263338088445074,
+        "y": 5.775249643366619
+      },
+      "isLocked": false,
+      "linkedName": "after second nz"
+    },
+    {
+      "anchor": {
+        "x": 0.8043937232524963,
+        "y": 5.956390870185448
+      },
+      "prevControl": {
+        "x": 1.8783024251069897,
+        "y": 5.839942938659058
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "after second nz"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
@@ -103,11 +119,11 @@
     },
     {
       "waypointRelativePos": 4.115138592750534,
-      "rotationDegrees": 157.51209091615752
+      "rotationDegrees": 166.31109783661492
     },
     {
-      "waypointRelativePos": 4.4669509594882655,
-      "rotationDegrees": -93.41847044248584
+      "waypointRelativePos": 4.388059701492528,
+      "rotationDegrees": -177.6395465815866
     }
   ],
   "constraintZones": [
@@ -149,6 +165,19 @@
         "nominalVoltage": 12.0,
         "unlimited": false
       }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 5.201890614449679,
+      "maxWaypointRelativePos": 6.0,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
     }
   ],
   "pointTowardsZones": [],
@@ -163,6 +192,17 @@
           "name": "INTAKE"
         }
       }
+    },
+    {
+      "name": "SCORE",
+      "waypointRelativePos": 4.68332207967589,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "SCORE"
+        }
+      }
     }
   ],
   "globalConstraints": {
@@ -175,7 +215,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -92.56377021146503
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "Double NZ Score",

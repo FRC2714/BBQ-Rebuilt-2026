@@ -38,7 +38,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "NZ To Score"
+            "pathName": "NZ To Depot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SCORE"
           }
         }
       ]

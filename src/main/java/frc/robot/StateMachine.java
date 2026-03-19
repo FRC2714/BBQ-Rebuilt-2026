@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoAimConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Climb;
@@ -44,6 +45,8 @@ public class StateMachine extends SubsystemBase {
   private static State m_state = State.Idle;
   private boolean phaseShiftActive = false;
   private boolean phaseShiftWarningActive = false;
+  private boolean disablePassing = true;
+
   private boolean xWasPressed = false;
 
   private static boolean isNotClimbing() {
@@ -221,6 +224,14 @@ public class StateMachine extends SubsystemBase {
         .ignoringDisable(true);
   }
 
+  public void enablePassing() {
+    disablePassing = false;
+  }
+
+  public void disablePassing() {
+    disablePassing = true;
+  }
+
   /** Stops the flywheel and dye rotor, returns to Idle. */
   public Command stopShoot() {
     return m_shooter
@@ -281,7 +292,12 @@ public class StateMachine extends SubsystemBase {
   public Command intakeSequence() {
     return (m_intake
         .intake()
-        .beforeStarting(() -> m_shooter.clearTurretOverride())
+        .alongWith(
+            Commands.waitUntil(
+                    () ->
+                        m_intake.getIntakePivotPosition()
+                            < IntakeConstants.PivotConstants.kPivotClear)
+                .andThen(() -> m_shooter.clearTurretOverride()))
         .onlyIf(StateMachine::isNotClimbing));
   }
 
@@ -429,13 +445,16 @@ public class StateMachine extends SubsystemBase {
     }
 
     publisher.set(new Pose2d(target, new Rotation2d()));
-
-    m_shooter.calculate(
-        robotPosition,
-        robotHeading,
-        m_drivetrain.getFieldRelativeVelocity(),
-        target,
-        ShooterConstants.kLatencyCompensation);
+    if (!disablePassing) {
+      m_shooter.calculate(
+          robotPosition,
+          robotHeading,
+          m_drivetrain.getFieldRelativeVelocity(),
+          target,
+          ShooterConstants.kLatencyCompensation);
+    } else {
+      m_shooter.setTurretAngle(0);
+    }
   }
 
   @Override

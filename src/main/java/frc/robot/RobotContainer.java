@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -47,7 +48,7 @@ public class RobotContainer {
       new CommandXboxController(OIConstants.kDriverControllerPort);
 
   private final JoystickButton leftSwitch = new JoystickButton(m_operatorBox, 1);
-  private final JoystickButton middleSwitch = new JoystickButton(m_operatorBox, 2);
+  public final JoystickButton middleSwitch = new JoystickButton(m_operatorBox, 2);
   private final JoystickButton rightSwitch = new JoystickButton(m_operatorBox, 3);
   private final JoystickButton extendIntakeButton = new JoystickButton(m_operatorBox, 4);
   private final JoystickButton retractIntakeButton = new JoystickButton(m_operatorBox, 7);
@@ -68,9 +69,15 @@ public class RobotContainer {
   public RobotContainer() {
     // NAMED COMMANDS FOR PATHPLANNER
     NamedCommands.registerCommand("SCORE", m_stateMachine.shoot());
-    NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShoot());
+    NamedCommands.registerCommand("AGITATE", m_intake.agitate());
+
     NamedCommands.registerCommand(
-        "INTAKE", m_stateMachine.intakeSequenceAuto(AutoConstants.kIntakeTimeout));
+        "ENABLE_PASSING", Commands.runOnce(() -> m_stateMachine.enablePassing()));
+    NamedCommands.registerCommand(
+        "DISABLE_PASSING", Commands.runOnce(() -> m_stateMachine.disablePassing()));
+
+    NamedCommands.registerCommand("STOP_SHOOTING", m_stateMachine.stopShoot());
+    NamedCommands.registerCommand("INTAKE", m_stateMachine.intakeSequence());
     NamedCommands.registerCommand(
         "STOW_INTAKE", m_stateMachine.stowSequenceAuto(AutoConstants.kStowTimeout));
     NamedCommands.registerCommand("PRELOAD", m_stateMachine.preloadCommand());
@@ -105,9 +112,6 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     m_stateMachine.configureBindings();
-
-    extendIntakeButton.onTrue(m_stateMachine.extendIntakeSequence());
-    retractIntakeButton.onTrue(m_stateMachine.retractIntakeSequence());
     button5.onTrue(m_stateMachine.zeroPoseAuto());
 
     m_driverController
@@ -134,7 +138,6 @@ public class RobotContainer {
         .leftTrigger()
         .onTrue(m_stateMachine.shoot())
         .onFalse(m_stateMachine.stopShoot());
-    m_driverController.leftBumper().whileTrue(m_dyeRotor.start()).whileFalse(m_dyeRotor.stop());
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
     m_driverController.rightBumper().whileTrue(m_stateMachine.extakeSequence());
 

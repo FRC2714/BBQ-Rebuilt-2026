@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoAimConstants;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
@@ -149,7 +148,7 @@ public class StateMachine extends SubsystemBase {
     //     new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning()).and(xNewPress);
     // startPreload.onTrue(this.preloadCommand());
 
-    Trigger agitate = new Trigger(() -> m_state == State.Shooting && !isIntaking());
+    Trigger agitate = new Trigger(() -> m_state == State.Shooting && !m_intake.isIntaking());
     agitate.whileTrue(m_intake.agitate());
 
     m_shooter.configureShooterBindings();
@@ -255,10 +254,6 @@ public class StateMachine extends SubsystemBase {
       return phaseShiftActive;
     }
     return ((int) Math.floor(matchTime * 4.0)) % 2 == 0;
-  }
-
-  private boolean isIntaking() {
-    return m_driverHID.getRightTriggerAxis() > OIConstants.kTriggerButtonThreshold;
   }
 
   /** Spins up flywheel, preloads fuel, then fires. Only runs from Idle. */

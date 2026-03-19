@@ -171,7 +171,7 @@
       "minWaypointRelativePos": 5.201890614449679,
       "maxWaypointRelativePos": 6.0,
       "constraints": {
-        "maxVelocity": 1.5,
+        "maxVelocity": 1.0,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -184,8 +184,8 @@
   "eventMarkers": [
     {
       "name": "INTAKE",
-      "waypointRelativePos": 0.756245779878466,
-      "endWaypointRelativePos": null,
+      "waypointRelativePos": 0.7562457798784659,
+      "endWaypointRelativePos": 4.9178774824766345,
       "command": {
         "type": "named",
         "data": {
@@ -201,6 +201,17 @@
         "type": "named",
         "data": {
           "name": "SCORE"
+        }
+      }
+    },
+    {
+      "name": "INTAKE",
+      "waypointRelativePos": 5.6446042640186915,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "INTAKE"
         }
       }
     }

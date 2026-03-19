@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoAimConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Climb;
@@ -142,9 +143,6 @@ public class StateMachine extends SubsystemBase {
     // Trigger startPreload =
     //     new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning()).and(xNewPress);
     // startPreload.onTrue(this.preloadCommand());
-
-    Trigger agitate = new Trigger(() -> m_state == State.Shooting && !isIntaking());
-    agitate.whileTrue(m_intake.agitate());
 
     m_shooter.configureShooterBindings();
     m_intake.configureBindings();
@@ -291,7 +289,12 @@ public class StateMachine extends SubsystemBase {
   public Command intakeSequence() {
     return (m_intake
         .intake()
-        .beforeStarting(() -> m_shooter.clearTurretOverride())
+        .alongWith(
+            Commands.waitUntil(
+                    () ->
+                        m_intake.getIntakePivotPosition()
+                            < IntakeConstants.PivotConstants.kPivotClear)
+                .andThen(() -> m_shooter.clearTurretOverride()))
         .onlyIf(StateMachine::isNotClimbing));
   }
 

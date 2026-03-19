@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Depot to NZ"
+            "pathName": "Depot to NZ Mirrored"
           }
         },
         {
@@ -38,7 +38,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "NZ To Score"
+            "pathName": "NZ To Score Mirrored"
           }
         },
         {

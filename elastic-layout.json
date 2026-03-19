@@ -731,6 +731,60 @@
         ],
         "containers": []
       }
+    },
+    {
+      "name": "HUD",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Match Time",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 768.0,
+            "height": 256.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/SmartDashboard/Match Time",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 20,
+              "yellow_start_time": 30
+            }
+          },
+          {
+            "title": "Time Until Next Phase Shift",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 640.0,
+            "height": 256.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/State Machine/Time Until Next Phase Shift",
+              "period": 0.06,
+              "data_type": "string"
+            }
+          },
+          {
+            "title": "Phase Shift Active",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 640.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/State Machine/Phase Shift Active",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          }
+        ]
+      }
     }
   ]
 }

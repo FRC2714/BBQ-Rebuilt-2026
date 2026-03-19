@@ -229,15 +229,14 @@ public final class Constants {
     public static final double kExtendDurationSeconds = 0.5;
     public static final double kAgitateOutPower = -0.15;
     public static final double kAgitateInPower = 0.2;
-    public static final int kAgitationCount = 4;
   }
 
   public static final class IntakeConstants {
 
     public static final class RollerConstants {
       public static final int kIntakeRollerCanId = 10; // needs tuning
-      public static final double kIntakeRollerPower = -1; // needs tuning
-      public static final double kExtakeRollerPower = 1; // needs tuning
+      public static final double kIntakeRollerPower = 1; // needs tuning
+      public static final double kExtakeRollerPower = -1; // needs tuning
       public static final double kRollerStop = 0.0; // needs tuning
     }
 

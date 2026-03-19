@@ -44,6 +44,8 @@ public class StateMachine extends SubsystemBase {
   private static State m_state = State.Idle;
   private boolean phaseShiftActive = false;
   private boolean phaseShiftWarningActive = false;
+  private boolean disablePassing = true;
+
   private boolean xWasPressed = false;
 
   private static boolean isNotClimbing() {
@@ -219,6 +221,14 @@ public class StateMachine extends SubsystemBase {
     return Commands.runEnd(
             () -> m_shooter.setTurretOverride(0), () -> m_shooter.clearTurretOverride())
         .ignoringDisable(true);
+  }
+
+  public void enablePassing() {
+    disablePassing = false;
+  }
+
+  public void disablePassing() {
+    disablePassing = true;
   }
 
   /** Stops the flywheel and dye rotor, returns to Idle. */
@@ -429,13 +439,16 @@ public class StateMachine extends SubsystemBase {
     }
 
     publisher.set(new Pose2d(target, new Rotation2d()));
-
-    m_shooter.calculate(
-        robotPosition,
-        robotHeading,
-        m_drivetrain.getFieldRelativeVelocity(),
-        target,
-        ShooterConstants.kLatencyCompensation);
+    if (!disablePassing) {
+      m_shooter.calculate(
+          robotPosition,
+          robotHeading,
+          m_drivetrain.getFieldRelativeVelocity(),
+          target,
+          ShooterConstants.kLatencyCompensation);
+    } else {
+      m_shooter.setTurretAngle(0);
+    }
   }
 
   @Override

@@ -113,7 +113,7 @@ public final class Constants {
     // Command timeouts in seconds (needs to be tested)
     public static final double kShootInitialTimeout = 1.5;
     public static final double kShootTimeout = 2.25;
-    public static final double kIntakeTimeout = 1.75;
+    public static final double kIntakeTimeout = 10;
     public static final double kExtakeTimeout = 1.75;
     public static final double kStowTimeout = 0.75;
   }
@@ -224,12 +224,19 @@ public final class Constants {
   // For field constants
   public static boolean disableHAL = false;
 
+  public static final class AgitationConstants {
+    public static final double kStowDurationSeconds = 0.25;
+    public static final double kExtendDurationSeconds = 0.5;
+    public static final double kAgitateOutPower = -0.15;
+    public static final double kAgitateInPower = 0.2;
+  }
+
   public static final class IntakeConstants {
 
     public static final class RollerConstants {
       public static final int kIntakeRollerCanId = 10; // needs tuning
-      public static final double kIntakeRollerPower = -1; // needs tuning
-      public static final double kExtakeRollerPower = 1; // needs tuning
+      public static final double kIntakeRollerPower = 1; // needs tuning
+      public static final double kExtakeRollerPower = -1; // needs tuning
       public static final double kRollerStop = 0.0; // needs tuning
     }
 
@@ -243,6 +250,7 @@ public final class Constants {
       public static final double kPivotDownPower = -0.42;
 
       public static final int kPivotThreshold = 1; // needs tuning
+      public static final int kPivotClear = 75; // needs tuning
       public static final double kPivotVelocityThreshold = 0.1;
     }
   }

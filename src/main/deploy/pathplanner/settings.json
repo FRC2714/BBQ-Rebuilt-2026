@@ -3,6 +3,7 @@
   "robotLength": 0.914,
   "holonomicMode": true,
   "pathFolders": [
+    "Double NZ Score",
     "Preload",
     "Scoop Depot NZ",
     "Scoop Outpost NZ"

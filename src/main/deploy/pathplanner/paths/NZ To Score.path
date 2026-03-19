@@ -36,44 +36,44 @@
         "y": 3.899144079885877
       },
       "prevControl": {
-        "x": 5.643452211126961,
-        "y": 4.351997146932953
+        "x": 5.594002394862649,
+        "y": 4.302829760323198
       },
       "nextControl": {
-        "x": 6.408719896738981,
-        "y": 3.4879852438226076
+        "x": 6.368578313253011,
+        "y": 3.6088192771084344
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.519557774607703,
+        "x": 7.308361445783132,
         "y": 3.899144079885877
       },
       "prevControl": {
-        "x": 7.0667047075606275,
-        "y": 3.39453637660485
+        "x": 6.947746987951808,
+        "y": 3.5323253012048186
       },
       "nextControl": {
-        "x": 7.850440452676336,
-        "y": 4.267841921162354
+        "x": 7.655661979512891,
+        "y": 4.252419870280335
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.390171184022824,
-        "y": 5.361212553495007
+        "x": 7.078879518072289,
+        "y": 5.477457831325301
       },
       "prevControl": {
-        "x": 7.933594864479314,
-        "y": 4.882482168330956
+        "x": 7.771947560398291,
+        "y": 5.13700335439323
       },
       "nextControl": {
-        "x": 6.490614547779593,
-        "y": 6.153679113994998
+        "x": 6.456,
+        "y": 5.783433734939758
       },
       "isLocked": false,
       "linkedName": null
@@ -107,7 +107,7 @@
     },
     {
       "waypointRelativePos": 4.4669509594882655,
-      "rotationDegrees": -93.41847044248584
+      "rotationDegrees": 179.85310005058443
     }
   ],
   "constraintZones": [
@@ -116,7 +116,7 @@
       "minWaypointRelativePos": 1.539500337609703,
       "maxWaypointRelativePos": 4.280891289669141,
       "constraints": {
-        "maxVelocity": 3.0,
+        "maxVelocity": 3.5,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 160.0,
         "maxAngularAcceleration": 720.0,
@@ -175,7 +175,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -92.56377021146503
+    "rotation": 178.48305274042775
   },
   "reversed": false,
   "folder": "Double NZ Score",

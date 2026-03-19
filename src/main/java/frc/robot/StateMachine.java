@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,6 +29,8 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Coordinates all robot subsystems through a state machine (Idle, Shooting, Climbing). Commands are
@@ -48,6 +51,8 @@ public class StateMachine extends SubsystemBase {
   private boolean disablePassing = true;
 
   private boolean xWasPressed = false;
+  private static final int[] PHASE_SHIFT_TRANSITION_TIMES = {130, 105, 80, 55, 30};
+  private static final double PHASE_SHIFT_WARNING_WINDOW_SECONDS = 5.0;
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -174,14 +179,82 @@ public class StateMachine extends SubsystemBase {
     return phaseShiftWarningActive;
   }
 
-  private boolean isPhaseShiftTime(double matchTime) {
-    int wholeSeconds = (int) Math.round(matchTime);
-    return wholeSeconds == 130 || wholeSeconds == 105 || wholeSeconds == 80 || wholeSeconds == 55;
+  private boolean isPhaseShiftWarningTime(double matchTime) {
+    double timeUntilNextPhaseShift = getTimeUntilNextPhaseShift(matchTime);
+    return timeUntilNextPhaseShift > 0
+        && timeUntilNextPhaseShift <= PHASE_SHIFT_WARNING_WINDOW_SECONDS;
   }
 
-  private boolean isPhaseShiftWarningTime(double matchTime) {
-    int wholeSeconds = (int) Math.round(matchTime);
-    return wholeSeconds == 138 || wholeSeconds == 113 || wholeSeconds == 88 || wholeSeconds == 63;
+  private double getTimeUntilNextPhaseShift(double matchTime) {
+    if (!DriverStation.isTeleopEnabled()) {
+      return -1;
+    }
+
+    for (int transitionTime : PHASE_SHIFT_TRANSITION_TIMES) {
+      if (matchTime >= transitionTime) {
+        return matchTime - transitionTime;
+      }
+    }
+    return -1;
+  }
+
+  public boolean isHubActive() {
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    if (alliance.isEmpty()) {
+      return false;
+    }
+    if (DriverStation.isAutonomousEnabled()) {
+      return true;
+    }
+    if (!DriverStation.isTeleopEnabled()) {
+      return false;
+    }
+
+    double matchTime = DriverStation.getMatchTime();
+    String gameData = DriverStation.getGameSpecificMessage();
+    if (gameData.isEmpty()) {
+      return true;
+    }
+
+    boolean redInactiveFirst = false;
+    switch (gameData.charAt(0)) {
+      case 'R' -> redInactiveFirst = true;
+      case 'B' -> redInactiveFirst = false;
+      default -> {
+        return true;
+      }
+    }
+
+    boolean shift1Active =
+        switch (alliance.get()) {
+          case Red -> !redInactiveFirst;
+          case Blue -> redInactiveFirst;
+        };
+
+    if (matchTime > 130) {
+      return true;
+    } else if (matchTime > 105) {
+      return shift1Active;
+    } else if (matchTime > 80) {
+      return !shift1Active;
+    } else if (matchTime > 55) {
+      return shift1Active;
+    } else if (matchTime > 30) {
+      return !shift1Active;
+    } else {
+      return true;
+    }
+  }
+
+  private String formatTimeUntilNextPhaseShift(double matchTime) {
+    return String.format(Locale.US, "%.2f", getTimeUntilNextPhaseShift(matchTime));
+  }
+
+  private boolean getPhaseShiftDashboardValue(double matchTime) {
+    if (!isPhaseShiftWarningTime(matchTime)) {
+      return phaseShiftActive;
+    }
+    return ((int) Math.floor(matchTime * 4.0)) % 2 == 0;
   }
 
   private boolean isIntaking() {
@@ -460,16 +533,20 @@ public class StateMachine extends SubsystemBase {
   @Override
   public void periodic() {
     runTargeting();
-    phaseShiftActive = isPhaseShiftTime(DriverStation.getMatchTime());
-    phaseShiftWarningActive = isPhaseShiftWarningTime(DriverStation.getMatchTime());
+    double matchTime = DriverStation.getMatchTime();
+    phaseShiftActive = isHubActive();
+    phaseShiftWarningActive = isPhaseShiftWarningTime(matchTime);
 
     SmartDashboard.putString(
         "State Machine/Current Comamand",
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
     SmartDashboard.putString("State Machine/State", m_state.toString());
 
-    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
-    SmartDashboard.putBoolean("State Machine/Phase Shift Active", phaseShiftActive);
+    SmartDashboard.putNumber("Match Time", matchTime);
+    SmartDashboard.putBoolean(
+        "State Machine/Phase Shift Active", getPhaseShiftDashboardValue(matchTime));
+    SmartDashboard.putString(
+        "State Machine/Time Until Next Phase Shift", formatTimeUntilNextPhaseShift(matchTime));
 
     m_publisher.publish();
   }

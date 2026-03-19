@@ -11,15 +11,40 @@
           }
         },
         {
-          "type": "wait",
+          "type": "race",
           "data": {
-            "waitTime": 3.0
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "SCORE"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "STOP_SHOOTING"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "NZ To Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SCORE"
           }
         }
       ]

@@ -158,6 +158,17 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
+      "name": "AGITATE",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "AGITATE"
+        }
+      }
+    },
+    {
       "name": "INTAKE",
       "waypointRelativePos": 1.0803511141120863,
       "endWaypointRelativePos": null,

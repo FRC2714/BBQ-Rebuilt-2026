@@ -69,6 +69,8 @@ public class RobotContainer {
   public RobotContainer() {
     // NAMED COMMANDS FOR PATHPLANNER
     NamedCommands.registerCommand("SCORE", m_stateMachine.shoot());
+    NamedCommands.registerCommand("AGITATE", m_intake.agitate());
+
     NamedCommands.registerCommand(
         "ENABLE_PASSING", Commands.runOnce(() -> m_stateMachine.enablePassing()));
     NamedCommands.registerCommand(
@@ -110,7 +112,6 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     m_stateMachine.configureBindings();
-    retractIntakeButton.onTrue(m_stateMachine.retractIntakeSequence());
     button5.onTrue(m_stateMachine.zeroPoseAuto());
 
     m_driverController

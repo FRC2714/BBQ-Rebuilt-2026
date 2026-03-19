@@ -300,43 +300,34 @@ public class DriveSubsystem extends SubsystemBase {
 
     double omegaRps = Units.degreesToRotations(getTurnRate());
 
-    var frontRightLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kFrontRightName);
-    var frontLeftLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kFrontLeftName);
-    var rearLeftLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kRearLeftName);
-    var rearRightLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kRearRightName);
-
     if (Math.abs(omegaRps) < .7) {
-      if (frontRightLLMeasurement != null && frontRightLLMeasurement.tagCount > 0) {
-        xyStdDev = .7 * (1 + frontRightLLMeasurement.avgTagDist * .5);
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
-        m_poseEstimator.addVisionMeasurement(
-            frontRightLLMeasurement.pose, frontRightLLMeasurement.timestampSeconds);
+      for (String limelightName : LimelightConstants.kCameraNames) {
+        var measurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+        if (measurement != null
+            && measurement.tagCount > 0
+            && Double.isFinite(measurement.pose.getX())
+            && Double.isFinite(measurement.pose.getY())) {
+          xyStdDev = .7 * (1 + measurement.avgTagDist * .5);
+          m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
+          m_poseEstimator.addVisionMeasurement(measurement.pose, measurement.timestampSeconds);
+        }
       }
+    }
 
-      if (frontLeftLLMeasurement != null && frontLeftLLMeasurement.tagCount > 0) {
-        xyStdDev = .7 * (1 + frontLeftLLMeasurement.avgTagDist * .5);
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
-        m_poseEstimator.addVisionMeasurement(
-            frontLeftLLMeasurement.pose, frontLeftLLMeasurement.timestampSeconds);
-      }
-
-      if (rearLeftLLMeasurement != null && rearLeftLLMeasurement.tagCount > 0) {
-        xyStdDev = .7 * (1 + rearLeftLLMeasurement.avgTagDist * .5);
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
-        m_poseEstimator.addVisionMeasurement(
-            rearLeftLLMeasurement.pose, rearLeftLLMeasurement.timestampSeconds);
-      }
-
-      if (rearRightLLMeasurement != null && rearRightLLMeasurement.tagCount > 0) {
-        xyStdDev = .7 * (1 + rearRightLLMeasurement.avgTagDist * .5);
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
-        m_poseEstimator.addVisionMeasurement(
-            rearRightLLMeasurement.pose, rearRightLLMeasurement.timestampSeconds);
-      }
+    // Publish per-camera IMU/gyro health to SmartDashboard for Elastic
+    for (String limelightName : LimelightConstants.kCameraNames) {
+      LimelightHelpers.IMUData imuData = LimelightHelpers.getIMUData(limelightName);
+      boolean hasGyro =
+          Double.isFinite(imuData.gyroX)
+              && Double.isFinite(imuData.gyroY)
+              && Double.isFinite(imuData.gyroZ)
+              && (imuData.gyroX != 0
+                  || imuData.gyroY != 0
+                  || imuData.gyroZ != 0
+                  || imuData.accelX != 0
+                  || imuData.accelY != 0
+                  || imuData.accelZ != 0);
+      SmartDashboard.putBoolean("Limelight/" + limelightName + "/IMU Connected", hasGyro);
     }
 
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());

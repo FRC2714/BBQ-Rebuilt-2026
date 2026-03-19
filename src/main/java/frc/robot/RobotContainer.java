@@ -137,7 +137,7 @@ public class RobotContainer {
         .leftTrigger()
         .onTrue(m_stateMachine.shoot())
         .onFalse(m_stateMachine.stopShoot());
-    m_driverController.leftBumper().whileTrue(m_dyeRotor.start()).whileFalse(m_dyeRotor.stop());
+    m_driverController.leftBumper().whileTrue(m_intake.agitate());
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
     m_driverController.rightBumper().whileTrue(m_stateMachine.extakeSequence());
 

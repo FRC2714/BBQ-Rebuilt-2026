@@ -250,6 +250,7 @@ public final class Constants {
       public static final double kPivotDownPower = -0.42;
 
       public static final int kPivotThreshold = 1; // needs tuning
+      public static final int kPivotClear = 75; // needs tuning
       public static final double kPivotVelocityThreshold = 0.1;
     }
   }

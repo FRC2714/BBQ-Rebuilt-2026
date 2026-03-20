@@ -323,29 +323,29 @@ public class StateMachine extends SubsystemBase {
   }
 
   /** Stows the intake then deploys the climbing mechanism. */
-  public Command deployClimber() {
-    return Commands.sequence(
-            m_shooter.stowTurretCommand(),
-            m_intake.stow().andThen(Commands.waitUntil(m_intake::atSetpoint)),
-            m_climb.deploy().until(m_climb::atSetpoint))
-        .beforeStarting(() -> setState(State.Climbing));
-  }
+  // public Command deployClimber() {
+  //   return Commands.sequence(
+  //           m_shooter.stowTurretCommand(),
+  //           m_intake.stow().andThen(Commands.waitUntil(m_intake::atSetpoint)),
+  //           m_climb.deploy().until(m_climb::atSetpoint))
+  //       .beforeStarting(() -> setState(State.Climbing));
+  // }
 
   /** Deploys climber and climbs. Only runs from Idle. */
-  public Command climb() {
-    return deployClimber()
-        .andThen(m_climb.climb())
-        .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing);
-  }
+  // public Command climb() {
+  //   return deployClimber()
+  //       .andThen(m_climb.climb())
+  //       .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing);
+  // }
 
   /** Reverses the climb and returns to Idle. Only runs from Climbing. */
-  public Command unclimb() {
-    return m_climb
-        .unclimb()
-        .until(() -> m_climb.atSetpoint())
-        .onlyIf(() -> m_state == State.Climbing)
-        .andThen(() -> setState(State.Idle));
-  }
+  // public Command unclimb() {
+  //   return m_climb
+  //       .unclimb()
+  //       .until(() -> m_climb.atSetpoint())
+  //       .onlyIf(() -> m_state == State.Climbing)
+  //       .andThen(() -> setState(State.Idle));
+  // }
 
   /** Runs the dye rotor until fuel is loaded, then stops. */
   public Command preload() {

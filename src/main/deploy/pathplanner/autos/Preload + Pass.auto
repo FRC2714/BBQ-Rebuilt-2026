@@ -5,13 +5,25 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "ENABLE_PASSING"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Preload"
           }
         },
         {
-          "type": "parallel",
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "race",
           "data": {
             "commands": [
               {
@@ -21,25 +33,24 @@
                 }
               },
               {
-                "type": "sequential",
+                "type": "wait",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.0
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "DYEROTOR"
-                      }
-                    }
-                  ]
+                  "waitTime": 3.0
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "STOP_SHOOTING"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "pass"
           }
         }
       ]

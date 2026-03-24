@@ -115,10 +115,6 @@ public class RobotContainer {
     button5.onTrue(m_stateMachine.zeroPoseAuto());
 
     m_driverController
-        .leftStick()
-        .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
-
-    m_driverController
         .back()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroPose(0), m_robotDrive));
     m_driverController

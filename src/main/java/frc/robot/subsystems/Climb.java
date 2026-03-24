@@ -4,27 +4,11 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.sim.SparkFlexSim;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Configs;
-import frc.robot.Constants;
-import frc.robot.Constants.ClimbConstants;
 
 /** Controls the left and right climb motors. Supports deploy, climb, and retract positions. */
 public class Climb extends SubsystemBase {
@@ -50,7 +34,8 @@ public class Climb extends SubsystemBase {
 
   public Climb() {
     // leftMotor.configure(
-    //     Configs.Climb.climbConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    //     Configs.Climb.climbConfig, ResetMode.kResetSafeParameters,
+    // PersistMode.kPersistParameters);
   }
 
   // /** Extends the climber arms to the deploy position. Stops motors on end. */

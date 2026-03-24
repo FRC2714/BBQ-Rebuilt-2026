@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoAimConstants;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
@@ -149,7 +148,7 @@ public class StateMachine extends SubsystemBase {
     //     new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning()).and(xNewPress);
     // startPreload.onTrue(this.preloadCommand());
 
-    Trigger agitate = new Trigger(() -> m_state == State.Shooting && !isIntaking());
+    Trigger agitate = new Trigger(() -> m_state == State.Shooting && !m_intake.isIntaking());
     agitate.whileTrue(m_intake.agitate());
 
     m_shooter.configureShooterBindings();
@@ -257,10 +256,6 @@ public class StateMachine extends SubsystemBase {
     return ((int) Math.floor(matchTime * 4.0)) % 2 == 0;
   }
 
-  private boolean isIntaking() {
-    return m_driverHID.getRightTriggerAxis() > OIConstants.kTriggerButtonThreshold;
-  }
-
   /** Spins up flywheel, preloads fuel, then fires. Only runs from Idle. */
   public Command shoot() {
     // Run preload (dye rotor until fuel loaded, then stop) in parallel with
@@ -328,29 +323,29 @@ public class StateMachine extends SubsystemBase {
   }
 
   /** Stows the intake then deploys the climbing mechanism. */
-  public Command deployClimber() {
-    return Commands.sequence(
-            m_shooter.stowTurretCommand(),
-            m_intake.stow().andThen(Commands.waitUntil(m_intake::atSetpoint)),
-            m_climb.deploy().until(m_climb::atSetpoint))
-        .beforeStarting(() -> setState(State.Climbing));
-  }
+  // public Command deployClimber() {
+  //   return Commands.sequence(
+  //           m_shooter.stowTurretCommand(),
+  //           m_intake.stow().andThen(Commands.waitUntil(m_intake::atSetpoint)),
+  //           m_climb.deploy().until(m_climb::atSetpoint))
+  //       .beforeStarting(() -> setState(State.Climbing));
+  // }
 
   /** Deploys climber and climbs. Only runs from Idle. */
-  public Command climb() {
-    return deployClimber()
-        .andThen(m_climb.climb())
-        .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing);
-  }
+  // public Command climb() {
+  //   return deployClimber()
+  //       .andThen(m_climb.climb())
+  //       .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing);
+  // }
 
   /** Reverses the climb and returns to Idle. Only runs from Climbing. */
-  public Command unclimb() {
-    return m_climb
-        .unclimb()
-        .until(() -> m_climb.atSetpoint())
-        .onlyIf(() -> m_state == State.Climbing)
-        .andThen(() -> setState(State.Idle));
-  }
+  // public Command unclimb() {
+  //   return m_climb
+  //       .unclimb()
+  //       .until(() -> m_climb.atSetpoint())
+  //       .onlyIf(() -> m_state == State.Climbing)
+  //       .andThen(() -> setState(State.Idle));
+  // }
 
   /** Runs the dye rotor until fuel is loaded, then stops. */
   public Command preload() {

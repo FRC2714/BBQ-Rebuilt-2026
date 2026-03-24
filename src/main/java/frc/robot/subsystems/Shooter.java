@@ -568,10 +568,7 @@ public class Shooter extends SubsystemBase {
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
     if (!zeroingHood) {
-      if (hasHoodBeenZeroed) {
-        // Only move hood if we know it has been zeroed
-        hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-      }
+      hoodController.setSetpoint(hoodCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
 
       if (isShooting) {
         flywheelController.setSetpoint(

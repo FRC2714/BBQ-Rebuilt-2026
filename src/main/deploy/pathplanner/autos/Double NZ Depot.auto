@@ -7,11 +7,11 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Preload"
+            "pathName": "Depot to NZ"
           }
         },
         {
-          "type": "parallel",
+          "type": "race",
           "data": {
             "commands": [
               {
@@ -21,25 +21,30 @@
                 }
               },
               {
-                "type": "sequential",
+                "type": "wait",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.0
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "DYEROTOR"
-                      }
-                    }
-                  ]
+                  "waitTime": 5.0
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "STOP_SHOOTING"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NZ To Depot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SCORE"
           }
         }
       ]

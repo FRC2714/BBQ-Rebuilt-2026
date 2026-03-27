@@ -79,6 +79,17 @@ public class DyeRotor extends SubsystemBase {
         });
   }
 
+  /** Momentarily run the rotor inreverse. */
+  public Command unjam() {
+    return this.run(
+            () -> {
+              dyeRotorCurrentTarget = paused ? 0 : -Constants.DyeRotorConstants.kDyeRotorPower;
+              dyeRotorMotor.set(dyeRotorCurrentTarget);
+            })
+        .withTimeout(0.15)
+        .andThen(stop());
+  }
+
   /** Starts the rotor directly (no command). Used by auto event markers. */
   public void startDirect() {
     paused = false;

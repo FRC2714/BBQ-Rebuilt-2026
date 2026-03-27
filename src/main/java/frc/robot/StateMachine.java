@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,13 +21,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoAimConstants;
-import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Coordinates all robot subsystems through a state machine (Idle, Shooting, Climbing). Commands are
@@ -44,7 +47,11 @@ public class StateMachine extends SubsystemBase {
   private static State m_state = State.Idle;
   private boolean phaseShiftActive = false;
   private boolean phaseShiftWarningActive = false;
+  private boolean disablePassing = true;
+
   private boolean xWasPressed = false;
+  private static final int[] PHASE_SHIFT_TRANSITION_TIMES = {130, 105, 80, 55, 30};
+  private static final double PHASE_SHIFT_WARNING_WINDOW_SECONDS = 5.0;
 
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
@@ -141,7 +148,7 @@ public class StateMachine extends SubsystemBase {
     //     new Trigger(() -> m_state != State.Shooting && !m_dyeRotor.isRunning()).and(xNewPress);
     // startPreload.onTrue(this.preloadCommand());
 
-    Trigger agitate = new Trigger(() -> m_state == State.Shooting && !isIntaking());
+    Trigger agitate = new Trigger(() -> m_state == State.Shooting && !m_intake.isIntaking());
     agitate.whileTrue(m_intake.agitate());
 
     m_shooter.configureShooterBindings();
@@ -171,18 +178,82 @@ public class StateMachine extends SubsystemBase {
     return phaseShiftWarningActive;
   }
 
-  private boolean isPhaseShiftTime(double matchTime) {
-    int wholeSeconds = (int) Math.round(matchTime);
-    return wholeSeconds == 130 || wholeSeconds == 105 || wholeSeconds == 80 || wholeSeconds == 55;
-  }
-
   private boolean isPhaseShiftWarningTime(double matchTime) {
-    int wholeSeconds = (int) Math.round(matchTime);
-    return wholeSeconds == 138 || wholeSeconds == 113 || wholeSeconds == 88 || wholeSeconds == 63;
+    double timeUntilNextPhaseShift = getTimeUntilNextPhaseShift(matchTime);
+    return timeUntilNextPhaseShift > 0
+        && timeUntilNextPhaseShift <= PHASE_SHIFT_WARNING_WINDOW_SECONDS;
   }
 
-  private boolean isIntaking() {
-    return m_driverHID.getRightTriggerAxis() > OIConstants.kTriggerButtonThreshold;
+  private double getTimeUntilNextPhaseShift(double matchTime) {
+    if (!DriverStation.isTeleopEnabled()) {
+      return -1;
+    }
+
+    for (int transitionTime : PHASE_SHIFT_TRANSITION_TIMES) {
+      if (matchTime >= transitionTime) {
+        return matchTime - transitionTime;
+      }
+    }
+    return -1;
+  }
+
+  public boolean isHubActive() {
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    if (alliance.isEmpty()) {
+      return false;
+    }
+    if (DriverStation.isAutonomousEnabled()) {
+      return true;
+    }
+    if (!DriverStation.isTeleopEnabled()) {
+      return false;
+    }
+
+    double matchTime = DriverStation.getMatchTime();
+    String gameData = DriverStation.getGameSpecificMessage();
+    if (gameData.isEmpty()) {
+      return true;
+    }
+
+    boolean redInactiveFirst = false;
+    switch (gameData.charAt(0)) {
+      case 'R' -> redInactiveFirst = true;
+      case 'B' -> redInactiveFirst = false;
+      default -> {
+        return true;
+      }
+    }
+
+    boolean shift1Active =
+        switch (alliance.get()) {
+          case Red -> !redInactiveFirst;
+          case Blue -> redInactiveFirst;
+        };
+
+    if (matchTime > 130) {
+      return true;
+    } else if (matchTime > 105) {
+      return shift1Active;
+    } else if (matchTime > 80) {
+      return !shift1Active;
+    } else if (matchTime > 55) {
+      return shift1Active;
+    } else if (matchTime > 30) {
+      return !shift1Active;
+    } else {
+      return true;
+    }
+  }
+
+  private String formatTimeUntilNextPhaseShift(double matchTime) {
+    return String.format(Locale.US, "%.2f", getTimeUntilNextPhaseShift(matchTime));
+  }
+
+  private boolean getPhaseShiftDashboardValue(double matchTime) {
+    if (!isPhaseShiftWarningTime(matchTime)) {
+      return phaseShiftActive;
+    }
+    return ((int) Math.floor(matchTime * 4.0)) % 2 == 0;
   }
 
   /** Spins up flywheel, preloads fuel, then fires. Only runs from Idle. */
@@ -221,6 +292,14 @@ public class StateMachine extends SubsystemBase {
         .ignoringDisable(true);
   }
 
+  public void enablePassing() {
+    disablePassing = false;
+  }
+
+  public void disablePassing() {
+    disablePassing = true;
+  }
+
   /** Stops the flywheel and dye rotor, returns to Idle. */
   public Command stopShoot() {
     return m_shooter
@@ -244,29 +323,29 @@ public class StateMachine extends SubsystemBase {
   }
 
   /** Stows the intake then deploys the climbing mechanism. */
-  public Command deployClimber() {
-    return Commands.sequence(
-            m_shooter.stowTurretCommand(),
-            m_intake.stow().andThen(Commands.waitUntil(m_intake::atSetpoint)),
-            m_climb.deploy().until(m_climb::atSetpoint))
-        .beforeStarting(() -> setState(State.Climbing));
-  }
+  // public Command deployClimber() {
+  //   return Commands.sequence(
+  //           m_shooter.stowTurretCommand(),
+  //           m_intake.stow().andThen(Commands.waitUntil(m_intake::atSetpoint)),
+  //           m_climb.deploy().until(m_climb::atSetpoint))
+  //       .beforeStarting(() -> setState(State.Climbing));
+  // }
 
   /** Deploys climber and climbs. Only runs from Idle. */
-  public Command climb() {
-    return deployClimber()
-        .andThen(m_climb.climb())
-        .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing);
-  }
+  // public Command climb() {
+  //   return deployClimber()
+  //       .andThen(m_climb.climb())
+  //       .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing);
+  // }
 
   /** Reverses the climb and returns to Idle. Only runs from Climbing. */
-  public Command unclimb() {
-    return m_climb
-        .unclimb()
-        .until(() -> m_climb.atSetpoint())
-        .onlyIf(() -> m_state == State.Climbing)
-        .andThen(() -> setState(State.Idle));
-  }
+  // public Command unclimb() {
+  //   return m_climb
+  //       .unclimb()
+  //       .until(() -> m_climb.atSetpoint())
+  //       .onlyIf(() -> m_state == State.Climbing)
+  //       .andThen(() -> setState(State.Idle));
+  // }
 
   /** Runs the dye rotor until fuel is loaded, then stops. */
   public Command preload() {
@@ -281,7 +360,12 @@ public class StateMachine extends SubsystemBase {
   public Command intakeSequence() {
     return (m_intake
         .intake()
-        .beforeStarting(() -> m_shooter.clearTurretOverride())
+        .alongWith(
+            Commands.waitUntil(
+                    () ->
+                        m_intake.getIntakePivotPosition()
+                            < IntakeConstants.PivotConstants.kPivotClear)
+                .andThen(() -> m_shooter.clearTurretOverride()))
         .onlyIf(StateMachine::isNotClimbing));
   }
 
@@ -429,28 +513,35 @@ public class StateMachine extends SubsystemBase {
     }
 
     publisher.set(new Pose2d(target, new Rotation2d()));
-
-    m_shooter.calculate(
-        robotPosition,
-        robotHeading,
-        m_drivetrain.getFieldRelativeVelocity(),
-        target,
-        ShooterConstants.kLatencyCompensation);
+    if (!disablePassing) {
+      m_shooter.calculate(
+          robotPosition,
+          robotHeading,
+          m_drivetrain.getFieldRelativeVelocity(),
+          target,
+          ShooterConstants.kLatencyCompensation);
+    } else {
+      m_shooter.setTurretAngle(0);
+    }
   }
 
   @Override
   public void periodic() {
     runTargeting();
-    phaseShiftActive = isPhaseShiftTime(DriverStation.getMatchTime());
-    phaseShiftWarningActive = isPhaseShiftWarningTime(DriverStation.getMatchTime());
+    double matchTime = DriverStation.getMatchTime();
+    phaseShiftActive = isHubActive();
+    phaseShiftWarningActive = isPhaseShiftWarningTime(matchTime);
 
     SmartDashboard.putString(
         "State Machine/Current Comamand",
         this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
     SmartDashboard.putString("State Machine/State", m_state.toString());
 
-    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
-    SmartDashboard.putBoolean("State Machine/Phase Shift Active", phaseShiftActive);
+    SmartDashboard.putNumber("Match Time", matchTime);
+    SmartDashboard.putBoolean(
+        "State Machine/Phase Shift Active", getPhaseShiftDashboardValue(matchTime));
+    SmartDashboard.putString(
+        "State Machine/Time Until Next Phase Shift", formatTimeUntilNextPhaseShift(matchTime));
 
     m_publisher.publish();
   }

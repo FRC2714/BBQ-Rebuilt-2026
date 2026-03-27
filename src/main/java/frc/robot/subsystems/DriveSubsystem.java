@@ -397,8 +397,8 @@ public class DriveSubsystem extends SubsystemBase {
     double driverRelativeHeading = getHeading() - m_driverHeadingOffsetDeg;
 
     if (shooting) {
-      xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2;
-      ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2;
+      xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 3;
+      ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 3;
       rotDelivered = (rot * DriveConstants.kMaxAngularSpeed) / 2;
     }
 

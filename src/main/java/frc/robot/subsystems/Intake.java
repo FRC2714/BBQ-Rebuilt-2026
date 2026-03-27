@@ -63,6 +63,8 @@ public class Intake extends SubsystemBase {
   private Debouncer bottomHardStopDebouncer = new Debouncer(0.5, DebounceType.kRising);
   private Debouncer topHardStopDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
+  private boolean isIntaking = false;
+
   // Simulation
   DCMotor pivotMotorSim = DCMotor.getNeoVortex(1);
   DCMotor rollerMotorSim = DCMotor.getNeoVortex(1);
@@ -171,12 +173,14 @@ public class Intake extends SubsystemBase {
   public Command intake() {
     return Commands.runEnd(
         () -> {
+          isIntaking = true;
           setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
           pivotExtend();
 
           if (Robot.isSimulation()) Simulation.getInstance().startIntake();
         },
         () -> {
+          isIntaking = false;
           setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
 
           if (Robot.isSimulation()) Simulation.getInstance().stopIntake();
@@ -216,7 +220,7 @@ public class Intake extends SubsystemBase {
    * and then finishes, leaving the intake extended with rollers stopped.
    */
   public Command agitate() {
-    return this.run(
+    return Commands.run(
             () -> {
               setRollerPower(IntakeConstants.RollerConstants.kRollerStop);
               pivotMotor.set(AgitationConstants.kAgitateInPower);
@@ -224,7 +228,7 @@ public class Intake extends SubsystemBase {
         .withTimeout(AgitationConstants.kStowDurationSeconds)
         .andThen(
             // Extend phase: extend pivot, run roller
-            this.run(
+            Commands.run(
                     () -> {
                       setRollerPower(IntakeConstants.RollerConstants.kIntakeRollerPower);
                       pivotMotor.set(AgitationConstants.kAgitateOutPower);
@@ -252,6 +256,10 @@ public class Intake extends SubsystemBase {
         });
   }
 
+  public boolean isIntaking() {
+    return isIntaking;
+  }
+
   @Override
   public void periodic() {
     intakeBar.setAngle(pivotEncoder.getPosition());
@@ -261,6 +269,7 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Pivot/Velocity", pivotEncoder.getVelocity());
     SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSetpoint);
     SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
+    SmartDashboard.putBoolean("Intake/Running", isIntaking());
 
     // 3d SIM
     intakePose3d =

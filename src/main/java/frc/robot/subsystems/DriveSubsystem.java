@@ -34,11 +34,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.LimelightConstants;
@@ -293,10 +290,9 @@ public class DriveSubsystem extends SubsystemBase {
         });
 
     for (String limelightName : LimelightConstants.kCameraNames) {
-      LimelightHelpers.SetRobotOrientation(limelightName, getHeading(), 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation(limelightName, getGyroHeading(), 0, 0, 0, 0, 0);
+      LimelightHelpers.SetIMUMode(limelightName, 0);
     }
-
-    LimelightHelpers.Flush();
 
     double omegaRps = Units.degreesToRotations(getTurnRate());
 
@@ -353,6 +349,8 @@ public class DriveSubsystem extends SubsystemBase {
       publisherModuleStates.set(swerveDriveSimulation.getMeasuredStates());
     }
     SmartDashboard.putNumber("omegaRPS", omegaRps);
+    SmartDashboard.putNumber("Drive/Gyro Heading", getGyroHeading());
+    SmartDashboard.putNumber("Drive/Pose Heading", getHeading());
   }
 
   @Override
@@ -544,28 +542,6 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition(),
         },
         pose);
-
-    for (String limelightName : LimelightConstants.kCameraNames) {
-      LimelightHelpers.SetRobotOrientation(limelightName, heading, 0, 0, 0, 0, 0);
-      LimelightHelpers.SetIMUMode(limelightName, 1);
-    }
-
-    // Switch back to fused mode after seeding
-    CommandScheduler.getInstance()
-        .schedule(
-            new WaitCommand(0.1)
-                .andThen(
-                    new InstantCommand(
-                        () -> LimelightHelpers.SetIMUMode(LimelightConstants.kFrontRightName, 4)))
-                .alongWith(
-                    new InstantCommand(
-                        () -> LimelightHelpers.SetIMUMode(LimelightConstants.kFrontLeftName, 4)))
-                .alongWith(
-                    new InstantCommand(
-                        () -> LimelightHelpers.SetIMUMode(LimelightConstants.kRearLeftName, 4)))
-                .alongWith(
-                    new InstantCommand(
-                        () -> LimelightHelpers.SetIMUMode(LimelightConstants.kRearRightName, 4))));
   }
 
   /** Sets the current heading as the driver's forward direction. */
@@ -590,6 +566,10 @@ public class DriveSubsystem extends SubsystemBase {
     return m_poseEstimator == null
         ? Units.rotationsToDegrees(m_gyro.getYaw())
         : m_poseEstimator.getEstimatedPosition().getRotation().getDegrees();
+  }
+
+  public double getGyroHeading() {
+    return Units.rotationsToDegrees(m_gyro.getYaw());
   }
 
   /**

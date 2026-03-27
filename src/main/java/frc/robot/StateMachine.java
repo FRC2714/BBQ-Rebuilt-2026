@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoAimConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -32,8 +31,8 @@ import java.util.Locale;
 import java.util.Optional;
 
 /**
- * Coordinates all robot subsystems through a state machine (Idle, Shooting, Climbing). Commands are
- * guarded by state checks to prevent conflicting actions.
+ * Coordinates all robot subsystems through a state machine (Idle, Shooting). Commands are guarded
+ * by state checks to prevent conflicting actions.
  */
 public class StateMachine extends SubsystemBase {
   private final DriveSubsystem m_drivetrain;
@@ -42,7 +41,6 @@ public class StateMachine extends SubsystemBase {
   private final DyeRotor m_dyeRotor;
   private final Publisher m_publisher;
   private final XboxController m_driverHID;
-  private final Climb m_climb;
 
   private static State m_state = State.Idle;
   private boolean phaseShiftActive = false;
@@ -53,16 +51,11 @@ public class StateMachine extends SubsystemBase {
   private static final int[] PHASE_SHIFT_TRANSITION_TIMES = {130, 105, 80, 55, 30};
   private static final double PHASE_SHIFT_WARNING_WINDOW_SECONDS = 5.0;
 
-  private static boolean isNotClimbing() {
-    return !(m_state == State.Climbing);
-  }
-
   private double startShootingRotorPosition = 0;
 
   enum State {
     Idle,
-    Shooting,
-    Climbing
+    Shooting
   }
 
   public StateMachine(
@@ -70,15 +63,13 @@ public class StateMachine extends SubsystemBase {
       Shooter shooter,
       Intake intake,
       DyeRotor dyeRotor,
-      Climb climb,
       CommandXboxController driverController) {
     m_drivetrain = drivetrain;
     m_shooter = shooter;
     m_intake = intake;
     m_dyeRotor = dyeRotor;
-    m_climb = climb;
 
-    m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor, m_climb);
+    m_publisher = new Publisher(m_drivetrain, m_shooter, m_intake, m_dyeRotor);
     m_driverHID = driverController.getHID();
 
     if (Robot.isSimulation()) {
@@ -322,31 +313,6 @@ public class StateMachine extends SubsystemBase {
         });
   }
 
-  /** Stows the intake then deploys the climbing mechanism. */
-  // public Command deployClimber() {
-  //   return Commands.sequence(
-  //           m_shooter.stowTurretCommand(),
-  //           m_intake.stow().andThen(Commands.waitUntil(m_intake::atSetpoint)),
-  //           m_climb.deploy().until(m_climb::atSetpoint))
-  //       .beforeStarting(() -> setState(State.Climbing));
-  // }
-
-  /** Deploys climber and climbs. Only runs from Idle. */
-  // public Command climb() {
-  //   return deployClimber()
-  //       .andThen(m_climb.climb())
-  //       .onlyIf(() -> m_state == State.Idle || m_state == State.Climbing);
-  // }
-
-  /** Reverses the climb and returns to Idle. Only runs from Climbing. */
-  // public Command unclimb() {
-  //   return m_climb
-  //       .unclimb()
-  //       .until(() -> m_climb.atSetpoint())
-  //       .onlyIf(() -> m_state == State.Climbing)
-  //       .andThen(() -> setState(State.Idle));
-  // }
-
   /** Runs the dye rotor until fuel is loaded, then stops. */
   public Command preload() {
     return m_dyeRotor
@@ -356,7 +322,7 @@ public class StateMachine extends SubsystemBase {
         .withName("preload");
   }
 
-  /** Runs the intake. Blocked while climbing. */
+  /** Runs the intake. */
   public Command intakeSequence() {
     return (m_intake
         .intake()
@@ -365,28 +331,25 @@ public class StateMachine extends SubsystemBase {
                     () ->
                         m_intake.getIntakePivotPosition()
                             < IntakeConstants.PivotConstants.kPivotClear)
-                .andThen(() -> m_shooter.clearTurretOverride()))
-        .onlyIf(StateMachine::isNotClimbing));
+                .andThen(() -> m_shooter.clearTurretOverride())));
   }
 
-  /** Reverses the intake. Blocked while climbing. */
+  /** Reverses the intake. */
   public Command extakeSequence() {
-    return (m_intake.extake().onlyIf(StateMachine::isNotClimbing));
+    return (m_intake.extake());
   }
 
-  /** Stows the intake. Blocked while climbing. */
+  /** Stows the intake. */
   public Command stowSequence() {
-    return m_shooter
-        .stowTurretCommand()
-        .andThen((m_intake.stow().onlyIf(StateMachine::isNotClimbing)).alongWith(stopShoot()));
+    return m_shooter.stowTurretCommand().andThen((m_intake.stow()).alongWith(stopShoot()));
   }
 
   public Command extendIntakeSequence() {
-    return m_intake.agitateOut().onlyIf(StateMachine::isNotClimbing);
+    return m_intake.agitateOut();
   }
 
   public Command retractIntakeSequence() {
-    return m_intake.agitateIn().onlyIf(StateMachine::isNotClimbing);
+    return m_intake.agitateIn();
   }
 
   // Auto commands
@@ -421,21 +384,21 @@ public class StateMachine extends SubsystemBase {
    * @param timeout max seconds to run intake
    */
   public Command intakeSequenceAuto(double timeout) {
-    return m_intake.intake().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout);
+    return m_intake.intake().withTimeout(timeout);
   }
 
   /**
    * @param timeout max seconds to run extake
    */
   public Command extakeSequenceAuto(double timeout) {
-    return m_intake.extake().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout);
+    return m_intake.extake().withTimeout(timeout);
   }
 
   /**
    * @param timeout max seconds to run stow
    */
   public Command stowSequenceAuto(double timeout) {
-    return m_intake.stow().onlyIf(StateMachine::isNotClimbing).withTimeout(timeout);
+    return m_intake.stow().withTimeout(timeout);
   }
 
   public Command manualDyeRotor() {

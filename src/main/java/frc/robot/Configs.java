@@ -1,6 +1,5 @@
 package frc.robot;
 
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
@@ -203,36 +202,6 @@ public final class Configs {
           .idleMode(IdleMode.kBrake)
           .inverted(false)
           .voltageCompensation(12);
-    }
-  }
-
-  public static final class Climb {
-    public static final SparkFlexConfig climbConfig = new SparkFlexConfig();
-
-    static {
-      climbConfig
-          .smartCurrentLimit(80)
-          .idleMode(IdleMode.kBrake)
-          .inverted(false)
-          .voltageCompensation(12);
-      climbConfig.absoluteEncoder.positionConversionFactor(360).inverted(true);
-      climbConfig
-          .closedLoop
-          .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          .p(0.05)
-          .d(0.5)
-          .outputRange(-0.5, 0.5)
-          .feedForward
-          .kS(0.115);
-
-      // Faster slot for deploy/stow
-      climbConfig
-          .closedLoop
-          .p(0.05, ClosedLoopSlot.kSlot1)
-          .d(0.5, ClosedLoopSlot.kSlot1)
-          .outputRange(-1, 1, ClosedLoopSlot.kSlot1)
-          .feedForward
-          .kS(0.115, ClosedLoopSlot.kSlot1);
     }
   }
 }

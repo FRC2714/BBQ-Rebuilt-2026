@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
 import frc.robot.subsystems.Intake;
@@ -40,7 +39,6 @@ public class RobotContainer {
   public final Shooter m_shooter = new Shooter();
   public final DyeRotor m_dyeRotor = new DyeRotor();
   public final Intake m_intake = new Intake();
-  private final Climb m_climb = new Climb();
 
   Joystick m_operatorBox = new Joystick(1); // operator controller 1
   // The driver's controller
@@ -58,7 +56,7 @@ public class RobotContainer {
   private final JoystickButton zeroHoodButton = new JoystickButton(m_operatorBox, 6);
 
   final StateMachine m_stateMachine =
-      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_climb, m_driverController);
+      new StateMachine(m_robotDrive, m_shooter, m_intake, m_dyeRotor, m_driverController);
 
   private SendableChooser<Command> autoChooser;
 
@@ -137,10 +135,6 @@ public class RobotContainer {
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
     m_driverController.rightBumper().whileTrue(m_stateMachine.extakeSequence());
     m_driverController.a().onTrue(m_dyeRotor.unjam());
-
-    // m_driverController.povLeft().onTrue(m_stateMachine.deplo\[]yClimber());
-    // m_driverController.povUp().onTrue(m_stateMachine.climb());
-    // m_driverController.povDown().onTrue(m_stateMachine.unclimb());
 
     rumble.onTrue(
         new StartEndCommand(

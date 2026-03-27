@@ -188,18 +188,6 @@ public final class Constants {
     public static final double kDyeRotorPower = 1.0;
   }
 
-  public static final class ClimbConstants {
-    public static final int kClimbMotorCanID = 45;
-
-    // The absolute encoder is zeroed such that the "zero position" (straight down) is 20 degrees
-    public static final double kZeroOffsetDegrees = 20;
-
-    public static final double kPositionTolerance = 2.0;
-    public static final double kDeployedSetpoint = 90 + kZeroOffsetDegrees;
-    public static final double kClimbSetpoint = 150 + kZeroOffsetDegrees;
-    public static final double kStowSetpoint = 0 + kZeroOffsetDegrees;
-  }
-
   public static final class AutoAimConstants {
     // Aim at starting line since LUT is calibrated for the height of the hub
     public static final Translation2d kRedLeftTarget =

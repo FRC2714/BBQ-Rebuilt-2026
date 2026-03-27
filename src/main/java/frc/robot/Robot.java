@@ -155,7 +155,6 @@ public class Robot extends TimedRobot {
         .onTrue(Commands.runOnce(() -> m_robotContainer.m_stateMachine.disablePassing()))
         .onFalse(Commands.runOnce(() -> m_robotContainer.m_stateMachine.enablePassing()));
 
-    // CommandScheduler.getInstance().schedule(m_robotContainer.m_stateMachine.unclimb());
     CommandScheduler.getInstance().schedule(m_robotContainer.m_shooter.zeroHoodIfNeeded());
 
     LimelightHelpers.SetIMUMode(LimelightConstants.kFrontRightName, 4); // 4 is internal imu + gyro

@@ -532,7 +532,6 @@ public class DriveSubsystem extends SubsystemBase {
     Pose2d pose = new Pose2d(0, 0, Rotation2d.fromDegrees(heading));
     setDriverHeadingOffset(heading);
 
-
     m_gyro.setYaw(pose.getRotation().getRotations());
     m_poseEstimator.resetRotation(pose.getRotation());
     m_poseEstimator.resetPosition(

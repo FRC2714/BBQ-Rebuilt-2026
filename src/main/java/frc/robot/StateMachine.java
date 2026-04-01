@@ -282,14 +282,14 @@ public class StateMachine extends SubsystemBase {
               m_shooter.clearTurretOverride();
               m_drivetrain.setShootingStateTrue();
             })
-        .andThen(Commands.parallel(
-                  m_shooter.startShooter(),
-                  m_dyeRotor.start())
+        .andThen(
+                  m_shooter.startShooter()
+                  .alongWith(m_dyeRotor.start()))
                 .beforeStarting(
                     () -> {
                       startShootingRotorPosition = m_dyeRotor.getRotorPosition();
                       setState(State.Shooting);
-                    }))
+                    })
         .onlyIf(() -> m_state == State.Idle);
   }
 

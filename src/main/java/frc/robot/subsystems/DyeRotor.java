@@ -39,6 +39,8 @@ public class DyeRotor extends SubsystemBase {
 
   private Pose3d pose = new Pose3d();
 
+  private boolean dyeRotorStarted = false;
+
   // Simulation
   DCMotor motor = DCMotor.getNeoVortex(1);
   private SparkFlexSim dyeRotorSim = new SparkFlexSim(dyeRotorMotor, motor);
@@ -63,6 +65,7 @@ public class DyeRotor extends SubsystemBase {
             () -> {
               dyeRotorCurrentTarget = paused ? 0 : Constants.DyeRotorConstants.kDyeRotorPower;
               dyeRotorMotor.set(dyeRotorCurrentTarget);
+              dyeRotorStarted = true;
             })
         .beforeStarting(
             () -> {
@@ -143,6 +146,10 @@ public class DyeRotor extends SubsystemBase {
   /** True if the rotor has a non-zero target. */
   public boolean isRunning() {
     return dyeRotorCurrentTarget != 0;
+  }
+
+  public boolean dyeRotorStarted() {
+    return dyeRotorStarted == true;
   }
 
   @Override

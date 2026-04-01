@@ -395,9 +395,15 @@ public class DriveSubsystem extends SubsystemBase {
     double driverRelativeHeading = getHeading() - m_driverHeadingOffsetDeg;
 
     if (shooting) {
-      xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 3;
-      ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 3;
-      rotDelivered = (rot * DriveConstants.kMaxAngularSpeed) / 2;
+      if(isInAllianceZone()){
+      xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 5;
+      ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 5;
+      rotDelivered = (rot * DriveConstants.kMaxAngularSpeed) / 4;
+      } else {
+              xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2.5;
+          ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2.5;
+            rotDelivered = (rot * DriveConstants.kMaxAngularSpeed) / 3;
+      }
     }
 
     var swerveModuleStates =

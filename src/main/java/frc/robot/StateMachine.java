@@ -31,6 +31,8 @@ import frc.robot.subsystems.Shooter;
 import java.util.Locale;
 import java.util.Optional;
 
+import com.fasterxml.jackson.core.json.UTF8DataInputJsonParser;
+
 /**
  * Coordinates all robot subsystems through a state machine (Idle, Shooting, Climbing). Commands are
  * guarded by state checks to prevent conflicting actions.
@@ -56,6 +58,7 @@ public class StateMachine extends SubsystemBase {
   private static boolean isNotClimbing() {
     return !(m_state == State.Climbing);
   }
+
 
   private double startShootingRotorPosition = 0;
 
@@ -124,6 +127,10 @@ public class StateMachine extends SubsystemBase {
     Trigger pauseShooter =
         new Trigger(() -> m_state == State.Shooting && !m_shooter.readyToShoot());
     pauseShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.pause()));
+
+    Trigger unjamDyerotor =
+        new Trigger(() -> !m_dyeRotor.isRunning() && m_dyeRotor.dyeRotorStarted());
+    unjamDyerotor.onTrue(Commands.runOnce(() -> m_dyeRotor.unjam()));
 
     Trigger resumeShooter =
         new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());

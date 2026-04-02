@@ -556,8 +556,7 @@ public class Shooter extends SubsystemBase {
     return flyWheelPose3d;
   }
 
-  @Override
-  public void periodic() {
+  private void run() {
     turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
     turretOverrideTarget = normalizeTurretTarget(turretOverrideTarget);
     double activeTurretTarget = getActiveTurretTarget();
@@ -578,12 +577,18 @@ public class Shooter extends SubsystemBase {
       }
     }
 
+    SmartDashboard.putNumber("Shooter/Turret/Setpoint", activeTurretTarget);
+  }
+
+  @Override
+  public void periodic() {
+    run();
+
     SmartDashboard.putNumber("Shooter/Flywheel/Expected Speed", flywheelCurrentTarget);
     SmartDashboard.putNumber(
         "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());
     SmartDashboard.putBoolean("Shooter/Flywheel/At Setpoint", flywheelAtSetpoint());
 
-    SmartDashboard.putNumber("Shooter/Turret/Setpoint", activeTurretTarget);
     SmartDashboard.putNumber("Shooter/Turret/Position", getTurretPosition());
     SmartDashboard.putBoolean("Shooter/Turret/At Setpoint", turretAtSetpoint());
     SmartDashboard.putBoolean("Shooter/Turret/Is Stowed", turretIsStowed());

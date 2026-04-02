@@ -84,7 +84,7 @@ public final class Configs {
       turretConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
-          .pid(0.05, 0, 0)
+          .pid(0.05, 0, 0.001)
           .outputRange(-1, 1);
       turretConfig
           .limitSwitch

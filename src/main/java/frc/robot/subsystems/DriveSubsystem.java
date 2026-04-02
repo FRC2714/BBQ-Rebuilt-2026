@@ -280,8 +280,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    updateOdometry();
-
     SmartDashboard.putNumber("Drive/Gyro Heading", getGyroHeading());
     SmartDashboard.putNumber("Drive/Pose Heading", getHeading());
   }
@@ -572,7 +570,7 @@ public class DriveSubsystem extends SubsystemBase {
     return virtualTarget;
   }
 
-  private void updateOdometry() {
+  public void updateOdometry() {
     m_poseEstimator.update(
         m_gyro.getRotation2d(),
         new SwerveModulePosition[] {

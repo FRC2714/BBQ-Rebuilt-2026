@@ -556,7 +556,7 @@ public class Shooter extends SubsystemBase {
     return flyWheelPose3d;
   }
 
-  private void run() {
+  public void run() {
     turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
     turretOverrideTarget = normalizeTurretTarget(turretOverrideTarget);
     double activeTurretTarget = getActiveTurretTarget();
@@ -582,8 +582,6 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    run();
-
     SmartDashboard.putNumber("Shooter/Flywheel/Expected Speed", flywheelCurrentTarget);
     SmartDashboard.putNumber(
         "Shooter/Flywheel/Actual Speed", flywheelRelativeEncoder.getVelocity());

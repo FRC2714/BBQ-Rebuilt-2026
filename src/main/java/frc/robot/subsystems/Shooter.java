@@ -229,7 +229,13 @@ public class Shooter extends SubsystemBase {
     // When robot rotates, turret must counter-rotate at the same rate
     double turretAngularVelocity = robotAngularVelocity - targetAngularVelocity;
 
-    this.turretFeedforward = ShooterConstants.kTurretKV * turretAngularVelocity;
+    // Only apply feedforward when close to target (actively tracking)
+    // If error is large, we're slewing — let PID drive it unimpeded
+    double turretError = turretCurrentTarget - getTurretPosition(); // degrees
+    this.turretFeedforward =
+        Math.abs(turretError) < ShooterConstants.kFFDeadbandDegrees
+            ? ShooterConstants.kTurretKV * turretAngularVelocity
+            : 0.0;
 
     SmartDashboard.putNumber("Shooter/Turret/Feedforward", turretFeedforward);
   }

@@ -167,6 +167,8 @@ public final class Constants {
     public static final double kShooterPositionTolerance =
         1; // degrees in which the relative encoder and setpoitn values can be off
 
+    public static final double kTurretKV = 0.06; // TODO: tune
+
     public static final class TurretSetpoints {
       public static final double kStow = 0;
     }

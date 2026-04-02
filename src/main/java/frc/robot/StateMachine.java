@@ -495,6 +495,7 @@ public class StateMachine extends SubsystemBase {
           robotPosition,
           robotHeading,
           m_drivetrain.getFieldRelativeVelocity(),
+          m_drivetrain.getTurnRate(),
           Field.getAllianceHub().toTranslation2d(),
           ShooterConstants.kLatencyCompensation);
       return;
@@ -518,6 +519,7 @@ public class StateMachine extends SubsystemBase {
           robotPosition,
           robotHeading,
           m_drivetrain.getFieldRelativeVelocity(),
+          m_drivetrain.getTurnRate(),
           target,
           ShooterConstants.kLatencyCompensation);
     } else {

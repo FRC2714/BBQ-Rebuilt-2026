@@ -91,6 +91,7 @@ public class Shooter extends SubsystemBase {
   private double turretOverrideTarget = TurretSetpoints.kStow;
   private double hoodCurrentTarget = HoodSetpoints.kStow;
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
+  private double turretFeedforward = 0;
 
   // Raw (non-lead-compensated) values for simulation — these point at the actual hub
   // rather than the predicted future position, so MapleLib doesn't double-compensate.
@@ -151,6 +152,7 @@ public class Shooter extends SubsystemBase {
       Translation2d robotPosition,
       Rotation2d robotHeading,
       Translation2d robotVelocity,
+      double robotAngularVelocity,
       Translation2d goalPosition,
       double latencyCompensation) {
 
@@ -216,6 +218,20 @@ public class Shooter extends SubsystemBase {
             turretAngle.relativeTo(robotHeading).getDegrees(),
             Constants.ShooterConstants.kTurretMinRange,
             Constants.ShooterConstants.kTurretMaxRange);
+
+    // Calculate feed forward for the turret to compensate for the target's relative motion
+    double cross =
+        adjustedRelativePosition.getX() * relativeVelocity.getY()
+            - adjustedRelativePosition.getY() * relativeVelocity.getX();
+    double distSq = Math.pow(adjustedRelativePosition.getNorm(), 2);
+    double targetAngularVelocity = Math.toDegrees(cross / distSq);
+
+    // When robot rotates, turret must counter-rotate at the same rate
+    double turretAngularVelocity = robotAngularVelocity - targetAngularVelocity;
+
+    this.turretFeedforward = ShooterConstants.kTurretKV * turretAngularVelocity;
+
+    SmartDashboard.putNumber("Shooter/Turret/Feedforward", turretFeedforward);
   }
 
   private Debouncer flywheelDebouncer =
@@ -563,7 +579,8 @@ public class Shooter extends SubsystemBase {
     turretController.setSetpoint(
         activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
         ControlType.kPosition,
-        ClosedLoopSlot.kSlot0);
+        ClosedLoopSlot.kSlot0,
+        turretFeedforward);
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
     if (!zeroingHood) {

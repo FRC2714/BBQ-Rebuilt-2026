@@ -586,7 +586,7 @@ public class Shooter extends SubsystemBase {
         activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
-        turretFeedforward);
+        turretOverrideEnabled ? 0 : turretFeedforward);
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
     if (!zeroingHood) {

@@ -26,7 +26,9 @@ public final class Configs {
       drivingConfig
           .encoder
           .positionConversionFactor(drivingFactor) // meters
-          .velocityConversionFactor(drivingFactor / 60.0); // meters per second
+          .velocityConversionFactor(drivingFactor / 60.0) // meters per second
+          .quadratureMeasurementPeriod(8)
+          .quadratureAverageDepth(2);
       drivingConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -35,6 +37,7 @@ public final class Configs {
           .outputRange(-1, 1)
           .feedForward
           .kV(drivingVelocityFeedForward);
+      drivingConfig.signals.primaryEncoderVelocityPeriodMs(5);
 
       turningConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(20);
 

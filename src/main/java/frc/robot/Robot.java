@@ -65,7 +65,7 @@ public class Robot extends TimedRobot {
           m_robotContainer.m_stateMachine.runTargeting();
           m_robotContainer.m_shooter.run();
         },
-        0.01,
+        0.005,
         0);
   }
 

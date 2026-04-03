@@ -331,13 +331,13 @@ public class DriveSubsystem extends SubsystemBase {
 
     if (shooting) {
       if (isInAllianceZone()) {
-        xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 5;
-        ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 5;
-        rotDelivered = (rot * DriveConstants.kMaxAngularSpeed) / 4;
-      } else {
-        xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2.5;
-        ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2.5;
+        xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 3;
+        ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 3;
         rotDelivered = (rot * DriveConstants.kMaxAngularSpeed) / 3;
+      } else {
+        xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2;
+        ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2;
+        rotDelivered = (rot * DriveConstants.kMaxAngularSpeed) / 2;
       }
     }
 

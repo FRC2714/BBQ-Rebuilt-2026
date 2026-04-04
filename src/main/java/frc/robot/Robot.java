@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.Shooter;
 import frc.robot.utils.LimelightHelpers;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.urcl.URCL;

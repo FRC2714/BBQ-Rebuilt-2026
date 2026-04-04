@@ -135,7 +135,7 @@ public final class Configs {
       flywheelConfigLeader
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(Robot.isReal() ? 0.002 : 0.001)
+          .p(Robot.isReal() ? 0.003 : 0.001)
           .outputRange(-1, 1)
           .feedForward
           .kV(Robot.isReal() ? 0.00185 : 0.00178);

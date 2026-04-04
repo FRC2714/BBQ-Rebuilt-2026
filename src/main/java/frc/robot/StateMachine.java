@@ -305,7 +305,6 @@ public class StateMachine extends SubsystemBase {
   public Command stopShoot() {
     return m_shooter
         .stopShooter()
-        .andThen(Commands.runOnce(() -> m_shooter.setTurretOverride(TurretSetpoints.kStow)))
         .andThen(m_shooter.stowTurretCommand())
         .alongWith(m_dyeRotor.stop())
         .withName("stop shooting")
@@ -416,7 +415,6 @@ public class StateMachine extends SubsystemBase {
           m_drivetrain.setShootingStateFalse();
           m_shooter.setIsShooting(false);
           m_dyeRotor.stopDirect();
-          m_shooter.stowTurretCommand();
         });
   }
 

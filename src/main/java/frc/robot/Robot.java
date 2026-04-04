@@ -64,6 +64,8 @@ public class Robot extends TimedRobot {
           m_robotContainer.m_robotDrive.updateOdometry();
           m_robotContainer.m_stateMachine.runTargeting();
           m_robotContainer.m_shooter.run();
+
+          m_robotContainer.m_stateMachine.pauseOrResumeShooter();
         },
         0.005,
         0);

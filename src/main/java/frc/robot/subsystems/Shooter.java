@@ -428,7 +428,7 @@ public class Shooter extends SubsystemBase {
   /** True when flywheel, turret, and hood are all at their setpoints. */
   public boolean readyToShoot() {
     boolean flywheelReady =
-        flywheelAtSetpoint() || adjustedDistance > ShooterConstants.kIgnoreFlywheelRpmDistance;
+        flywheelAtSetpoint() || adjustedDistance >= ShooterConstants.kIgnoreFlywheelRpmDistance;
     return flywheelReady && turretAtSetpoint() && hoodAtSetpoint();
   }
 

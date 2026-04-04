@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utils.LimelightHelpers;
 import org.ironmaple.simulation.SimulatedArena;
@@ -33,7 +32,6 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
 
   private final Shooter m_shooter = new Shooter();
-
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -152,7 +150,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    if (!m_shooter.isShooterRunning())
+    if (m_shooter.isShooterRunning() != true)
       CommandScheduler.getInstance().schedule(m_shooter.stowTurretCommand());
   }
 

@@ -459,10 +459,6 @@ public class Shooter extends SubsystemBase {
     return isStowed;
   }
 
-  public boolean isShooterRunning() {
-    return isShooting;
-  }
-
   public Command stowTurretCommand() {
     return this.run(
             () -> {
@@ -586,7 +582,6 @@ public class Shooter extends SubsystemBase {
     turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
     turretOverrideTarget = normalizeTurretTarget(turretOverrideTarget);
     double activeTurretTarget = getActiveTurretTarget();
-
     turretController.setSetpoint(
         activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
         ControlType.kPosition,

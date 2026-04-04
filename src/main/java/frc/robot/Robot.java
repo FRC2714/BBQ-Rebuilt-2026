@@ -146,10 +146,7 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {
-    // if (m_shooter.isShooterRunning() != true)
-    //   CommandScheduler.getInstance().schedule(m_shooter.stowTurretCommand());
-  }
+  public void teleopPeriodic() {}
 
   @Override
   public void testInit() {

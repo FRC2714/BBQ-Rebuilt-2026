@@ -114,9 +114,7 @@ public class RobotContainer {
     m_stateMachine.configureBindings();
     button5.onTrue(m_stateMachine.zeroPoseAuto());
 
-    m_driverController
-        .back()
-        .onTrue(new InstantCommand(() -> m_stateMachine.zeroPoseAuto(), m_robotDrive));
+    m_driverController.back().onTrue(m_stateMachine.zeroPoseAuto());
     m_driverController
         .start()
         .onTrue(new InstantCommand(() -> m_robotDrive.zeroDriverHeading(), m_robotDrive));

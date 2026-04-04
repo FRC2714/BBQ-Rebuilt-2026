@@ -367,8 +367,7 @@ public class StateMachine extends SubsystemBase {
             Commands.waitUntil(
                     () ->
                         m_intake.getIntakePivotPosition()
-                            < IntakeConstants.PivotConstants.kPivotClear)
-                .andThen(() -> m_shooter.clearTurretOverride()))
+                            < IntakeConstants.PivotConstants.kPivotClear))
         .onlyIf(StateMachine::isNotClimbing));
   }
 

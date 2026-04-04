@@ -587,15 +587,11 @@ public class Shooter extends SubsystemBase {
     turretOverrideTarget = normalizeTurretTarget(turretOverrideTarget);
     double activeTurretTarget = getActiveTurretTarget();
 
-    if (isShooting) {
-      turretController.setSetpoint(
-          activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
-          ControlType.kPosition,
-          ClosedLoopSlot.kSlot0,
-          turretOverrideEnabled ? 0 : turretFeedforward);
-    } else {
-      stowTurret();
-    }
+    turretController.setSetpoint(
+        activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0,
+        turretOverrideEnabled ? 0 : turretFeedforward);
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
     if (!zeroingHood) {

@@ -161,7 +161,7 @@ public final class Constants {
     public static final int kFlywheelFollowerMotorId = 31;
 
     public static final double kFlywheelDebounceTimeSeconds = 0.1;
-    public static final double kTurretDebounceTimeSeconds = 0.1;
+    public static final double kTurretDebounceTimeSeconds = 0.25;
     public static final double kHoodDebounceTimeSeconds = 0.1;
 
     public static final double kShooterPositionTolerance =

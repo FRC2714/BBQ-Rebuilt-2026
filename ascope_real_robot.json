@@ -1,13 +1,13 @@
 {
   "hubs": [
     {
-      "x": 688,
-      "y": 0,
-      "width": 1232,
-      "height": 1152,
+      "x": 637,
+      "y": 38,
+      "width": 1091,
+      "height": 1006,
       "state": {
         "sidebar": {
-          "width": 331,
+          "width": 181,
           "expanded": [
             "/Shuffleboard",
             "/Swerve Module States/0",
@@ -28,11 +28,14 @@
             "/NT/SmartDashboard/Shooter",
             "/NT/SmartDashboard/Shooter/Turret",
             "/NT/URCL",
-            "/NT/URCL/Spark-29"
+            "/NT/URCL/Spark-29",
+            "/URCL",
+            "/URCL/Spark-30",
+            "/URCL/Spark-31"
           ]
         },
         "tabs": {
-          "selected": 2,
+          "selected": 3,
           "tabs": [
             {
               "type": 0,
@@ -281,23 +284,33 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -8.239507665157916,
-                  11.441948143730116,
-                  -0.010620730197770656
+                  10.071016451682773,
+                  4.159887100148499,
+                  -5.880522808596627
                 ],
                 "cameraTarget": [
-                  -1.0283147215226156,
-                  -1.0153883500195895,
-                  0.9299420939376285
+                  6.8533747208966656,
+                  1.666751588832398,
+                  -2.4672594485368067
                 ]
               },
               "controlsHeight": 394
             },
             {
               "type": 1,
-              "title": "Line Graph",
+              "title": "Shooter",
               "controller": {
                 "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/SmartDashboard/distance to hub",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#c0b487",
+                      "size": "normal"
+                    }
+                  },
                   {
                     "type": "stepped",
                     "logKey": "NT:/SmartDashboard/Shooter/Turret/Setpoint",
@@ -317,22 +330,83 @@
                       "color": "#e5b31b",
                       "size": "normal"
                     }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/SmartDashboard/Shooter/Hood/Position",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#5f4528",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/SmartDashboard/Shooter/Hood/Setpoint",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
                   }
                 ],
-                "rightSources": [],
+                "rightSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/SmartDashboard/Shooter/Flywheel/Expected Speed",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#80588e",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/SmartDashboard/Shooter/Flywheel/Actual Speed",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e48b32",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/URCL/Spark-30/AppliedOutput",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#858584",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/URCL/Spark-31/AppliedOutput",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#d993aa",
+                      "size": "normal"
+                    }
+                  }
+                ],
                 "discreteSources": [
                   {
                     "type": "stripes",
-                    "logKey": "NT:/SmartDashboard/Shooter/Turret/Is Stowed",
+                    "logKey": "NT:/SmartDashboard/Shooter/Flywheel/At Setpoint",
                     "logType": "Boolean",
                     "visible": true,
                     "options": {
-                      "color": "#2b66a2"
+                      "color": "#af2437"
                     }
                   },
                   {
                     "type": "stripes",
-                    "logKey": "NT:/URCL/Spark-29/HardForwardLimitReached",
+                    "logKey": "NT:/SmartDashboard/Shooter/Hood/At Setpoint",
                     "logType": "Boolean",
                     "visible": true,
                     "options": {
@@ -341,16 +415,22 @@
                   },
                   {
                     "type": "stripes",
-                    "logKey": "NT:/URCL/Spark-29/HardReverseLimitReached",
+                    "logKey": "NT:/SmartDashboard/Shooter/Turret/At Setpoint",
                     "logType": "Boolean",
                     "visible": true,
                     "options": {
-                      "color": "#af2437"
+                      "color": "#2b66a2"
                     }
                   }
                 ],
-                "leftLockedRange": null,
-                "rightLockedRange": null,
+                "leftLockedRange": [
+                  -200,
+                  200
+                ],
+                "rightLockedRange": [
+                  0,
+                  6500
+                ],
                 "leftUnitConversion": {
                   "autoTarget": null,
                   "preset": null
@@ -364,7 +444,7 @@
               },
               "controllerUUID": "ioiselfnetb8jbxsz41ixno38t3aapxk",
               "renderer": null,
-              "controlsHeight": 200
+              "controlsHeight": 299
             },
             {
               "type": 9,
@@ -406,18 +486,6 @@
       }
     }
   ],
-  "satellites": [
-    {
-      "x": -12,
-      "y": 16,
-      "width": 699,
-      "height": 500,
-      "state": {
-        "type": 1,
-        "visualizer": null
-      },
-      "uuid": "ioiselfnetb8jbxsz41ixno38t3aapxk"
-    }
-  ],
+  "satellites": [],
   "version": "26.0.0"
 }

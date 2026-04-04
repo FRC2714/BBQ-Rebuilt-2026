@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoAimConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
@@ -304,6 +305,8 @@ public class StateMachine extends SubsystemBase {
   public Command stopShoot() {
     return m_shooter
         .stopShooter()
+        .andThen(Commands.runOnce(() -> m_shooter.setTurretOverride(TurretSetpoints.kStow)))
+        .andThen(m_shooter.stowTurretCommand())
         .alongWith(m_dyeRotor.stop())
         .withName("stop shooting")
         .beforeStarting(
@@ -414,6 +417,7 @@ public class StateMachine extends SubsystemBase {
           m_drivetrain.setShootingStateFalse();
           m_shooter.setIsShooting(false);
           m_dyeRotor.stopDirect();
+          m_shooter.stowTurretCommand();
         });
   }
 

@@ -31,8 +31,6 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private final Shooter m_shooter = new Shooter();
-
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -150,8 +148,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    if (m_shooter.isShooterRunning() != true)
-      CommandScheduler.getInstance().schedule(m_shooter.stowTurretCommand());
+    // if (m_shooter.isShooterRunning() != true)
+    //   CommandScheduler.getInstance().schedule(m_shooter.stowTurretCommand());
   }
 
   @Override

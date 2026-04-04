@@ -58,6 +58,15 @@ public class Robot extends TimedRobot {
       StatusLogger.start();
       DriverStation.startDataLog(DataLogManager.getLog());
     }
+
+    addPeriodic(
+        () -> {
+          m_robotContainer.m_robotDrive.updateOdometry();
+          m_robotContainer.m_stateMachine.runTargeting();
+          m_robotContainer.m_shooter.run();
+        },
+        0.005,
+        0);
   }
 
   /**

@@ -14,6 +14,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
+import com.reduxrobotics.sensors.canandgyro.CanandgyroSettings;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -154,6 +155,9 @@ public class DriveSubsystem extends SubsystemBase {
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
     SmartDashboard.putData("Field", m_field2d);
 
+    m_gyro.setSettings(
+        new CanandgyroSettings().setYawFramePeriod(0.005).setAngularVelocityFramePeriod(0.005));
+
     if (Robot.isSimulation()) {
       swerveDriveSimulation =
           new SelfControlledSwerveDriveSimulation(
@@ -280,75 +284,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_poseEstimator.update(
-        m_gyro.getRotation2d(),
-        new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition(),
-        });
-
-    for (String limelightName : LimelightConstants.kCameraNames) {
-      LimelightHelpers.SetRobotOrientation(limelightName, getGyroHeading(), 0, 0, 0, 0, 0);
-      LimelightHelpers.SetIMUMode(limelightName, 0);
-    }
-
-    double omegaRps = Units.degreesToRotations(getTurnRate());
-
-    var frontRightLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kFrontRightName);
-    var frontLeftLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kFrontLeftName);
-    var rearLeftLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kRearLeftName);
-    var rearRightLLMeasurement =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kRearRightName);
-
-    if (Math.abs(omegaRps) < .7) {
-      if (frontRightLLMeasurement != null && frontRightLLMeasurement.tagCount > 0) {
-        xyStdDev = .7 * (1 + frontRightLLMeasurement.avgTagDist * .5);
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
-        m_poseEstimator.addVisionMeasurement(
-            frontRightLLMeasurement.pose, frontRightLLMeasurement.timestampSeconds);
-      }
-
-      if (frontLeftLLMeasurement != null && frontLeftLLMeasurement.tagCount > 0) {
-        xyStdDev = .7 * (1 + frontLeftLLMeasurement.avgTagDist * .5);
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
-        m_poseEstimator.addVisionMeasurement(
-            frontLeftLLMeasurement.pose, frontLeftLLMeasurement.timestampSeconds);
-      }
-
-      if (rearLeftLLMeasurement != null && rearLeftLLMeasurement.tagCount > 0) {
-        xyStdDev = .7 * (1 + rearLeftLLMeasurement.avgTagDist * .5);
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
-        m_poseEstimator.addVisionMeasurement(
-            rearLeftLLMeasurement.pose, rearLeftLLMeasurement.timestampSeconds);
-      }
-
-      if (rearRightLLMeasurement != null && rearRightLLMeasurement.tagCount > 0) {
-        xyStdDev = .7 * (1 + rearRightLLMeasurement.avgTagDist * .5);
-        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
-        m_poseEstimator.addVisionMeasurement(
-            rearRightLLMeasurement.pose, rearRightLLMeasurement.timestampSeconds);
-      }
-    }
-
-    m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
-
-    if (Robot.isReal()) {
-      publisherModuleStates.set(
-          new SwerveModuleState[] {
-            m_frontLeft.getState(),
-            m_frontRight.getState(),
-            m_rearLeft.getState(),
-            m_rearRight.getState(),
-          });
-    } else {
-      publisherModuleStates.set(swerveDriveSimulation.getMeasuredStates());
-    }
-    SmartDashboard.putNumber("omegaRPS", omegaRps);
     SmartDashboard.putNumber("Drive/Gyro Heading", getGyroHeading());
     SmartDashboard.putNumber("Drive/Pose Heading", getHeading());
   }
@@ -395,9 +330,15 @@ public class DriveSubsystem extends SubsystemBase {
     double driverRelativeHeading = getHeading() - m_driverHeadingOffsetDeg;
 
     if (shooting) {
-      xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 3;
-      ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 3;
-      rotDelivered = (rot * DriveConstants.kMaxAngularSpeed) / 2;
+      if (isInAllianceZone()) {
+        xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 3;
+        ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 3;
+        rotDelivered = (rot * DriveConstants.kMaxAngularSpeed) / 3;
+      } else {
+        xSpeedDelivered = (xSpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2;
+        ySpeedDelivered = (ySpeed * DriveConstants.kMaxSpeedMetersPerSecond) / 2;
+        rotDelivered = (rot * DriveConstants.kMaxAngularSpeed) / 2;
+      }
     }
 
     var swerveModuleStates =
@@ -631,5 +572,77 @@ public class DriveSubsystem extends SubsystemBase {
         futurePosition.plus(shotVelocity.div(shotVelocity.getNorm()).times(distanceToHub));
 
     return virtualTarget;
+  }
+
+  public void updateOdometry() {
+    m_poseEstimator.update(
+        m_gyro.getRotation2d(),
+        new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition(),
+        });
+
+    for (String limelightName : LimelightConstants.kCameraNames) {
+      LimelightHelpers.SetRobotOrientation(limelightName, getGyroHeading(), 0, 0, 0, 0, 0);
+      LimelightHelpers.SetIMUMode(limelightName, 0);
+    }
+
+    double omegaRps = Units.degreesToRotations(getTurnRate());
+
+    var frontRightLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kFrontRightName);
+    var frontLeftLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kFrontLeftName);
+    var rearLeftLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kRearLeftName);
+    var rearRightLLMeasurement =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimelightConstants.kRearRightName);
+
+    if (Math.abs(omegaRps) < .7) {
+      if (frontRightLLMeasurement != null && frontRightLLMeasurement.tagCount > 0) {
+        xyStdDev = .7 * (1 + frontRightLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
+        m_poseEstimator.addVisionMeasurement(
+            frontRightLLMeasurement.pose, frontRightLLMeasurement.timestampSeconds);
+      }
+
+      if (frontLeftLLMeasurement != null && frontLeftLLMeasurement.tagCount > 0) {
+        xyStdDev = .7 * (1 + frontLeftLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
+        m_poseEstimator.addVisionMeasurement(
+            frontLeftLLMeasurement.pose, frontLeftLLMeasurement.timestampSeconds);
+      }
+
+      if (rearLeftLLMeasurement != null && rearLeftLLMeasurement.tagCount > 0) {
+        xyStdDev = .7 * (1 + rearLeftLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
+        m_poseEstimator.addVisionMeasurement(
+            rearLeftLLMeasurement.pose, rearLeftLLMeasurement.timestampSeconds);
+      }
+
+      if (rearRightLLMeasurement != null && rearRightLLMeasurement.tagCount > 0) {
+        xyStdDev = .7 * (1 + rearRightLLMeasurement.avgTagDist * .5);
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
+        m_poseEstimator.addVisionMeasurement(
+            rearRightLLMeasurement.pose, rearRightLLMeasurement.timestampSeconds);
+      }
+    }
+
+    m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
+
+    if (Robot.isReal()) {
+      publisherModuleStates.set(
+          new SwerveModuleState[] {
+            m_frontLeft.getState(),
+            m_frontRight.getState(),
+            m_rearLeft.getState(),
+            m_rearRight.getState(),
+          });
+    } else {
+      publisherModuleStates.set(swerveDriveSimulation.getMeasuredStates());
+    }
+    SmartDashboard.putNumber("omegaRPS", omegaRps);
   }
 }

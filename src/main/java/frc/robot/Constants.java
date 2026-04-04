@@ -169,6 +169,7 @@ public final class Constants {
 
     public static final double kTurretKV = 0.06; // TODO: tune
     public static final double kFFDeadbandDegrees = 30.0; // TODO: tune
+    public static final double kIgnoreFlywheelRpmDistance = 10; // meters
 
     public static final class TurretSetpoints {
       public static final double kStow = 0;

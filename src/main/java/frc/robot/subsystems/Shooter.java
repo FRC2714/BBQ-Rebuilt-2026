@@ -459,6 +459,10 @@ public class Shooter extends SubsystemBase {
     return isStowed;
   }
 
+  public boolean isShooterRunning() {
+    return isShooting;
+  }
+
   public Command stowTurretCommand() {
     return this.run(
             () -> {

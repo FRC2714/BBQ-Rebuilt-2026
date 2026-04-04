@@ -593,6 +593,8 @@ public class Shooter extends SubsystemBase {
           ControlType.kPosition,
           ClosedLoopSlot.kSlot0,
           turretOverrideEnabled ? 0 : turretFeedforward);
+    } else {
+      setTurretOverride(TurretSetpoints.kStow);
     }
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());

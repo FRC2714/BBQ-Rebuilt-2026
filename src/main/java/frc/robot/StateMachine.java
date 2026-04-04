@@ -486,7 +486,7 @@ public class StateMachine extends SubsystemBase {
     }
   }
 
-  private void runTargeting() {
+  public void runTargeting() {
     Translation2d robotPosition = m_drivetrain.getPose().getTranslation();
     Rotation2d robotHeading = m_drivetrain.getPose().getRotation();
 
@@ -495,6 +495,7 @@ public class StateMachine extends SubsystemBase {
           robotPosition,
           robotHeading,
           m_drivetrain.getFieldRelativeVelocity(),
+          m_drivetrain.getTurnRate(),
           Field.getAllianceHub().toTranslation2d(),
           ShooterConstants.kLatencyCompensation);
       return;
@@ -518,6 +519,7 @@ public class StateMachine extends SubsystemBase {
           robotPosition,
           robotHeading,
           m_drivetrain.getFieldRelativeVelocity(),
+          m_drivetrain.getTurnRate(),
           target,
           ShooterConstants.kLatencyCompensation);
     } else {
@@ -527,7 +529,6 @@ public class StateMachine extends SubsystemBase {
 
   @Override
   public void periodic() {
-    runTargeting();
     double matchTime = DriverStation.getMatchTime();
     phaseShiftActive = isHubActive();
     phaseShiftWarningActive = isPhaseShiftWarningTime(matchTime);

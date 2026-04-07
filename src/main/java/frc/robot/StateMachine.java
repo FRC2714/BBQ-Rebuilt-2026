@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoAimConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.ShooterConstants.TurretSetpoints;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DyeRotor;
@@ -364,9 +363,8 @@ public class StateMachine extends SubsystemBase {
         .intake()
         .alongWith(
             Commands.waitUntil(
-                    () ->
-                        m_intake.getIntakePivotPosition()
-                            < IntakeConstants.PivotConstants.kPivotClear))
+                () ->
+                    m_intake.getIntakePivotPosition() < IntakeConstants.PivotConstants.kPivotClear))
         .onlyIf(StateMachine::isNotClimbing));
   }
 

@@ -124,28 +124,14 @@ public class RobotContainer {
     button8.onTrue(m_shooter.zeroTurretSequenceLeft());
     leftSwitch.whileTrue(m_stateMachine.toggleOverride());
 
-    // Manual shooting mode — rightSwitch is a latching toggle, used directly as the trigger
-    rightSwitch.onTrue(
-        Commands.runOnce(() -> SmartDashboard.putBoolean("Manual Shooting Mode", true)));
-    rightSwitch.onFalse(
-        Commands.runOnce(() -> SmartDashboard.putBoolean("Manual Shooting Mode", false)));
-
     // Shooter moved to state machine bindings
 
     // intake keybinds
     m_driverController.rightTrigger().whileTrue(m_stateMachine.intakeSequence());
-
-    // Left trigger: state machine shoot in normal mode, direct flywheel in manual mode
     m_driverController
         .leftTrigger()
-        .and(rightSwitch.negate())
         .onTrue(m_stateMachine.shoot())
         .onFalse(m_stateMachine.stopShoot());
-    m_driverController.leftTrigger().and(rightSwitch).whileTrue(m_shooter.startShooter());
-
-    // Left bumper: direct dye rotor spin in manual mode
-    m_driverController.leftBumper().and(rightSwitch).whileTrue(m_dyeRotor.start());
-
     m_driverController.b().onTrue(m_stateMachine.stowSequence());
     m_driverController.rightBumper().whileTrue(m_stateMachine.extakeSequence());
     m_driverController.a().onTrue(m_dyeRotor.unjam());

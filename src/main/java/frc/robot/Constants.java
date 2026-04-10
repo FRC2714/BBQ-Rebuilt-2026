@@ -189,7 +189,8 @@ public final class Constants {
   public static final class DyeRotorConstants {
     public static final int kDyeRotorMotorCanID = 60;
     public static final int kDyeRotorFollowerMotorCanID = 61;
-    public static final double kDyeRotorPower = 1.0;
+    // Closed-loop velocity target in motor-shaft RPM (encoder has no conversion factor).
+    public static final double kDyeRotorVelocity = 6000.0;
   }
 
   public static final class ClimbConstants {

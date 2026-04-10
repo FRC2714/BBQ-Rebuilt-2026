@@ -33,6 +33,9 @@ public class DyeRotor extends SubsystemBase {
 
   private SparkFlex dyeRotorMotor =
       new SparkFlex(Constants.DyeRotorConstants.kDyeRotorMotorCanID, MotorType.kBrushless);
+  private SparkFlex dyeRotorFollowerMotor =
+      new SparkFlex(
+          Constants.DyeRotorConstants.kDyeRotorFollowerMotorCanID, MotorType.kBrushless);
   private RelativeEncoder encoder = dyeRotorMotor.getEncoder();
   private double dyeRotorCurrentTarget = 0;
   private boolean paused = false;
@@ -51,6 +54,10 @@ public class DyeRotor extends SubsystemBase {
   public DyeRotor() {
     dyeRotorMotor.configure(
         Configs.DyeRotor.dyeRotorConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
+    dyeRotorFollowerMotor.configure(
+        Configs.DyeRotor.dyeRotorFollowerConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     rotorArm.setAngle(45);

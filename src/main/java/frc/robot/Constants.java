@@ -188,6 +188,7 @@ public final class Constants {
 
   public static final class DyeRotorConstants {
     public static final int kDyeRotorMotorCanID = 60;
+    public static final int kDyeRotorFollowerMotorCanID = 61;
     public static final double kDyeRotorPower = 1.0;
   }
 

@@ -6,6 +6,7 @@ import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import frc.robot.Constants.DyeRotorConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.ShooterConstants;
 
@@ -148,6 +149,7 @@ public final class Configs {
 
   public static final class DyeRotor {
     public static final SparkFlexConfig dyeRotorConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig dyeRotorFollowerConfig = new SparkFlexConfig();
 
     static {
       dyeRotorConfig
@@ -163,6 +165,12 @@ public final class Configs {
           .outputRange(-0.5, 0.5)
           .feedForward
           .kV(0.00185);
+
+      dyeRotorFollowerConfig
+          .smartCurrentLimit(80)
+          .idleMode(IdleMode.kCoast)
+          .voltageCompensation(12)
+          .follow(DyeRotorConstants.kDyeRotorMotorCanID, false);
     }
   }
 

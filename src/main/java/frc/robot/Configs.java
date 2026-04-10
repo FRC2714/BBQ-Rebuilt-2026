@@ -157,7 +157,12 @@ public final class Configs {
           .idleMode(IdleMode.kCoast)
           .inverted(true)
           .voltageCompensation(12);
-      dyeRotorConfig.encoder.quadratureMeasurementPeriod(8).quadratureAverageDepth(2);
+      dyeRotorConfig
+          .encoder
+          .quadratureMeasurementPeriod(8)
+          .quadratureAverageDepth(2)
+          .positionConversionFactor(1.0 / DyeRotorConstants.kDyeRotorGearRatio)
+          .velocityConversionFactor(1.0 / DyeRotorConstants.kDyeRotorGearRatio);
       dyeRotorConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)

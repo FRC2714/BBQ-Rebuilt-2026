@@ -49,10 +49,11 @@ public class DyeRotor extends SubsystemBase {
   DCMotor motor = DCMotor.getNeoVortex(1);
   private SparkFlexSim dyeRotorSim = new SparkFlexSim(dyeRotorMotor, motor);
   private static final double MOMENT_OF_INERTIA = 0.00032; // kg*m^2
-  private static final double GEARING = 10.0; // 1:1 if direct drive
   private FlywheelSim flywheelSim =
       new FlywheelSim(
-          LinearSystemId.createFlywheelSystem(motor, MOMENT_OF_INERTIA, GEARING), motor);
+          LinearSystemId.createFlywheelSystem(
+              motor, MOMENT_OF_INERTIA, Constants.DyeRotorConstants.kDyeRotorGearRatio),
+          motor);
 
   public DyeRotor() {
     dyeRotorMotor.configure(
@@ -154,7 +155,7 @@ public class DyeRotor extends SubsystemBase {
 
   /** Returns rotor position in output rotations (after gearing). */
   public double getRotorPosition() {
-    return encoder.getPosition() / GEARING;
+    return encoder.getPosition();
   }
 
   /** True if the rotor has a non-zero target. */
@@ -172,7 +173,7 @@ public class DyeRotor extends SubsystemBase {
             0.058,
             0,
             0.2,
-            new Rotation3d(0.0, 0.0, Units.rotationsToRadians(-encoder.getPosition() / GEARING)));
+            new Rotation3d(0.0, 0.0, Units.rotationsToRadians(-encoder.getPosition())));
   }
 
   @Override
@@ -182,6 +183,6 @@ public class DyeRotor extends SubsystemBase {
     flywheelSim.update(0.02);
 
     dyeRotorSim.iterate(
-        flywheelSim.getAngularVelocityRPM() * GEARING, RobotController.getBatteryVoltage(), 0.02);
+        flywheelSim.getAngularVelocityRPM(), RobotController.getBatteryVoltage(), 0.02);
   }
 }

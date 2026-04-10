@@ -34,8 +34,7 @@ public class DyeRotor extends SubsystemBase {
   private SparkFlex dyeRotorMotor =
       new SparkFlex(Constants.DyeRotorConstants.kDyeRotorMotorCanID, MotorType.kBrushless);
   private SparkFlex dyeRotorFollowerMotor =
-      new SparkFlex(
-          Constants.DyeRotorConstants.kDyeRotorFollowerMotorCanID, MotorType.kBrushless);
+      new SparkFlex(Constants.DyeRotorConstants.kDyeRotorFollowerMotorCanID, MotorType.kBrushless);
   private RelativeEncoder encoder = dyeRotorMotor.getEncoder();
   private double dyeRotorCurrentTarget = 0;
   private boolean paused = false;

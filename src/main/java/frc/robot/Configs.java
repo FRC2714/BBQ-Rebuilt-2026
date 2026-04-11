@@ -217,7 +217,7 @@ public final class Configs {
           .p(0.0001)
           .outputRange(-1, 1)
           .feedForward
-          .kV(0.00185);
+          .kV(0.003);
     }
   }
 

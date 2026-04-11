@@ -8,6 +8,9 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.sim.SparkFlexSim;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -33,7 +36,10 @@ public class DyeRotor extends SubsystemBase {
 
   private SparkFlex dyeRotorMotor =
       new SparkFlex(Constants.DyeRotorConstants.kDyeRotorMotorCanID, MotorType.kBrushless);
+  private SparkFlex dyeRotorFollowerMotor =
+      new SparkFlex(Constants.DyeRotorConstants.kDyeRotorFollowerMotorCanID, MotorType.kBrushless);
   private RelativeEncoder encoder = dyeRotorMotor.getEncoder();
+  private SparkClosedLoopController dyeRotorController = dyeRotorMotor.getClosedLoopController();
   private double dyeRotorCurrentTarget = 0;
   private boolean paused = false;
 
@@ -43,14 +49,19 @@ public class DyeRotor extends SubsystemBase {
   DCMotor motor = DCMotor.getNeoVortex(1);
   private SparkFlexSim dyeRotorSim = new SparkFlexSim(dyeRotorMotor, motor);
   private static final double MOMENT_OF_INERTIA = 0.00032; // kg*m^2
-  private static final double GEARING = 56.25; // 1:1 if direct drive
   private FlywheelSim flywheelSim =
       new FlywheelSim(
-          LinearSystemId.createFlywheelSystem(motor, MOMENT_OF_INERTIA, GEARING), motor);
+          LinearSystemId.createFlywheelSystem(
+              motor, MOMENT_OF_INERTIA, Constants.DyeRotorConstants.kDyeRotorGearRatio),
+          motor);
 
   public DyeRotor() {
     dyeRotorMotor.configure(
         Configs.DyeRotor.dyeRotorConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
+    dyeRotorFollowerMotor.configure(
+        Configs.DyeRotor.dyeRotorFollowerConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     rotorArm.setAngle(45);
@@ -61,8 +72,9 @@ public class DyeRotor extends SubsystemBase {
   public Command start() {
     return this.run(
             () -> {
-              dyeRotorCurrentTarget = paused ? 0 : Constants.DyeRotorConstants.kDyeRotorPower;
-              dyeRotorMotor.set(dyeRotorCurrentTarget);
+              dyeRotorCurrentTarget = paused ? 0 : Constants.DyeRotorConstants.kDyeRotorVelocity;
+              dyeRotorController.setSetpoint(
+                  dyeRotorCurrentTarget, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
             })
         .beforeStarting(
             () -> {
@@ -75,7 +87,8 @@ public class DyeRotor extends SubsystemBase {
     return this.runOnce(
         () -> {
           dyeRotorCurrentTarget = 0;
-          dyeRotorMotor.set(0);
+          dyeRotorController.setSetpoint(
+              dyeRotorCurrentTarget, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
         });
   }
 
@@ -83,8 +96,9 @@ public class DyeRotor extends SubsystemBase {
   public Command unjam() {
     return this.run(
             () -> {
-              dyeRotorCurrentTarget = paused ? 0 : -Constants.DyeRotorConstants.kDyeRotorPower;
-              dyeRotorMotor.set(dyeRotorCurrentTarget);
+              dyeRotorCurrentTarget = paused ? 0 : -Constants.DyeRotorConstants.kDyeRotorVelocity;
+              dyeRotorController.setSetpoint(
+                  dyeRotorCurrentTarget, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
             })
         .withTimeout(0.15)
         .andThen(stop());
@@ -93,28 +107,32 @@ public class DyeRotor extends SubsystemBase {
   /** Starts the rotor directly (no command). Used by auto event markers. */
   public void startDirect() {
     paused = false;
-    dyeRotorCurrentTarget = Constants.DyeRotorConstants.kDyeRotorPower;
-    dyeRotorMotor.set(dyeRotorCurrentTarget);
+    dyeRotorCurrentTarget = Constants.DyeRotorConstants.kDyeRotorVelocity;
+    dyeRotorController.setSetpoint(
+        dyeRotorCurrentTarget, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
 
   /** Stops the rotor directly (no command). Used by auto event markers. */
   public void stopDirect() {
     dyeRotorCurrentTarget = 0;
-    dyeRotorMotor.set(0);
+    dyeRotorController.setSetpoint(
+        dyeRotorCurrentTarget, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
 
   /** Pauses the rotor. The {@link #start()} command will output 0 until resumed. */
   public void pause() {
     paused = true;
     dyeRotorCurrentTarget = 0;
-    dyeRotorMotor.set(0);
+    dyeRotorController.setSetpoint(
+        dyeRotorCurrentTarget, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
 
   /** Resumes the rotor after a pause. */
   public void resume() {
     paused = false;
-    dyeRotorCurrentTarget = Constants.DyeRotorConstants.kDyeRotorPower;
-    dyeRotorMotor.set(dyeRotorCurrentTarget);
+    dyeRotorCurrentTarget = Constants.DyeRotorConstants.kDyeRotorVelocity;
+    dyeRotorController.setSetpoint(
+        dyeRotorCurrentTarget, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
 
   // Mech2d for DyeRotor
@@ -137,7 +155,7 @@ public class DyeRotor extends SubsystemBase {
 
   /** Returns rotor position in output rotations (after gearing). */
   public double getRotorPosition() {
-    return encoder.getPosition() / GEARING;
+    return encoder.getPosition();
   }
 
   /** True if the rotor has a non-zero target. */
@@ -148,6 +166,8 @@ public class DyeRotor extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Dye Rotor/Setpoint", dyeRotorCurrentTarget);
+    SmartDashboard.putNumber("Dye Rotor/velocity", encoder.getVelocity());
+
     rotorArm.setAngle(Units.rotationsToDegrees(encoder.getPosition()));
 
     pose =
@@ -155,7 +175,7 @@ public class DyeRotor extends SubsystemBase {
             0.058,
             0,
             0.2,
-            new Rotation3d(0.0, 0.0, Units.rotationsToRadians(-encoder.getPosition() / GEARING)));
+            new Rotation3d(0.0, 0.0, Units.rotationsToRadians(-encoder.getPosition())));
   }
 
   @Override
@@ -165,6 +185,6 @@ public class DyeRotor extends SubsystemBase {
     flywheelSim.update(0.02);
 
     dyeRotorSim.iterate(
-        flywheelSim.getAngularVelocityRPM() * GEARING, RobotController.getBatteryVoltage(), 0.02);
+        flywheelSim.getAngularVelocityRPM(), RobotController.getBatteryVoltage(), 0.02);
   }
 }

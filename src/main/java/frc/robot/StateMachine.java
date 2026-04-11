@@ -117,17 +117,18 @@ public class StateMachine extends SubsystemBase {
     }
   }
 
+  public void pauseOrResumeShooter() {
+    if (m_state == State.Shooting && !m_shooter.readyToShoot()) {
+      m_dyeRotor.pause();
+    } else if (m_state == State.Shooting && m_shooter.readyToShoot()) {
+      m_dyeRotor.resume();
+    }
+  }
+
   /**
    * Sets up triggers that pause/resume the dye rotor based on flywheel readiness during shooting.
    */
   public void configureBindings() {
-    Trigger pauseShooter =
-        new Trigger(() -> m_state == State.Shooting && !m_shooter.readyToShoot());
-    pauseShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.pause()));
-
-    Trigger resumeShooter =
-        new Trigger(() -> m_state == State.Shooting && m_shooter.readyToShoot());
-    resumeShooter.onTrue(Commands.runOnce(() -> m_dyeRotor.resume()));
     // Trigger xNewPress =
     //     new Trigger(
     //         () -> {

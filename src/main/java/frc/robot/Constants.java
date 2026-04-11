@@ -138,10 +138,10 @@ public final class Constants {
 
   public static final class ShooterConstants {
     public static final int kTurretCanId = 29;
-    public static final int kTurretMaxRange = 200;
+    public static final int kTurretMaxRange = 190;
     public static final double kFwdLimitSwitchOffset = 16.33;
     public static final double kRevLimitSwitchOffset = -16.33;
-    public static final int kTurretMinRange = -200;
+    public static final int kTurretMinRange = -190;
     public static final double kTurretMountingOffsetDegrees = 0.0;
     public static final Transform2d turretOffset =
         new Transform2d(
@@ -169,6 +169,7 @@ public final class Constants {
 
     public static final double kTurretKV = 0.06; // TODO: tune
     public static final double kFFDeadbandDegrees = 30.0; // TODO: tune
+    public static final double kIgnoreFlywheelRpmDistance = 6; // meters
 
     public static final class TurretSetpoints {
       public static final double kStow = 0;
@@ -188,7 +189,10 @@ public final class Constants {
 
   public static final class DyeRotorConstants {
     public static final int kDyeRotorMotorCanID = 60;
-    public static final double kDyeRotorPower = 1.0;
+    public static final int kDyeRotorFollowerMotorCanID = 61;
+    public static final double kDyeRotorGearRatio = 31.25;
+    // Closed-loop velocity target in output-shaft RPM (multiplied by gear ratio before setpoint).
+    public static final double kDyeRotorVelocity = 150;
   }
 
   public static final class ClimbConstants {
@@ -238,9 +242,11 @@ public final class Constants {
 
     public static final class RollerConstants {
       public static final int kIntakeRollerCanId = 10; // needs tuning
-      public static final double kIntakeRollerPower = 1; // needs tuning
-      public static final double kExtakeRollerPower = -1; // needs tuning
-      public static final double kRollerStop = 0.0; // needs tuning
+      public static final double kIntakeRollerGearRatio = 9.0;
+      // Closed-loop velocity targets in output-shaft RPM.
+      public static final double kIntakeRollerVelocity = 550; // needs tuning
+      public static final double kExtakeRollerVelocity = -550; // needs tuning
+      public static final double kRollerStop = 0.0;
     }
 
     public static final class PivotConstants {

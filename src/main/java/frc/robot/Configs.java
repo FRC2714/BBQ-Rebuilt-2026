@@ -6,6 +6,8 @@ import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import frc.robot.Constants.DyeRotorConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.ShooterConstants;
 
@@ -135,7 +137,7 @@ public final class Configs {
       flywheelConfigLeader
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(Robot.isReal() ? 0.001 : 0.001)
+          .p(Robot.isReal() ? 0.003 : 0.001)
           .outputRange(-1, 1)
           .feedForward
           .kV(Robot.isReal() ? 0.00185 : 0.00178);
@@ -148,21 +150,32 @@ public final class Configs {
 
   public static final class DyeRotor {
     public static final SparkFlexConfig dyeRotorConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig dyeRotorFollowerConfig = new SparkFlexConfig();
 
     static {
       dyeRotorConfig
           .smartCurrentLimit(80)
           .idleMode(IdleMode.kCoast)
-          .inverted(true)
+          .inverted(false)
           .voltageCompensation(12);
-      dyeRotorConfig.encoder.quadratureMeasurementPeriod(8).quadratureAverageDepth(2);
+      dyeRotorConfig
+          .encoder
+          .quadratureMeasurementPeriod(8)
+          .quadratureAverageDepth(2)
+          .positionConversionFactor(1.0 / DyeRotorConstants.kDyeRotorGearRatio)
+          .velocityConversionFactor(1.0 / DyeRotorConstants.kDyeRotorGearRatio);
       dyeRotorConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(0.0001)
-          .outputRange(-0.5, 0.5)
+          .p(0.001)
+          .outputRange(-1, 1)
           .feedForward
-          .kV(0.00185);
+          .kV(0.0575);
+
+      dyeRotorFollowerConfig
+          .apply(dyeRotorConfig)
+          .disableVoltageCompensation()
+          .follow(DyeRotorConstants.kDyeRotorMotorCanID, false);
     }
   }
 
@@ -206,6 +219,17 @@ public final class Configs {
           .idleMode(IdleMode.kBrake)
           .inverted(false)
           .voltageCompensation(12);
+      rollerConfig
+          .encoder
+          .positionConversionFactor(1.0 / IntakeConstants.RollerConstants.kIntakeRollerGearRatio)
+          .velocityConversionFactor(1.0 / IntakeConstants.RollerConstants.kIntakeRollerGearRatio);
+      rollerConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .p(0.0005)
+          .outputRange(-1, 1)
+          .feedForward
+          .kV(0.006);
     }
   }
 

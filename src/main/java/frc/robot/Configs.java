@@ -107,6 +107,7 @@ public final class Configs {
           .forwardSoftLimit(ShooterConstants.kTurretMaxRange)
           .reverseSoftLimitEnabled(true)
           .reverseSoftLimit(ShooterConstants.kTurretMinRange);
+      turretConfig.signals.externalOrAltEncoderPosition(5);
 
       hoodConfig
           .smartCurrentLimit(20)

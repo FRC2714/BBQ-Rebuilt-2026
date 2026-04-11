@@ -496,6 +496,14 @@ public class Shooter extends SubsystemBase {
     return zeroHood().onlyIf(() -> !hasHoodBeenZeroed);
   }
 
+  /**
+   * For use only in auto init since we will assume that it starts in the correct starting position.
+   * The constructor sets the position of the encoder to the max hood angle.
+   */
+  public void setHasHoodBeenZeroed(boolean zeroed) {
+    hasHoodBeenZeroed = zeroed;
+  }
+
   public Command zeroTurretSequenceRight() {
 
     return new RunCommand(

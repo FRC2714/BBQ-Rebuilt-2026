@@ -278,6 +278,8 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
     SmartDashboard.putBoolean("Intake/Running", isIntaking());
 
+    SmartDashboard.putNumber("Intake/Roller/Velocity", rollerEncoder.getVelocity());
+
     // 3d SIM
     intakePose3d =
         new Pose3d(

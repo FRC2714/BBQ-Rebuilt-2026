@@ -169,6 +169,7 @@ public final class Constants {
 
     public static final double kTurretKV = 0.06; // TODO: tune
     public static final double kFFDeadbandDegrees = 30.0; // TODO: tune
+    public static final double kIgnoreFlywheelRpmDistance = 6; // meters
 
     public static final class TurretSetpoints {
       public static final double kStow = 0;
@@ -241,10 +242,10 @@ public final class Constants {
 
     public static final class RollerConstants {
       public static final int kIntakeRollerCanId = 10; // needs tuning
-      public static final double kIntakeRollerGearRatio = 3.0;
+      public static final double kIntakeRollerGearRatio = 9.0;
       // Closed-loop velocity targets in output-shaft RPM.
-      public static final double kIntakeRollerVelocity = 900; // needs tuning
-      public static final double kExtakeRollerVelocity = -900; // needs tuning
+      public static final double kIntakeRollerVelocity = 600; // needs tuning
+      public static final double kExtakeRollerVelocity = -600; // needs tuning
       public static final double kRollerStop = 0.0;
     }
 

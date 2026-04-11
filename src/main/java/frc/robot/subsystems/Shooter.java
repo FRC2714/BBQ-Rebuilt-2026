@@ -92,6 +92,7 @@ public class Shooter extends SubsystemBase {
   private double hoodCurrentTarget = HoodSetpoints.kStow;
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
   private double turretFeedforward = 0;
+  private double adjustedDistance = 0;
 
   // Raw (non-lead-compensated) values for simulation — these point at the actual hub
   // rather than the predicted future position, so MapleLib doesn't double-compensate.
@@ -201,7 +202,7 @@ public class Shooter extends SubsystemBase {
     }
 
     // 5. Once converged, look up control variables for the adjusted position
-    double adjustedDistance = adjustedRelativePosition.getNorm();
+    this.adjustedDistance = adjustedRelativePosition.getNorm();
     ShooterParams adjustedParams = shooterMap.get(adjustedDistance);
 
     // Aim toward the predicted future position of the target rather than its
@@ -426,7 +427,9 @@ public class Shooter extends SubsystemBase {
 
   /** True when flywheel, turret, and hood are all at their setpoints. */
   public boolean readyToShoot() {
-    return flywheelAtSetpoint() && turretAtSetpoint() && hoodAtSetpoint();
+    boolean flywheelReady =
+        flywheelAtSetpoint() || adjustedDistance >= ShooterConstants.kIgnoreFlywheelRpmDistance;
+    return flywheelReady && turretAtSetpoint() && hoodAtSetpoint();
   }
 
   public boolean flywheelAtSetpoint() {

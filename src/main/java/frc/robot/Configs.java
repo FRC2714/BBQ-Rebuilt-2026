@@ -226,10 +226,10 @@ public final class Configs {
       rollerConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(0.0005)
+          .p(0.0015)
           .outputRange(-1, 1)
           .feedForward
-          .kV(0.006);
+          .kV(0.018);
     }
   }
 

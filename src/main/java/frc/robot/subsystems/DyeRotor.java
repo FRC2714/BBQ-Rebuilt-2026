@@ -166,6 +166,8 @@ public class DyeRotor extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Dye Rotor/Setpoint", dyeRotorCurrentTarget);
+    SmartDashboard.putNumber("Dye Rotor/velocity", encoder.getVelocity());
+
     rotorArm.setAngle(Units.rotationsToDegrees(encoder.getPosition()));
 
     pose =

@@ -156,7 +156,7 @@ public final class Configs {
       dyeRotorConfig
           .smartCurrentLimit(80)
           .idleMode(IdleMode.kCoast)
-          .inverted(true)
+          .inverted(false)
           .voltageCompensation(12);
       dyeRotorConfig
           .encoder
@@ -167,15 +167,14 @@ public final class Configs {
       dyeRotorConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(0.0001)
-          .outputRange(-0.5, 0.5)
+          .p(0.01)
+          .outputRange(-1, 1)
           .feedForward
-          .kV(0.00185);
+          .kV(0.004);
 
       dyeRotorFollowerConfig
-          .smartCurrentLimit(80)
-          .idleMode(IdleMode.kCoast)
-          .voltageCompensation(12)
+          .apply(dyeRotorConfig)
+          .disableVoltageCompensation()
           .follow(DyeRotorConstants.kDyeRotorMotorCanID, false);
     }
   }

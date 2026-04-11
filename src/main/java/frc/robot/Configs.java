@@ -6,6 +6,7 @@ import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import frc.robot.Constants.DyeRotorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -149,21 +150,32 @@ public final class Configs {
 
   public static final class DyeRotor {
     public static final SparkFlexConfig dyeRotorConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig dyeRotorFollowerConfig = new SparkFlexConfig();
 
     static {
       dyeRotorConfig
           .smartCurrentLimit(80)
           .idleMode(IdleMode.kCoast)
-          .inverted(true)
+          .inverted(false)
           .voltageCompensation(12);
-      dyeRotorConfig.encoder.quadratureMeasurementPeriod(8).quadratureAverageDepth(2);
+      dyeRotorConfig
+          .encoder
+          .quadratureMeasurementPeriod(8)
+          .quadratureAverageDepth(2)
+          .positionConversionFactor(1.0 / DyeRotorConstants.kDyeRotorGearRatio)
+          .velocityConversionFactor(1.0 / DyeRotorConstants.kDyeRotorGearRatio);
       dyeRotorConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(0.0001)
-          .outputRange(-0.5, 0.5)
+          .p(0.01)
+          .outputRange(-1, 1)
           .feedForward
-          .kV(0.00185);
+          .kV(0.004);
+
+      dyeRotorFollowerConfig
+          .apply(dyeRotorConfig)
+          .disableVoltageCompensation()
+          .follow(DyeRotorConstants.kDyeRotorMotorCanID, false);
     }
   }
 

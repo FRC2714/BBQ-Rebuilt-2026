@@ -7,6 +7,7 @@ import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import frc.robot.Constants.DyeRotorConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.ShooterConstants;
 
@@ -219,6 +220,17 @@ public final class Configs {
           .idleMode(IdleMode.kBrake)
           .inverted(false)
           .voltageCompensation(12);
+      rollerConfig
+          .encoder
+          .positionConversionFactor(1.0 / IntakeConstants.RollerConstants.kIntakeRollerGearRatio)
+          .velocityConversionFactor(1.0 / IntakeConstants.RollerConstants.kIntakeRollerGearRatio);
+      rollerConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .p(0.0001)
+          .outputRange(-1, 1)
+          .feedForward
+          .kV(0.003);
     }
   }
 

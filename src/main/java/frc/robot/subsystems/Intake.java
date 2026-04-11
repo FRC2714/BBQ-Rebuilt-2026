@@ -10,6 +10,8 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.sim.SparkRelativeEncoderSim;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -56,6 +58,7 @@ public class Intake extends SubsystemBase {
       new SparkFlex(
           Constants.IntakeConstants.RollerConstants.kIntakeRollerCanId, MotorType.kBrushless);
   private RelativeEncoder rollerEncoder = rollerMotor.getEncoder();
+  private SparkClosedLoopController rollerController = rollerMotor.getClosedLoopController();
 
   private double pivotSetpoint = 0;
   private Pose3d intakePose3d = new Pose3d();
@@ -135,8 +138,12 @@ public class Intake extends SubsystemBase {
     pivotMotor.set(IntakeConstants.PivotConstants.kPivotUpPower);
   }
 
-  private void setRollerPower(double power) {
-    rollerMotor.set(power);
+  private void setRollerVelocity(double velocityRpm) {
+    if (velocityRpm == 0) {
+      rollerMotor.stopMotor();
+    } else {
+      rollerController.setSetpoint(velocityRpm, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    }
   }
 
   public Pose3d getIntakePose3d() {
@@ -174,14 +181,14 @@ public class Intake extends SubsystemBase {
     return Commands.runEnd(
         () -> {
           isIntaking = true;
-          setRollerPower(Constants.IntakeConstants.RollerConstants.kIntakeRollerPower);
+          setRollerVelocity(Constants.IntakeConstants.RollerConstants.kIntakeRollerVelocity);
           pivotExtend();
 
           if (Robot.isSimulation()) Simulation.getInstance().startIntake();
         },
         () -> {
           isIntaking = false;
-          setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
+          setRollerVelocity(Constants.IntakeConstants.RollerConstants.kRollerStop);
 
           if (Robot.isSimulation()) Simulation.getInstance().stopIntake();
         });
@@ -191,11 +198,11 @@ public class Intake extends SubsystemBase {
   public Command extake() {
     return Commands.runEnd(
         () -> {
-          setRollerPower(Constants.IntakeConstants.RollerConstants.kExtakeRollerPower);
+          setRollerVelocity(Constants.IntakeConstants.RollerConstants.kExtakeRollerVelocity);
           pivotExtend();
         },
         () -> {
-          setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
+          setRollerVelocity(Constants.IntakeConstants.RollerConstants.kRollerStop);
         });
   }
 
@@ -203,7 +210,7 @@ public class Intake extends SubsystemBase {
   public Command stow() {
     return this.runOnce(
         () -> {
-          setRollerPower(Constants.IntakeConstants.RollerConstants.kRollerStop);
+          setRollerVelocity(Constants.IntakeConstants.RollerConstants.kRollerStop);
           pivotStow();
         });
   }
@@ -222,7 +229,7 @@ public class Intake extends SubsystemBase {
   public Command agitate() {
     return Commands.run(
             () -> {
-              setRollerPower(IntakeConstants.RollerConstants.kRollerStop);
+              setRollerVelocity(IntakeConstants.RollerConstants.kRollerStop);
               pivotMotor.set(AgitationConstants.kAgitateInPower);
             })
         .withTimeout(AgitationConstants.kStowDurationSeconds)
@@ -230,14 +237,14 @@ public class Intake extends SubsystemBase {
             // Extend phase: extend pivot, run roller
             Commands.run(
                     () -> {
-                      setRollerPower(IntakeConstants.RollerConstants.kIntakeRollerPower);
+                      setRollerVelocity(IntakeConstants.RollerConstants.kIntakeRollerVelocity);
                       pivotMotor.set(AgitationConstants.kAgitateOutPower);
                     })
                 .withTimeout(AgitationConstants.kExtendDurationSeconds))
         .repeatedly()
         .finallyDo(
             () -> {
-              setRollerPower(IntakeConstants.RollerConstants.kRollerStop);
+              setRollerVelocity(IntakeConstants.RollerConstants.kRollerStop);
               pivotExtend();
             });
   }
@@ -270,6 +277,8 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Pivot/Setpoint", pivotSetpoint);
     SmartDashboard.putBoolean("Intake/Pivot/At Setpoint?", atSetpoint());
     SmartDashboard.putBoolean("Intake/Running", isIntaking());
+
+    SmartDashboard.putNumber("Intake/Roller/Velocity", rollerEncoder.getVelocity());
 
     // 3d SIM
     intakePose3d =

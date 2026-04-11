@@ -89,7 +89,7 @@ public final class Configs {
       turretConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
-          .pid(0.05, 0, 0.001)
+          .pid(0.025, 0, 0.001)
           .outputRange(-1, 1);
       turretConfig
           .limitSwitch
@@ -133,12 +133,12 @@ public final class Configs {
           .inverted(false)
           .voltageCompensation(12);
 
-      flywheelConfigLeader.encoder.quadratureMeasurementPeriod(8).quadratureAverageDepth(2);
+      flywheelConfigLeader.encoder.quadratureMeasurementPeriod(2).quadratureAverageDepth(4);
 
       flywheelConfigLeader
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(Robot.isReal() ? 0.003 : 0.001)
+          .p(Robot.isReal() ? 0.008 : 0.001)
           .outputRange(-1, 1)
           .feedForward
           .kV(Robot.isReal() ? 0.00185 : 0.00178);

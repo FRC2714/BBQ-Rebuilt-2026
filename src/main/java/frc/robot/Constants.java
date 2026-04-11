@@ -138,10 +138,10 @@ public final class Constants {
 
   public static final class ShooterConstants {
     public static final int kTurretCanId = 29;
-    public static final int kTurretMaxRange = 200;
+    public static final int kTurretMaxRange = 190;
     public static final double kFwdLimitSwitchOffset = 16.33;
     public static final double kRevLimitSwitchOffset = -16.33;
-    public static final int kTurretMinRange = -200;
+    public static final int kTurretMinRange = -190;
     public static final double kTurretMountingOffsetDegrees = 0.0;
     public static final Transform2d turretOffset =
         new Transform2d(
@@ -244,8 +244,8 @@ public final class Constants {
       public static final int kIntakeRollerCanId = 10; // needs tuning
       public static final double kIntakeRollerGearRatio = 9.0;
       // Closed-loop velocity targets in output-shaft RPM.
-      public static final double kIntakeRollerVelocity = 600; // needs tuning
-      public static final double kExtakeRollerVelocity = -600; // needs tuning
+      public static final double kIntakeRollerVelocity = 550; // needs tuning
+      public static final double kExtakeRollerVelocity = -550; // needs tuning
       public static final double kRollerStop = 0.0;
     }
 

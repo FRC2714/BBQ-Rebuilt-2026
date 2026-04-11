@@ -288,8 +288,16 @@ public class StateMachine extends SubsystemBase {
   }
 
   public Command toggleOverride() {
+    Shooter.ShooterParams lockedParams = Shooter.getShooterParamsAt(2.5);
     return Commands.runEnd(
-            () -> m_shooter.setTurretOverride(0), () -> m_shooter.clearTurretOverride())
+            () -> {
+              m_shooter.setTurretOverride(0);
+              m_shooter.setFlywheelHoodOverride(lockedParams.rpm(), lockedParams.hoodAngle());
+            },
+            () -> {
+              m_shooter.clearTurretOverride();
+              m_shooter.clearFlywheelHoodOverride();
+            })
         .ignoringDisable(true);
   }
 

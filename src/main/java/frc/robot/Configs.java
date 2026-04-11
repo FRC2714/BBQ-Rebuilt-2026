@@ -167,10 +167,10 @@ public final class Configs {
       dyeRotorConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(0.01)
+          .p(0.001)
           .outputRange(-1, 1)
           .feedForward
-          .kV(0.004);
+          .kV(0.0575);
 
       dyeRotorFollowerConfig
           .apply(dyeRotorConfig)
@@ -226,10 +226,10 @@ public final class Configs {
       rollerConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(0.0001)
+          .p(0.0005)
           .outputRange(-1, 1)
           .feedForward
-          .kV(0.003);
+          .kV(0.006);
     }
   }
 

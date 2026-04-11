@@ -191,7 +191,7 @@ public final class Constants {
     public static final int kDyeRotorFollowerMotorCanID = 61;
     public static final double kDyeRotorGearRatio = 31.25;
     // Closed-loop velocity target in output-shaft RPM (multiplied by gear ratio before setpoint).
-    public static final double kDyeRotorVelocity = 100.0;
+    public static final double kDyeRotorVelocity = 150;
   }
 
   public static final class ClimbConstants {
@@ -243,8 +243,8 @@ public final class Constants {
       public static final int kIntakeRollerCanId = 10; // needs tuning
       public static final double kIntakeRollerGearRatio = 3.0;
       // Closed-loop velocity targets in output-shaft RPM.
-      public static final double kIntakeRollerVelocity = 2000; // needs tuning
-      public static final double kExtakeRollerVelocity = -2000; // needs tuning
+      public static final double kIntakeRollerVelocity = 900; // needs tuning
+      public static final double kExtakeRollerVelocity = -900; // needs tuning
       public static final double kRollerStop = 0.0;
     }
 

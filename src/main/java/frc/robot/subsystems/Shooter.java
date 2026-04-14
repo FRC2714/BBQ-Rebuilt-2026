@@ -91,7 +91,9 @@ public class Shooter extends SubsystemBase {
   private double turretOverrideTarget = TurretSetpoints.kStow;
   private double hoodCurrentTarget = HoodSetpoints.kStow;
   private double flywheelCurrentTarget = FlywheelSetpoints.kStow;
+  private boolean flywheelHoodOverrideEnabled = false;
   private double turretFeedforward = 0;
+  private double adjustedDistance = 0;
 
   // Raw (non-lead-compensated) values for simulation — these point at the actual hub
   // rather than the predicted future position, so MapleLib doesn't double-compensate.
@@ -136,9 +138,9 @@ public class Shooter extends SubsystemBase {
     shooterMap.put(1.2, new ShooterParams(2650.0, 72.276537, 0.81));
     shooterMap.put(2.0, new ShooterParams(2714.0, 67.276537, 0.91));
     shooterMap.put(3.0, new ShooterParams(3250.0, 64.276537, 1.09));
-    shooterMap.put(4.0, new ShooterParams(3650.0, 62.276537, 1.22));
-    shooterMap.put(5.0, new ShooterParams(4150.0, 58.276537, 1.44));
-    shooterMap.put(6.0, new ShooterParams(4350.0, ShooterConstants.kHoodMinAngle, 1.38));
+    shooterMap.put(4.0, new ShooterParams(3650.0, 62.276537, 1.28));
+    shooterMap.put(5.0, new ShooterParams(3800, 56.5, 1.36));
+    shooterMap.put(6.0, new ShooterParams(4350.0, ShooterConstants.kHoodMinAngle, 1.40));
     shooterMap.put(7.0, new ShooterParams(5200.0, 54.276537, 1.59));
     shooterMap.put(8.0, new ShooterParams(5950.0, 54.276537, 1.53));
     shooterMap.put(8.5, new ShooterParams(6300.0, 54.276537, 1.64));
@@ -201,7 +203,7 @@ public class Shooter extends SubsystemBase {
     }
 
     // 5. Once converged, look up control variables for the adjusted position
-    double adjustedDistance = adjustedRelativePosition.getNorm();
+    this.adjustedDistance = adjustedRelativePosition.getNorm();
     ShooterParams adjustedParams = shooterMap.get(adjustedDistance);
 
     // Aim toward the predicted future position of the target rather than its
@@ -211,8 +213,10 @@ public class Shooter extends SubsystemBase {
     double requiredHoodAngle = adjustedParams.hoodAngle;
 
     // 6. Set outputs
-    this.flywheelCurrentTarget = requiredRpm;
-    this.hoodCurrentTarget = requiredHoodAngle;
+    if (!flywheelHoodOverrideEnabled) {
+      this.flywheelCurrentTarget = requiredRpm;
+      this.hoodCurrentTarget = requiredHoodAngle;
+    }
     this.turretCurrentTarget =
         MathUtil.clamp(
             turretAngle.relativeTo(robotHeading).getDegrees(),
@@ -426,7 +430,9 @@ public class Shooter extends SubsystemBase {
 
   /** True when flywheel, turret, and hood are all at their setpoints. */
   public boolean readyToShoot() {
-    return flywheelAtSetpoint() && turretAtSetpoint() && hoodAtSetpoint();
+    boolean flywheelReady =
+        flywheelAtSetpoint() || adjustedDistance >= ShooterConstants.kIgnoreFlywheelRpmDistance;
+    return flywheelReady && turretAtSetpoint() && hoodAtSetpoint();
   }
 
   public boolean flywheelAtSetpoint() {
@@ -557,6 +563,22 @@ public class Shooter extends SubsystemBase {
 
   public void clearTurretOverride() {
     turretOverrideEnabled = false;
+  }
+
+  /** Locks flywheel RPM and hood angle, preventing {@link #calculate} from updating them. */
+  public void setFlywheelHoodOverride(double rpm, double hoodAngle) {
+    flywheelHoodOverrideEnabled = true;
+    flywheelCurrentTarget = rpm;
+    hoodCurrentTarget = hoodAngle;
+  }
+
+  public void clearFlywheelHoodOverride() {
+    flywheelHoodOverrideEnabled = false;
+  }
+
+  /** Looks up the shooter parameters (rpm, hood angle, time-of-flight) for a given distance. */
+  public static ShooterParams getShooterParamsAt(double distanceMeters) {
+    return shooterMap.get(distanceMeters);
   }
 
   private double getActiveTurretTarget() {

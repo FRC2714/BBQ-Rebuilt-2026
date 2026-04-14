@@ -6,6 +6,8 @@ import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import frc.robot.Constants.DyeRotorConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.ShooterConstants;
 
@@ -87,7 +89,7 @@ public final class Configs {
       turretConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
-          .pid(0.05, 0, 0.001)
+          .pid(0.075, 0, 0.001)
           .outputRange(-1, 1);
       turretConfig
           .limitSwitch
@@ -105,6 +107,7 @@ public final class Configs {
           .forwardSoftLimit(ShooterConstants.kTurretMaxRange)
           .reverseSoftLimitEnabled(true)
           .reverseSoftLimit(ShooterConstants.kTurretMinRange);
+      turretConfig.signals.externalOrAltEncoderPosition(5);
 
       hoodConfig
           .smartCurrentLimit(20)
@@ -125,12 +128,12 @@ public final class Configs {
           .kS(0.175);
 
       flywheelConfigLeader
-          .smartCurrentLimit(60)
+          .smartCurrentLimit(73)
           .idleMode(IdleMode.kCoast)
           .inverted(false)
           .voltageCompensation(12);
 
-      flywheelConfigLeader.encoder.quadratureMeasurementPeriod(8).quadratureAverageDepth(2);
+      flywheelConfigLeader.encoder.quadratureMeasurementPeriod(20).quadratureAverageDepth(8);
 
       flywheelConfigLeader
           .closedLoop
@@ -148,21 +151,32 @@ public final class Configs {
 
   public static final class DyeRotor {
     public static final SparkFlexConfig dyeRotorConfig = new SparkFlexConfig();
+    public static final SparkFlexConfig dyeRotorFollowerConfig = new SparkFlexConfig();
 
     static {
       dyeRotorConfig
-          .smartCurrentLimit(80)
+          .smartCurrentLimit(60)
           .idleMode(IdleMode.kCoast)
-          .inverted(true)
+          .inverted(false)
           .voltageCompensation(12);
-      dyeRotorConfig.encoder.quadratureMeasurementPeriod(8).quadratureAverageDepth(2);
+      dyeRotorConfig
+          .encoder
+          .quadratureMeasurementPeriod(8)
+          .quadratureAverageDepth(2)
+          .positionConversionFactor(1.0 / DyeRotorConstants.kDyeRotorGearRatio)
+          .velocityConversionFactor(1.0 / DyeRotorConstants.kDyeRotorGearRatio);
       dyeRotorConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(0.0001)
-          .outputRange(-0.5, 0.5)
+          .p(0.001)
+          .outputRange(-1, 1)
           .feedForward
-          .kV(0.00185);
+          .kV(0.0575);
+
+      dyeRotorFollowerConfig
+          .apply(dyeRotorConfig)
+          .disableVoltageCompensation()
+          .follow(DyeRotorConstants.kDyeRotorMotorCanID, false);
     }
   }
 
@@ -172,7 +186,7 @@ public final class Configs {
 
     static {
       pivotConfig
-          .smartCurrentLimit(60)
+          .smartCurrentLimit(80)
           .idleMode(IdleMode.kBrake)
           .inverted(true)
           .voltageCompensation(12);
@@ -206,6 +220,17 @@ public final class Configs {
           .idleMode(IdleMode.kBrake)
           .inverted(false)
           .voltageCompensation(12);
+      rollerConfig
+          .encoder
+          .positionConversionFactor(1.0 / IntakeConstants.RollerConstants.kIntakeRollerGearRatio)
+          .velocityConversionFactor(1.0 / IntakeConstants.RollerConstants.kIntakeRollerGearRatio);
+      rollerConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .p(0.0015)
+          .outputRange(-1, 1)
+          .feedForward
+          .kV(0.018);
     }
   }
 

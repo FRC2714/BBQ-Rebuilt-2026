@@ -471,7 +471,6 @@ public class DriveSubsystem extends SubsystemBase {
   /** Zeroes the heading of the robot. */
   public void zeroPose(double heading) {
     Pose2d pose = new Pose2d(0, 0, Rotation2d.fromDegrees(heading));
-    setDriverHeadingOffset(heading);
 
     m_gyro.setYaw(pose.getRotation().getRotations());
     m_poseEstimator.resetRotation(pose.getRotation());

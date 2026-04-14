@@ -167,6 +167,7 @@ public class StateMachine extends SubsystemBase {
                 m_drivetrain.zeroPose(0);
                 System.out.println("zeroed blue");
               }
+              m_drivetrain.zeroDriverHeading();
             })
         .ignoringDisable(true);
   }

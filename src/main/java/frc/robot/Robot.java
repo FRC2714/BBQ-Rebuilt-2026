@@ -121,6 +121,10 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
+
+    // Always assumme hood is zeroed in auto, either manually before a match for automatically via
+    // teleop. During testing, it will auto-zero if we run teleop before auto.
+    m_robotContainer.m_shooter.setHasHoodBeenZeroed(true);
   }
 
   /** This function is called periodically during autonomous. */
@@ -143,7 +147,12 @@ public class Robot extends TimedRobot {
         .onFalse(Commands.runOnce(() -> m_robotContainer.m_stateMachine.enablePassing()));
 
     // CommandScheduler.getInstance().schedule(m_robotContainer.m_stateMachine.unclimb());
-    CommandScheduler.getInstance().schedule(m_robotContainer.m_shooter.zeroHoodIfNeeded());
+    CommandScheduler.getInstance()
+        .schedule(
+            m_robotContainer
+                .m_stateMachine
+                .stopShoot()
+                .andThen(m_robotContainer.m_shooter.zeroHoodIfNeeded()));
   }
 
   /** This function is called periodically during operator control. */

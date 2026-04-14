@@ -192,7 +192,7 @@ public final class Constants {
     public static final int kDyeRotorFollowerMotorCanID = 61;
     public static final double kDyeRotorGearRatio = 31.25;
     // Closed-loop velocity target in output-shaft RPM (multiplied by gear ratio before setpoint).
-    public static final double kDyeRotorVelocity = 150;
+    public static final double kDyeRotorVelocity = 165;
   }
 
   public static final class ClimbConstants {

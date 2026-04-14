@@ -89,7 +89,7 @@ public final class Configs {
       turretConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
-          .pid(0.025, 0, 0.001)
+          .pid(0.075, 0, 0.001)
           .outputRange(-1, 1);
       turretConfig
           .limitSwitch
@@ -128,17 +128,17 @@ public final class Configs {
           .kS(0.175);
 
       flywheelConfigLeader
-          .smartCurrentLimit(60)
+          .smartCurrentLimit(73)
           .idleMode(IdleMode.kCoast)
           .inverted(false)
           .voltageCompensation(12);
 
-      flywheelConfigLeader.encoder.quadratureMeasurementPeriod(2).quadratureAverageDepth(4);
+      flywheelConfigLeader.encoder.quadratureMeasurementPeriod(20).quadratureAverageDepth(8);
 
       flywheelConfigLeader
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(Robot.isReal() ? 0.008 : 0.001)
+          .p(Robot.isReal() ? 0.001 : 0.001)
           .outputRange(-1, 1)
           .feedForward
           .kV(Robot.isReal() ? 0.00185 : 0.00178);
@@ -155,7 +155,7 @@ public final class Configs {
 
     static {
       dyeRotorConfig
-          .smartCurrentLimit(80)
+          .smartCurrentLimit(60)
           .idleMode(IdleMode.kCoast)
           .inverted(false)
           .voltageCompensation(12);
@@ -186,7 +186,7 @@ public final class Configs {
 
     static {
       pivotConfig
-          .smartCurrentLimit(60)
+          .smartCurrentLimit(80)
           .idleMode(IdleMode.kBrake)
           .inverted(true)
           .voltageCompensation(12);

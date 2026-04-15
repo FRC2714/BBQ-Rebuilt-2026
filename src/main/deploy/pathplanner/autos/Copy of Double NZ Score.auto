@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Copy of Depot to NZ"
+            "pathName": "Depot to NZ Triangle"
           }
         },
         {
@@ -42,9 +42,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "SCORE"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Rotate to Shoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SCORE"
+                }
+              }
+            ]
           }
         }
       ]

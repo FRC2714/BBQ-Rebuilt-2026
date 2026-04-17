@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 3.6101431568287037,
-        "y": 5.930513552068473
+        "y": 2.279486447931527
       },
       "prevControl": null,
       "nextControl": {
         "x": 5.926163128298034,
-        "y": 5.904636233951498
+        "y": 2.305363766048502
       },
       "isLocked": false,
       "linkedName": null
@@ -17,15 +17,15 @@
     {
       "anchor": {
         "x": 6.726406581038135,
-        "y": 5.930513552068473
+        "y": 2.279486447931527
       },
       "prevControl": {
         "x": 5.914293358719899,
-        "y": 5.903443111324531
+        "y": 2.306556888675469
       },
       "nextControl": {
         "x": 7.547380211486076,
-        "y": 5.957879339750072
+        "y": 2.252120660249928
       },
       "isLocked": false,
       "linkedName": null
@@ -33,47 +33,47 @@
     {
       "anchor": {
         "x": 7.941353189315981,
-        "y": 5.086695530039346
+        "y": 3.123304469960654
       },
       "prevControl": {
         "x": 7.957480988952785,
-        "y": 6.197411943855932
+        "y": 2.012588056144068
       },
       "nextControl": {
         "x": 7.909582356084997,
-        "y": 2.8986483850491376
-      },
-      "isLocked": false,
-      "linkedName": "nz_to_score"
-    },
-    {
-      "anchor": {
-        "x": 5.625727148910411,
-        "y": 5.5444359085648145
-      },
-      "prevControl": {
-        "x": 6.619660482243743,
-        "y": 5.213124797453704
-      },
-      "nextControl": {
-        "x": 5.2467070894881624,
-        "y": 5.6707759283722305
+        "y": 5.311351614950862
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.133352353780314,
-        "y": 5.5444359085648145
+        "x": 5.625727148910411,
+        "y": 2.6655640914351855
       },
       "prevControl": {
-        "x": 3.8449786019971466,
-        "y": 5.544435908564814
+        "x": 6.619660482243743,
+        "y": 2.996875202546296
+      },
+      "nextControl": {
+        "x": 5.2467070894881624,
+        "y": 2.5392240716277694
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.338318721064815,
+        "y": 2.6655640914351855
+      },
+      "prevControl": {
+        "x": 4.049944969281648,
+        "y": 2.665564091435186
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "after first score depot"
+      "linkedName": "after first score depot triangle mirrored"
     }
   ],
   "rotationTargets": [
@@ -83,11 +83,11 @@
     },
     {
       "waypointRelativePos": 1.950952540106952,
-      "rotationDegrees": -90.0
+      "rotationDegrees": 90.0
     },
     {
       "waypointRelativePos": 2.03319502074688,
-      "rotationDegrees": -89.38233143952431
+      "rotationDegrees": 89.38233143952431
     }
   ],
   "constraintZones": [
@@ -107,7 +107,7 @@
     {
       "name": "head back",
       "minWaypointRelativePos": 2.27658195020747,
-      "maxWaypointRelativePos": 3.165428764348404,
+      "maxWaypointRelativePos": 3.2194463200540113,
       "constraints": {
         "maxVelocity": 1.75,
         "maxAcceleration": 1.0,
@@ -132,7 +132,7 @@
     },
     {
       "name": "slow over bump backward",
-      "minWaypointRelativePos": 2.93855503038488,
+      "minWaypointRelativePos": 2.8953409858203862,
       "maxWaypointRelativePos": 4.0,
       "constraints": {
         "maxVelocity": 1.5,
@@ -168,7 +168,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": "Double NZ Score",

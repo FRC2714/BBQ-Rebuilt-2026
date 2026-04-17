@@ -78,6 +78,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final Field2d m_field2d = new Field2d();
 
+  private boolean isAuto = false;
+
   private double m_driverHeadingOffsetDeg = 0.0; // Used for relative heading for the driver
 
   private static final double[] BLUE_ZONE = {
@@ -260,6 +262,8 @@ public class DriveSubsystem extends SubsystemBase {
         driveRoutine.dynamic(SysIdRoutine.Direction.kReverse));
   }
 
+  
+
   public Command rotationalDynamic() {
     return new SequentialCommandGroup(
         rotationRoutine.dynamic(SysIdRoutine.Direction.kForward),
@@ -365,10 +369,16 @@ public class DriveSubsystem extends SubsystemBase {
       return;
     }
 
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+
+
+    m_frontLeft.setDesiredState(swerveModuleStates[0], isAuto);
+    m_frontRight.setDesiredState(swerveModuleStates[1], isAuto);
+    m_rearLeft.setDesiredState(swerveModuleStates[2], isAuto);
+    m_rearRight.setDesiredState(swerveModuleStates[3], isAuto);
+  }
+
+  public void setIsAuto(boolean auto){
+    isAuto = auto;
   }
 
   /** Drives the robot with ChassisSpeeds (m/s and rad/s). */
@@ -402,18 +412,18 @@ public class DriveSubsystem extends SubsystemBase {
       return;
     }
 
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+    m_frontLeft.setDesiredState(swerveModuleStates[0], isAuto);
+    m_frontRight.setDesiredState(swerveModuleStates[1], isAuto);
+    m_rearLeft.setDesiredState(swerveModuleStates[2], isAuto);
+    m_rearRight.setDesiredState(swerveModuleStates[3], isAuto);
   }
 
   /** Sets the wheels into an X formation to prevent movement. */
   public void setX() {
-    m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-    m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-    m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-    m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+    m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)), isAuto);
+    m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), isAuto);
+    m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), isAuto);
+    m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)), isAuto);
   }
 
   /** Enables half-speed driving for shooting stability. */
@@ -445,10 +455,10 @@ public class DriveSubsystem extends SubsystemBase {
       return;
     }
 
-    m_frontLeft.setDesiredState(desiredStates[0]);
-    m_frontRight.setDesiredState(desiredStates[1]);
-    m_rearLeft.setDesiredState(desiredStates[2]);
-    m_rearRight.setDesiredState(desiredStates[3]);
+    m_frontLeft.setDesiredState(desiredStates[0], isAuto);
+    m_frontRight.setDesiredState(desiredStates[1], isAuto);
+    m_rearLeft.setDesiredState(desiredStates[2], isAuto);
+    m_rearRight.setDesiredState(desiredStates[3], isAuto);
   }
 
   public SwerveModuleState[] getModuleStates() {

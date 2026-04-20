@@ -105,20 +105,15 @@ public class MAXSwerveModule {
     // Optimize the reference state to avoid spinning further than 90 degrees.
     correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.getPosition()));
 
-    if(isAuto)
-    {
-          m_drivingClosedLoopController.setSetpoint(
-        correctedDesiredState.speedMetersPerSecond,
-        ControlType.kVelocity,
-        ClosedLoopSlot.kSlot0
-          );
-    }
-    else{
-          m_drivingClosedLoopController.setSetpoint(
-        correctedDesiredState.speedMetersPerSecond,
-        ControlType.kVelocity,
-        ClosedLoopSlot.kSlot0,
-        DriveConstants.kDriveFeedforward.calculate(correctedDesiredState.speedMetersPerSecond));
+    if (isAuto) {
+      m_drivingClosedLoopController.setSetpoint(
+          correctedDesiredState.speedMetersPerSecond, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    } else {
+      m_drivingClosedLoopController.setSetpoint(
+          correctedDesiredState.speedMetersPerSecond,
+          ControlType.kVelocity,
+          ClosedLoopSlot.kSlot0,
+          DriveConstants.kDriveFeedforward.calculate(correctedDesiredState.speedMetersPerSecond));
     }
 
     // Command driving and turning SPARKS towards their respective setpoints.

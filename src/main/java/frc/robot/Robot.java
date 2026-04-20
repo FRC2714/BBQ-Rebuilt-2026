@@ -140,7 +140,6 @@ public class Robot extends TimedRobot {
     // this line or comm
     m_robotContainer.m_robotDrive.setIsAuto(false);
 
-
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

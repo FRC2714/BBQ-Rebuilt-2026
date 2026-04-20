@@ -262,8 +262,6 @@ public class DriveSubsystem extends SubsystemBase {
         driveRoutine.dynamic(SysIdRoutine.Direction.kReverse));
   }
 
-  
-
   public Command rotationalDynamic() {
     return new SequentialCommandGroup(
         rotationRoutine.dynamic(SysIdRoutine.Direction.kForward),
@@ -369,15 +367,13 @@ public class DriveSubsystem extends SubsystemBase {
       return;
     }
 
-
-
     m_frontLeft.setDesiredState(swerveModuleStates[0], isAuto);
     m_frontRight.setDesiredState(swerveModuleStates[1], isAuto);
     m_rearLeft.setDesiredState(swerveModuleStates[2], isAuto);
     m_rearRight.setDesiredState(swerveModuleStates[3], isAuto);
   }
 
-  public void setIsAuto(boolean auto){
+  public void setIsAuto(boolean auto) {
     isAuto = auto;
   }
 

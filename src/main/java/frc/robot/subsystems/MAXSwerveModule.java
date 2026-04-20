@@ -95,7 +95,7 @@ public class MAXSwerveModule {
    *
    * @param desiredState Desired state with speed and angle.
    */
-  public void setDesiredState(SwerveModuleState desiredState) {
+  public void setDesiredState(SwerveModuleState desiredState, boolean isAuto) {
     // Apply chassis angular offset to the desired state.
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
@@ -105,12 +105,18 @@ public class MAXSwerveModule {
     // Optimize the reference state to avoid spinning further than 90 degrees.
     correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.getPosition()));
 
+    if (isAuto) {
+      m_drivingClosedLoopController.setSetpoint(
+          correctedDesiredState.speedMetersPerSecond, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    } else {
+      m_drivingClosedLoopController.setSetpoint(
+          correctedDesiredState.speedMetersPerSecond,
+          ControlType.kVelocity,
+          ClosedLoopSlot.kSlot0,
+          DriveConstants.kDriveFeedforward.calculate(correctedDesiredState.speedMetersPerSecond));
+    }
+
     // Command driving and turning SPARKS towards their respective setpoints.
-    m_drivingClosedLoopController.setSetpoint(
-        correctedDesiredState.speedMetersPerSecond,
-        ControlType.kVelocity,
-        ClosedLoopSlot.kSlot0,
-        DriveConstants.kDriveFeedforward.calculate(correctedDesiredState.speedMetersPerSecond));
     m_turningClosedLoopController.setSetpoint(
         correctedDesiredState.angle.getRadians(), ControlType.kPosition);
 

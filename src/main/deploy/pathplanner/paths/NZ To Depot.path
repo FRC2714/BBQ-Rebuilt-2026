@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.2368616262482157,
-        "y": 5.76231098430813
+        "x": 3.133352353780314,
+        "y": 5.5444359085648145
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.826405253663017,
-        "y": 5.787936182099924
+        "x": 2.7228959811951152,
+        "y": 5.570061106356608
       },
       "isLocked": false,
       "linkedName": "after first score depot"
@@ -221,7 +221,7 @@
   "folder": "Double NZ Score",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.18561930786878814
   },
   "useDefaultConstraints": true
 }

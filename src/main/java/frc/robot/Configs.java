@@ -218,7 +218,7 @@ public final class Configs {
       rollerConfig
           .smartCurrentLimit(80)
           .idleMode(IdleMode.kBrake)
-          .inverted(false)
+          .inverted(true)
           .voltageCompensation(12);
       rollerConfig
           .encoder

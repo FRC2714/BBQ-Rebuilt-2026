@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Depot to NZ"
+            "pathName": "Center Preload"
           }
         },
         {
@@ -23,7 +23,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 4.0
+                  "waitTime": 3.5
                 }
               }
             ]
@@ -38,13 +38,20 @@
         {
           "type": "path",
           "data": {
-            "pathName": "NZ To Score"
+            "pathName": "center hairpin"
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "SCORE"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "SCORE"
+                }
+              }
+            ]
           }
         }
       ]

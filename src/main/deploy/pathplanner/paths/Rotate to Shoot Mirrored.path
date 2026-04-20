@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.068659058487874,
+        "y": 2.6655640914351855
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.0874133211060704,
+        "y": 2.3952640728743693
+      },
+      "isLocked": false,
+      "linkedName": "after second nz mirrored"
+    },
+    {
+      "anchor": {
+        "x": 3.068659058487874,
+        "y": 2.6655640914351855
+      },
+      "prevControl": {
+        "x": 3.077667316531938,
+        "y": 2.9286640914351842
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 50.0,
+    "maxAngularAcceleration": 100.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -360.0
+  },
+  "reversed": false,
+  "folder": "Double NZ Score",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 178.40885972880565
+  },
+  "useDefaultConstraints": false
+}

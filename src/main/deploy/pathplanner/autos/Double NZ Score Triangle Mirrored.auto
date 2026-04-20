@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Depot to NZ Mirrored"
+            "pathName": "Depot to NZ Triangle Mirrored"
           }
         },
         {
@@ -23,7 +23,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 3.0
+                  "waitTime": 3.5
                 }
               }
             ]
@@ -38,13 +38,26 @@
         {
           "type": "path",
           "data": {
-            "pathName": "NZ To Score Mirrored"
+            "pathName": "NZ To Score Triangle Mirrored"
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "SCORE"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Rotate to Shoot Mirrored"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SCORE"
+                }
+              }
+            ]
           }
         }
       ]

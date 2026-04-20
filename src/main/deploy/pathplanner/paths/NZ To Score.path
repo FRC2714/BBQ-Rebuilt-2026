@@ -94,6 +94,10 @@
   ],
   "rotationTargets": [
     {
+      "waypointRelativePos": 0.6609808102345434,
+      "rotationDegrees": 0.0
+    },
+    {
       "waypointRelativePos": 1.4029850746268575,
       "rotationDegrees": -88.58233694857138
     },
@@ -177,7 +181,7 @@
   "folder": "Double NZ Score",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.18561930786878814
   },
   "useDefaultConstraints": true
 }

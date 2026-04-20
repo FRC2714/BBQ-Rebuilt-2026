@@ -88,6 +88,10 @@
     {
       "waypointRelativePos": 2.03319502074688,
       "rotationDegrees": 89.38233143952431
+    },
+    {
+      "waypointRelativePos": 3.002132196162035,
+      "rotationDegrees": 0.0
     }
   ],
   "constraintZones": [
@@ -109,8 +113,8 @@
       "minWaypointRelativePos": 2.27658195020747,
       "maxWaypointRelativePos": 3.2194463200540113,
       "constraints": {
-        "maxVelocity": 1.75,
-        "maxAcceleration": 1.0,
+        "maxVelocity": 1.5,
+        "maxAcceleration": 3.0,
         "maxAngularVelocity": 120.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -136,7 +140,7 @@
       "maxWaypointRelativePos": 4.0,
       "constraints": {
         "maxVelocity": 1.5,
-        "maxAcceleration": 1.0,
+        "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -168,7 +172,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 0.19788946833297605
   },
   "reversed": false,
   "folder": "Double NZ Score",

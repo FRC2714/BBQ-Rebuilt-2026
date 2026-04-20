@@ -221,7 +221,7 @@
   "folder": "Double NZ Score",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.18561930786878814
   },
   "useDefaultConstraints": true
 }

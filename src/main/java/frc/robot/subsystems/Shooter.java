@@ -105,6 +105,7 @@ public class Shooter extends SubsystemBase {
   public boolean turretUpdated = false;
 
   private boolean isShooting = false;
+  private boolean zeroingTurret = false;
   private boolean zeroingHood = false;
   private boolean hasHoodBeenZeroed = false;
 
@@ -512,30 +513,48 @@ public class Shooter extends SubsystemBase {
 
   public Command zeroTurretSequenceRight() {
 
-    return new RunCommand(
-            () -> {
-              turretMotor.set(.35);
-            },
-            this)
-        .until(
-            () ->
-                turretMotor.getForwardLimitSwitch().isPressed()
-                    || turretMotor.getReverseLimitSwitch().isPressed())
-        .andThen(new InstantCommand(() -> turretMotor.set(0), this));
+    return this.runOnce(() -> zeroingTurret = true)
+        .andThen(
+            new RunCommand(
+                    () -> {
+                      turretMotor.set(.35);
+                    },
+                    this)
+                .until(
+                    () ->
+                        turretMotor.getForwardLimitSwitch().isPressed()
+                            || turretMotor.getReverseLimitSwitch().isPressed()))
+        .andThen(
+            new InstantCommand(
+                () -> {
+                  turretMotor.set(0);
+                  zeroingTurret = false;
+                  wasZeroed = true;
+                },
+                this));
   }
 
   public Command zeroTurretSequenceLeft() {
 
-    return new RunCommand(
-            () -> {
-              turretMotor.set(-.35);
-            },
-            this)
-        .until(
-            () ->
-                turretMotor.getForwardLimitSwitch().isPressed()
-                    || turretMotor.getReverseLimitSwitch().isPressed())
-        .andThen(new InstantCommand(() -> turretMotor.set(0), this));
+    return this.runOnce(() -> zeroingTurret = true)
+        .andThen(
+            new RunCommand(
+                    () -> {
+                      turretMotor.set(-.35);
+                    },
+                    this)
+                .until(
+                    () ->
+                        turretMotor.getForwardLimitSwitch().isPressed()
+                            || turretMotor.getReverseLimitSwitch().isPressed()))
+        .andThen(
+            new InstantCommand(
+                () -> {
+                  turretMotor.set(0);
+                  zeroingTurret = false;
+                  wasZeroed = true;
+                },
+                this));
   }
 
   /** Disables limit-switch-triggered motor stop so turret can move freely after zeroing. */
@@ -609,14 +628,16 @@ public class Shooter extends SubsystemBase {
   }
 
   public void run() {
-    turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
-    turretOverrideTarget = normalizeTurretTarget(turretOverrideTarget);
-    double activeTurretTarget = getActiveTurretTarget();
-    turretController.setSetpoint(
-        activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        turretOverrideEnabled ? 0 : turretFeedforward);
+    if (!zeroingTurret) {
+      turretCurrentTarget = normalizeTurretTarget(turretCurrentTarget);
+      turretOverrideTarget = normalizeTurretTarget(turretOverrideTarget);
+      double activeTurretTarget = getActiveTurretTarget();
+      turretController.setSetpoint(
+          activeTurretTarget + ShooterConstants.kTurretMountingOffsetDegrees,
+          ControlType.kPosition,
+          ClosedLoopSlot.kSlot0,
+          turretOverrideEnabled ? 0 : turretFeedforward);
+    }
 
     SmartDashboard.putNumber("hood position", hoodRelativeEncoder.getPosition());
     if (!zeroingHood) {

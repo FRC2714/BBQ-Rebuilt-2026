@@ -314,6 +314,7 @@ public class StateMachine extends SubsystemBase {
   public Command stopShoot() {
     return m_shooter
         .stopShooter()
+        .andThen(m_shooter.stowTurretCommand())
         .alongWith(m_dyeRotor.stop())
         .withName("stop shooting")
         .beforeStarting(
@@ -372,10 +373,8 @@ public class StateMachine extends SubsystemBase {
         .intake()
         .alongWith(
             Commands.waitUntil(
-                    () ->
-                        m_intake.getIntakePivotPosition()
-                            < IntakeConstants.PivotConstants.kPivotClear)
-                .andThen(() -> m_shooter.clearTurretOverride()))
+                () ->
+                    m_intake.getIntakePivotPosition() < IntakeConstants.PivotConstants.kPivotClear))
         .onlyIf(StateMachine::isNotClimbing));
   }
 
